@@ -1,0 +1,53 @@
+// app/hooks/useFirebase.js
+import { useState, useEffect } from 'react';
+import { db } from '../../config/firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { useAuth } from './useAuth';
+
+export const useFirebase = () => {
+  const { isSignedIn, user } = useAuth();
+  const [loading, setLoading] = useState(false);
+  
+  const getUserData = async () => {
+    if (!isSignedIn || !user) return null;
+    
+    try {
+      setLoading(true);
+      const userRef = doc(db, 'users', user.id);
+      const docSnap = await getDoc(userRef);
+      
+      if (docSnap.exists()) {
+        return docSnap.data();
+      }
+      return null;
+    } catch (error) {
+      console.error('Error getting user data:', error);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const updateUserData = async (data) => {
+    if (!isSignedIn || !user) return false;
+    
+    try {
+      setLoading(true);
+      const userRef = doc(db, 'users', user.id);
+      
+      await setDoc(userRef, {
+        ...data,
+        updatedAt: new Date()
+      }, { merge: true });
+      
+      return true;
+    } catch (error) {
+      console.error('Error updating user data:', error);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  return { getUserData, updateUserData, loading };
+};
