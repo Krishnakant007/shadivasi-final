@@ -1227,16 +1227,114 @@
 // 12/09/2025
 
 // app/_layout.jsx
+// import { Stack } from "expo-router";
+// import { ClerkProvider } from "@clerk/clerk-expo";
+// import * as SecureStore from 'expo-secure-store';
+// import { View } from "react-native";
+// import { LanguageProvider } from './context/LanguageContext';
+// import { ProfileProvider } from './context/ProfileContext';
+// import AuthStateHandler from './components/AuthStateHandler';
+// import { ProfileProgressProvider } from './context/ProfileProgressContext';
+// import { AuthProvider } from './context/AuthContext';
+
+// const tokenCache = {
+//   async getToken(key) {
+//     try {
+//       return SecureStore.getItemAsync(key);
+//     } catch (err) {
+//       return null;
+//     }
+//   },
+//   async saveToken(key, value) {
+//     try {
+//       return SecureStore.setItemAsync(key, value);
+//     } catch (err) {
+//       return;
+//     }
+//   },
+// };
+
+// function AppContent() {
+//   return (
+//     <ProfileProgressProvider>
+//       <AuthStateHandler />
+//       <Stack screenOptions={{ headerShown: false }}>
+//         {/* Tab Navigator */}
+//         <Stack.Screen name="(tabs)" />
+        
+//         {/* Chat Screens */}
+//         <Stack.Screen name="chat/[id]" options={{ headerShown: false, title: 'Chat' }} />
+        
+//         {/* Profile Screens */}
+//         <Stack.Screen name="profile/[id]" options={{ headerShown: true, title: 'Profile' }} />
+        
+//         {/* New Screens - Add all your new screens here */}
+//         <Stack.Screen name="EditProfile" options={{ headerShown: false }} />
+//         <Stack.Screen name="EditPartnerPreference" options={{ headerShown: false }} />
+//         <Stack.Screen name="AccountSettings" options={{ headerShown: false }} />
+//         <Stack.Screen name="TermsAndConditions" options={{ headerShown: false }} />
+//         <Stack.Screen name="PrivacyPolicy" options={{ headerShown: false }} />
+//         <Stack.Screen name="DailyMatches" options={{ headerShown: false }} />
+//         <Stack.Screen name="HelpSupport" options={{ headerShown: false }} />
+        
+//         {/* Add any other screens you might have */}
+//         <Stack.Screen name="Upgrade" options={{ headerShown: false }} />
+//         <Stack.Screen name="Matches" options={{ headerShown: false }} />
+//         <Stack.Screen name="Messages" options={{ headerShown: false }} />
+//       </Stack>
+//     </ProfileProgressProvider>
+//   );
+// }
+
+// export default function RootLayout() {
+//   return (
+//     <ClerkProvider
+//       tokenCache={tokenCache}
+//       publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}
+//     >
+//       <LanguageProvider>
+//         <ProfileProvider>
+//           <AuthProvider>
+//             <AppContent />
+//           </AuthProvider>
+//         </ProfileProvider>
+//       </LanguageProvider>
+//     </ClerkProvider>
+//   );
+// }
+
+
+
+
+
+
+
+//19/09/2025
+
+// app/_layout.jsx
 import { Stack } from "expo-router";
 import { ClerkProvider } from "@clerk/clerk-expo";
-import * as SecureStore from 'expo-secure-store';
-import { View } from "react-native";
-import { LanguageProvider } from './context/LanguageContext';
-import { ProfileProvider } from './context/ProfileContext';
-import AuthStateHandler from './components/AuthStateHandler';
-import { ProfileProgressProvider } from './context/ProfileProgressContext';
-import { AuthProvider } from './context/AuthContext';
+import * as SecureStore from "expo-secure-store";
+import { useEffect, useRef } from "react";
+import { Platform } from "react-native";
+import * as Notifications from "expo-notifications";
 
+import { LanguageProvider } from "./context/LanguageContext";
+import { ProfileProvider } from "./context/ProfileContext";
+import AuthStateHandler from "./components/AuthStateHandler";
+import { ProfileProgressProvider } from "./context/ProfileProgressContext";
+import { AuthProvider } from "./context/AuthContext";
+
+// ✅ Notification handler config
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
+
+// Clerk token cache
 const tokenCache = {
   async getToken(key) {
     try {
@@ -1255,35 +1353,108 @@ const tokenCache = {
 };
 
 function AppContent() {
+  const notificationListener = useRef();
+  const responseListener = useRef();
+
+  useEffect(() => {
+    // ✅ Register for push notifications
+    registerForPushNotificationsAsync().then((token) => {
+      console.log("Expo Push Token:", token);
+    });
+
+    // ✅ Listen for foreground notifications
+    notificationListener.current =
+      Notifications.addNotificationReceivedListener((notification) => {
+        console.log("Notification received:", notification);
+      });
+
+    // ✅ Listen for notification responses (when user taps)
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        console.log("Notification response:", response);
+      });
+
+    return () => {
+      if (notificationListener.current) {
+        Notifications.removeNotificationSubscription(
+          notificationListener.current
+        );
+      }
+      if (responseListener.current) {
+        Notifications.removeNotificationSubscription(responseListener.current);
+      }
+    };
+  }, []);
+
   return (
     <ProfileProgressProvider>
       <AuthStateHandler />
       <Stack screenOptions={{ headerShown: false }}>
         {/* Tab Navigator */}
         <Stack.Screen name="(tabs)" />
-        
+
         {/* Chat Screens */}
-        <Stack.Screen name="chat/[id]" options={{ headerShown: false, title: 'Chat' }} />
-        
+        <Stack.Screen
+          name="chat/[id]"
+          options={{ headerShown: false, title: "Chat" }}
+        />
+
         {/* Profile Screens */}
-        <Stack.Screen name="profile/[id]" options={{ headerShown: true, title: 'Profile' }} />
-        
-        {/* New Screens - Add all your new screens here */}
+        <Stack.Screen
+          name="profile/[id]"
+          options={{ headerShown: true, title: "Profile" }}
+        />
+
+        {/* New Screens */}
         <Stack.Screen name="EditProfile" options={{ headerShown: false }} />
-        <Stack.Screen name="EditPartnerPreference" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="EditPartnerPreference"
+          options={{ headerShown: false }}
+        />
         <Stack.Screen name="AccountSettings" options={{ headerShown: false }} />
-        <Stack.Screen name="TermsAndConditions" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="TermsAndConditions"
+          options={{ headerShown: false }}
+        />
         <Stack.Screen name="PrivacyPolicy" options={{ headerShown: false }} />
         <Stack.Screen name="DailyMatches" options={{ headerShown: false }} />
         <Stack.Screen name="HelpSupport" options={{ headerShown: false }} />
-        
-        {/* Add any other screens you might have */}
         <Stack.Screen name="Upgrade" options={{ headerShown: false }} />
         <Stack.Screen name="Matches" options={{ headerShown: false }} />
         <Stack.Screen name="Messages" options={{ headerShown: false }} />
       </Stack>
     </ProfileProgressProvider>
   );
+}
+
+// ✅ Register for push notifications function
+async function registerForPushNotificationsAsync() {
+  let token;
+  if (Platform.OS === "android") {
+    await Notifications.setNotificationChannelAsync("default", {
+      name: "default",
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: "#FF231F7C",
+    });
+  }
+
+  const { status: existingStatus } =
+    await Notifications.getPermissionsAsync();
+  let finalStatus = existingStatus;
+
+  if (existingStatus !== "granted") {
+    const { status } = await Notifications.requestPermissionsAsync();
+    finalStatus = status;
+  }
+
+  if (finalStatus !== "granted") {
+    alert("Failed to get push token for notifications!");
+    return null;
+  }
+
+  token = (await Notifications.getExpoPushTokenAsync()).data;
+  return token;
 }
 
 export default function RootLayout() {
