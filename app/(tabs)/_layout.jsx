@@ -811,16 +811,317 @@
 //trail2
 
 // app/(tabs)/_layout.jsx
+// import { Tabs } from "expo-router";
+// import { FontAwesome } from "@expo/vector-icons";
+// import { useAuth } from "../hooks/useAuth";
+// import { Redirect } from "expo-router";
+// import { ActivityIndicator, View, StyleSheet, Platform, SafeAreaView } from "react-native";
+// import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+// export default function TabsLayout() {
+//   const { isLoaded, isSignedIn, profileCompleted, loading } = useAuth();
+//   const insets = useSafeAreaInsets();
+
+//   if (!isLoaded || loading) {
+//     return (
+//       <SafeAreaView style={styles.safeArea}>
+//         <View style={styles.loadingContainer}>
+//           <ActivityIndicator size="large" color="#FF6B6B" />
+//         </View>
+//       </SafeAreaView>
+//     );
+//   }
+
+//   if (!isSignedIn) return <Redirect href="/" />;
+//   if (!profileCompleted) return <Redirect href="/homescreens/info1" />;
+
+//   // Calculate dynamic padding for iOS devices
+//   const iosBottomPadding = insets.bottom > 0 ? insets.bottom - 5 : 10;
+//   const tabBarHeight = Platform.OS === "ios" ? 82 : 70;
+//   const tabBarBottom = Platform.OS === "ios" ? 10 : 15;
+
+//   return (
+//     <SafeAreaView style={styles.safeArea}>
+//       <Tabs
+//         screenOptions={{
+//           headerShown: false,
+//           tabBarShowLabel: true,
+//           tabBarActiveTintColor: "#FF6B6B",
+//           tabBarInactiveTintColor: "#888888",
+//           tabBarStyle: {
+//             backgroundColor: "#FFF",
+//             borderTopWidth: 0,
+//             elevation: 8,
+//             shadowColor: "#000",
+//             shadowOffset: { width: 0, height: -2 },
+//             shadowOpacity: 0.1,
+//             shadowRadius: 4,
+//             height: tabBarHeight,
+//             paddingBottom: Platform.OS === "ios" ? iosBottomPadding : 8,
+//             paddingTop: 8,
+//             marginHorizontal: 10,
+//             borderRadius: 20,
+//             position: "absolute",
+//             bottom: tabBarBottom,
+//             left: 10,
+//             right: 10,
+//           },
+//           tabBarLabelStyle: {
+//             fontSize: 11, // Slightly smaller to fit all labels
+//             fontWeight: "500",
+//             marginBottom: Platform.OS === "ios" ? 2 : 3,
+//           },
+//           tabBarItemStyle: {
+//             paddingVertical: 4,
+//           },
+//         }}
+//       >
+//         <Tabs.Screen
+//           name="index"
+//           options={{
+//             tabBarLabel: "Home",
+//             tabBarIcon: ({ color, size }) => (
+//               <View style={styles.iconContainer}>
+//                 <FontAwesome name="home" size={size} color={color} />
+//               </View>
+//             ),
+//           }}
+//         />
+//         <Tabs.Screen
+//           name="Matches"
+//           options={{
+//             tabBarLabel: "Matches",
+//             tabBarIcon: ({ color, size }) => (
+//               <View style={styles.iconContainer}>
+//                 <FontAwesome name="heart" size={size} color={color} />
+//               </View>
+//             ),
+//           }}
+//         />
+//         <Tabs.Screen
+//           name="Messages"
+//           options={{
+//             tabBarLabel: "Messages",
+//             tabBarIcon: ({ color, size }) => (
+//               <View style={styles.iconContainer}>
+//                 <FontAwesome name="envelope" size={size} color={color} />
+//               </View>
+//             ),
+//           }}
+//         />
+//         <Tabs.Screen
+//           name="Upgrade"
+//           options={{
+//             tabBarLabel: "Upgrade",
+//             tabBarIcon: ({ color, size }) => (
+//               <View style={styles.iconContainer}>
+//                 <FontAwesome name="diamond" size={size} color={color} />
+//               </View>
+//             ),
+//           }}
+//         />
+//         <Tabs.Screen
+//           name="Profile"
+//           options={{
+//             tabBarLabel: "Profile",
+//             tabBarIcon: ({ color, size }) => (
+//               <View style={styles.iconContainer}>
+//                 <FontAwesome name="user" size={size} color={color} />
+//               </View>
+//             ),
+//           }}
+//         />
+//       </Tabs>
+//     </SafeAreaView>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   safeArea: {
+//     flex: 1,
+//     backgroundColor: "#F8F9FA",
+//   },
+//   loadingContainer: {
+//     flex: 1,
+//     justifyContent: "center",
+//     alignItems: "center",
+//     backgroundColor: "#F8F9FA"
+//   },
+//   iconContainer: {
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     marginBottom: Platform.OS === "ios" ? 2 : 0,
+//   },
+// });
+
+
+
+
+
+
+// 20/09/2025
+// // app/(tabs)/_layout.jsx
+// import { Tabs } from "expo-router";
+// import { FontAwesome } from "@expo/vector-icons";
+// import { useAuth } from "../hooks/useAuth";
+// import { Redirect } from "expo-router";
+// import { ActivityIndicator, View, StyleSheet, Platform, SafeAreaView } from "react-native";
+// import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+// export default function TabsLayout() {
+//   const { isLoaded, isSignedIn, profileCompleted, loading } = useAuth();
+//   const insets = useSafeAreaInsets();
+
+//   if (!isLoaded || loading) {
+//     return (
+//       <SafeAreaView style={styles.safeArea}>
+//         <View style={styles.loadingContainer}>
+//           <ActivityIndicator size="large" color="#FF6B6B" />
+//         </View>
+//       </SafeAreaView>
+//     );
+//   }
+
+//   if (!isSignedIn) return <Redirect href="/" />;
+//   if (!profileCompleted) return <Redirect href="/homescreens/info1" />;
+
+//   // Dynamic padding for iOS & Android navigation bars
+//   const iosBottomPadding = insets.bottom > 0 ? insets.bottom - 5 : 10;
+//   const androidBottomPadding = insets.bottom > 0 ? insets.bottom + 6 : 20;
+
+//   const tabBarHeight = Platform.OS === "ios" ? 82 : 70;
+//   const tabBarBottom = Platform.OS === "ios" ? iosBottomPadding : androidBottomPadding;
+
+//   return (
+//     <SafeAreaView style={styles.safeArea}>
+//       <Tabs
+//         screenOptions={{
+//           headerShown: false,
+//           tabBarShowLabel: true,
+//           tabBarActiveTintColor: "#FF6B6B",
+//           tabBarInactiveTintColor: "#888888",
+//           tabBarStyle: {
+//             backgroundColor: "#FFF",
+//             borderTopWidth: 0,
+//             elevation: 8,
+//             shadowColor: "#000",
+//             shadowOffset: { width: 0, height: -2 },
+//             shadowOpacity: 0.1,
+//             shadowRadius: 4,
+//             height: tabBarHeight,
+//             paddingBottom: Platform.OS === "ios" ? iosBottomPadding : androidBottomPadding,
+//             paddingTop: 8,
+//             marginHorizontal: 10,
+//             borderRadius: 20,
+//             position: "absolute",
+//             bottom: tabBarBottom,
+//             left: 10,
+//             right: 10,
+//           },
+//           tabBarLabelStyle: {
+//             fontSize: 11,
+//             fontWeight: "500",
+//             marginBottom: Platform.OS === "ios" ? 2 : 3,
+//           },
+//           tabBarItemStyle: {
+//             paddingVertical: 4,
+//           },
+//         }}
+//       >
+//         <Tabs.Screen
+//           name="index"
+//           options={{
+//             tabBarLabel: "Home",
+//             tabBarIcon: ({ color, size }) => (
+//               <View style={styles.iconContainer}>
+//                 <FontAwesome name="home" size={size} color={color} />
+//               </View>
+//             ),
+//           }}
+//         />
+//         <Tabs.Screen
+//           name="Matches"
+//           options={{
+//             tabBarLabel: "Matches",
+//             tabBarIcon: ({ color, size }) => (
+//               <View style={styles.iconContainer}>
+//                 <FontAwesome name="heart" size={size} color={color} />
+//               </View>
+//             ),
+//           }}
+//         />
+//         <Tabs.Screen
+//           name="Messages"
+//           options={{
+//             tabBarLabel: "Messages",
+//             tabBarIcon: ({ color, size }) => (
+//               <View style={styles.iconContainer}>
+//                 <FontAwesome name="envelope" size={size} color={color} />
+//               </View>
+//             ),
+//           }}
+//         />
+//         <Tabs.Screen
+//           name="Upgrade"
+//           options={{
+//             tabBarLabel: "Upgrade",
+//             tabBarIcon: ({ color, size }) => (
+//               <View style={styles.iconContainer}>
+//                 <FontAwesome name="diamond" size={size} color={color} />
+//               </View>
+//             ),
+//           }}
+//         />
+//         <Tabs.Screen
+//           name="Profile"
+//           options={{
+//             tabBarLabel: "Profile",
+//             tabBarIcon: ({ color, size }) => (
+//               <View style={styles.iconContainer}>
+//                 <FontAwesome name="user" size={size} color={color} />
+//               </View>
+//             ),
+//           }}
+//         />
+//       </Tabs>
+//     </SafeAreaView>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   safeArea: {
+//     flex: 1,
+//     backgroundColor: "#F8F9FA",
+//   },
+//   loadingContainer: {
+//     flex: 1,
+//     justifyContent: "center",
+//     alignItems: "center",
+//     backgroundColor: "#F8F9FA"
+//   },
+//   iconContainer: {
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     marginBottom: Platform.OS === "ios" ? 2 : 0,
+//   },
+// });
+
+
+
+
+
+
+
+//28/09/2025
+// app/(tabs)/_layout.jsx
 import { Tabs } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
 import { useAuth } from "../hooks/useAuth";
 import { Redirect } from "expo-router";
-import { ActivityIndicator, View, StyleSheet, Platform, SafeAreaView } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { ActivityIndicator, View, StyleSheet, SafeAreaView } from "react-native";
 
 export default function TabsLayout() {
   const { isLoaded, isSignedIn, profileCompleted, loading } = useAuth();
-  const insets = useSafeAreaInsets();
 
   if (!isLoaded || loading) {
     return (
@@ -835,45 +1136,13 @@ export default function TabsLayout() {
   if (!isSignedIn) return <Redirect href="/" />;
   if (!profileCompleted) return <Redirect href="/homescreens/info1" />;
 
-  // Calculate dynamic padding for iOS devices
-  const iosBottomPadding = insets.bottom > 0 ? insets.bottom - 5 : 10;
-  const tabBarHeight = Platform.OS === "ios" ? 82 : 70;
-  const tabBarBottom = Platform.OS === "ios" ? 10 : 15;
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <Tabs
         screenOptions={{
           headerShown: false,
-          tabBarShowLabel: true,
           tabBarActiveTintColor: "#FF6B6B",
           tabBarInactiveTintColor: "#888888",
-          tabBarStyle: {
-            backgroundColor: "#FFF",
-            borderTopWidth: 0,
-            elevation: 8,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: -2 },
-            shadowOpacity: 0.1,
-            shadowRadius: 4,
-            height: tabBarHeight,
-            paddingBottom: Platform.OS === "ios" ? iosBottomPadding : 8,
-            paddingTop: 8,
-            marginHorizontal: 10,
-            borderRadius: 20,
-            position: "absolute",
-            bottom: tabBarBottom,
-            left: 10,
-            right: 10,
-          },
-          tabBarLabelStyle: {
-            fontSize: 11, // Slightly smaller to fit all labels
-            fontWeight: "500",
-            marginBottom: Platform.OS === "ios" ? 2 : 3,
-          },
-          tabBarItemStyle: {
-            paddingVertical: 4,
-          },
         }}
       >
         <Tabs.Screen
@@ -881,9 +1150,7 @@ export default function TabsLayout() {
           options={{
             tabBarLabel: "Home",
             tabBarIcon: ({ color, size }) => (
-              <View style={styles.iconContainer}>
-                <FontAwesome name="home" size={size} color={color} />
-              </View>
+              <FontAwesome name="home" size={size} color={color} />
             ),
           }}
         />
@@ -892,9 +1159,7 @@ export default function TabsLayout() {
           options={{
             tabBarLabel: "Matches",
             tabBarIcon: ({ color, size }) => (
-              <View style={styles.iconContainer}>
-                <FontAwesome name="heart" size={size} color={color} />
-              </View>
+              <FontAwesome name="heart" size={size} color={color} />
             ),
           }}
         />
@@ -903,9 +1168,7 @@ export default function TabsLayout() {
           options={{
             tabBarLabel: "Messages",
             tabBarIcon: ({ color, size }) => (
-              <View style={styles.iconContainer}>
-                <FontAwesome name="envelope" size={size} color={color} />
-              </View>
+              <FontAwesome name="envelope" size={size} color={color} />
             ),
           }}
         />
@@ -914,9 +1177,7 @@ export default function TabsLayout() {
           options={{
             tabBarLabel: "Upgrade",
             tabBarIcon: ({ color, size }) => (
-              <View style={styles.iconContainer}>
-                <FontAwesome name="diamond" size={size} color={color} />
-              </View>
+              <FontAwesome name="diamond" size={size} color={color} />
             ),
           }}
         />
@@ -925,9 +1186,7 @@ export default function TabsLayout() {
           options={{
             tabBarLabel: "Profile",
             tabBarIcon: ({ color, size }) => (
-              <View style={styles.iconContainer}>
-                <FontAwesome name="user" size={size} color={color} />
-              </View>
+              <FontAwesome name="user" size={size} color={color} />
             ),
           }}
         />
@@ -945,11 +1204,139 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#F8F9FA"
-  },
-  iconContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: Platform.OS === "ios" ? 2 : 0,
+    backgroundColor: "#F8F9FA",
   },
 });
+
+
+
+
+
+
+
+
+
+// app/(tabs)/_layout.jsx
+// import { Tabs } from "expo-router";
+// import { FontAwesome } from "@expo/vector-icons";
+// import { useAuth } from "../hooks/useAuth";
+// import { Redirect } from "expo-router";
+// import { ActivityIndicator, View, StyleSheet, Platform, SafeAreaView, Text, Dimensions } from "react-native";
+// import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+// const { width: screenWidth } = Dimensions.get("window");
+
+// export default function TabsLayout() {
+//   const { isLoaded, isSignedIn, profileCompleted, loading } = useAuth();
+//   const insets = useSafeAreaInsets();
+
+//   if (!isLoaded || loading) {
+//     return (
+//       <SafeAreaView style={styles.safeArea}>
+//         <View style={styles.loadingContainer}>
+//           <ActivityIndicator size="large" color="#FF6B6B" />
+//         </View>
+//       </SafeAreaView>
+//     );
+//   }
+
+//   if (!isSignedIn) return <Redirect href="/" />;
+//   if (!profileCompleted) return <Redirect href="/homescreens/info1" />;
+
+//   const iosBottomPadding = insets.bottom > 0 ? insets.bottom - 5 : 10;
+//   const androidBottomPadding = insets.bottom > 0 ? insets.bottom + 6 : 20;
+
+//   const tabBarHeight = Platform.OS === "ios" ? 82 : 70;
+//   const tabBarBottom = Platform.OS === "ios" ? iosBottomPadding : androidBottomPadding;
+
+//   const getFontSize = () => {
+//     if (screenWidth < 350) return 9;
+//     if (screenWidth < 400) return 10;
+//     return 11;
+//   };
+
+//   const tabsData = [
+//     { name: "index", label: "Home", icon: "home" },
+//     { name: "Matches", label: "Matches", icon: "heart" },
+//     { name: "Messages", label: "Messages", icon: "envelope" },
+//     { name: "Upgrade", label: "Upgrade", icon: "diamond" },
+//     { name: "Profile", label: "Profile", icon: "user" },
+//   ];
+
+//   return (
+//     <SafeAreaView style={styles.safeArea}>
+//       <Tabs
+//         screenOptions={{
+//           headerShown: false,
+//           tabBarShowLabel: false, // we render label manually
+//           tabBarActiveTintColor: "#FF6B6B",
+//           tabBarInactiveTintColor: "#888888",
+//           tabBarStyle: {
+//             backgroundColor: "#FFF",
+//             borderTopWidth: 0,
+//             elevation: 8,
+//             shadowColor: "#000",
+//             shadowOffset: { width: 0, height: -2 },
+//             shadowOpacity: 0.1,
+//             shadowRadius: 4,
+//             height: tabBarHeight,
+//             paddingBottom: Platform.OS === "ios" ? iosBottomPadding : androidBottomPadding,
+//             paddingTop: 8,
+//             marginHorizontal: 10,
+//             borderRadius: 20,
+//             position: "absolute",
+//             bottom: tabBarBottom,
+//             left: 10,
+//             right: 10,
+//           },
+//           tabBarItemStyle: {
+//             paddingVertical: 0, // allow container to handle spacing
+//           },
+//         }}
+//       >
+//         {tabsData.map((tab) => (
+//           <Tabs.Screen
+//             key={tab.name}
+//             name={tab.name}
+//             options={{
+//               tabBarIcon: ({ color, size }) => (
+//                 <View style={styles.iconContainer}>
+//                   <FontAwesome name={tab.icon} size={size} color={color} />
+//                   <Text
+//                     style={{
+//                       fontSize: getFontSize(),
+//                       color,
+//                       textAlign: "center",
+//                       marginTop: 2,
+//                     }}
+//                     numberOfLines={1} // ensure text stays in one line
+//                     adjustsFontSizeToFit // shrink text if needed
+//                   >
+//                     {tab.label}
+//                   </Text>
+//                 </View>
+//               ),
+//             }}
+//           />
+//         ))}
+//       </Tabs>
+//     </SafeAreaView>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   safeArea: {
+//     flex: 1,
+//     backgroundColor: "#F8F9FA",
+//   },
+//   loadingContainer: {
+//     flex: 1,
+//     justifyContent: "center",
+//     alignItems: "center",
+//     backgroundColor: "#F8F9FA",
+//   },
+//   iconContainer: {
+//     justifyContent: "center",
+//     alignItems: "center",
+//   },
+// });

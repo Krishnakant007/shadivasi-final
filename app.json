@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "shaadivasi-finale",
+   "name": "shaadivasi",
     "slug": "shaadivasi-finale",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -12,6 +12,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.fashtra.shaadivasifinale",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -45,8 +46,7 @@
         "expo-notifications",
         {
           "icon": "./assets/images/notification-icon.png",
-          "color": "#ffffff",
-          "sounds": []
+          "color": "#ffffff"
         }
       ]
     ],

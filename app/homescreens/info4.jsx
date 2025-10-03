@@ -2278,7 +2278,7 @@
 //02/09/2025
 
 //23/08/2025
-
+//app/homescreens/info4.jsx
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Modal, FlatList, ActivityIndicator, Image, Animated, Dimensions, ScrollView } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';

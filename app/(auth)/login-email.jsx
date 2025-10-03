@@ -1018,7 +1018,7 @@ export default function EmailLogin() {
 
             <View style={styles.content}>
                 <Image 
-                    source={require('../../assets/images/login1.jpg')} 
+                    source={require('../../assets/images/login1.png')} 
                     style={styles.logo}
                 />
                 

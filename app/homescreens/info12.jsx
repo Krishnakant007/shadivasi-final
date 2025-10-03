@@ -3183,6 +3183,501 @@
 
 //23/08/2025
 
+// import React, { useState, useEffect, useRef } from 'react';
+// import {
+//   View,
+//   Text,
+//   TextInput,
+//   TouchableOpacity,
+//   StyleSheet,
+//   ActivityIndicator,
+//   ScrollView,
+//   Alert,
+//   Image
+// } from "react-native";
+// import { useRouter } from "expo-router";
+// import { useUser } from "@clerk/clerk-expo";
+// import { useLanguage } from "../context/LanguageContext";
+// import { useProfile } from "../context/ProfileContext";
+// import { useFirestore } from "../hooks/useFirebase";
+// import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
+// import { serverTimestamp } from 'firebase/firestore';
+// import { useProfileNavigation } from '../utils/navigationHelper';
+
+// export default function Info12() {
+//   const router = useRouter();
+//   const { user } = useUser();
+//   const { language, toggleLanguage } = useLanguage();
+//   const { profileFor, gender, getPrefix } = useProfile();
+//   const { saveUserProfile, userData, updateUserProfile, loading: firestoreLoading } = useFirestore();
+//   const { getPreviousScreen } = useProfileNavigation();
+//   const [loading, setLoading] = useState(false);
+//   const [aboutMe, setAboutMe] = useState("");
+//   const [charCount, setCharCount] = useState(0);
+//   const [showWarning, setShowWarning] = useState(false);
+//   const minChars = 50;
+//   const inputRef = useRef(null);
+
+//   // Initialize with existing data if available
+//   useEffect(() => {
+//     if (userData?.aboutMe) {
+//       setAboutMe(userData.aboutMe);
+//       setCharCount(userData.aboutMe.length);
+//     }
+//   }, [userData]);
+
+//   // Character count and warning logic
+//   useEffect(() => {
+//     setCharCount(aboutMe.length);
+//     const timer = setTimeout(() => {
+//       setShowWarning(aboutMe.length > 0 && aboutMe.length < minChars);
+//     }, 1000);
+//     return () => clearTimeout(timer);
+//   }, [aboutMe]);
+
+//   const handleHelpPress = () => {
+//     Alert.alert(
+//       language === 'ENG' ? "Help with About Me" : "अपने बारे में मदद",
+//       language === 'ENG'
+//         ? "Share interesting details about yourself..."
+//         : "अपने बारे में रोचक विवरण साझा करें...",
+//       [{ text: "OK" }]
+//     );
+//   };
+
+//   const saveAboutMe = async () => {
+//     if (charCount < minChars) {
+//       Alert.alert(
+//         language === 'ENG' ? "More Details Needed" : "अधिक विवरण आवश्यक",
+//         language === 'ENG'
+//           ? `Please write at least ${minChars} characters about yourself`
+//           : `कृपया अपने बारे में कम से कम ${minChars} अक्षर लिखें`,
+//         [{ text: "OK" }]
+//       );
+//       return;
+//     }
+
+//     setLoading(true);
+//     try {
+//       const updateData = {
+//         aboutMe,
+//         profileProgress: 90,
+//         updatedAt: serverTimestamp()
+//       };
+
+//       // Use updateUserProfile to only update specific fields
+//       await updateUserProfile(updateData);
+
+//       // Navigate to next screen
+//       router.push('/homescreens/info13');
+
+//     } catch (err) {
+//       console.error("Error saving about me:", err);
+//       Alert.alert(
+//         language === 'ENG' ? "Error" : "त्रुटि",
+//         language === 'ENG'
+//           ? "Could not save information. Please try again."
+//           : "जानकारी सहेजी नहीं जा सकी। कृपया पुनः प्रयास करें।",
+//         [{ text: "OK" }]
+//       );
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // Show loading while checking firestore data
+//   if (firestoreLoading) {
+//     return (
+//       <View style={styles.loadingContainer}>
+//         <ActivityIndicator size="large" color="#7e57c2" />
+//       </View>
+//     );
+//   }
+
+//   // Translations
+//   const translations = {
+//     title: {
+//       ENG: `Tell us about ${getPrefix().toLowerCase()}self`,
+//       HI: profileFor === 'MySelf' ? "अपने बारे में बताएं" :
+//           profileFor === 'My Son' ? "अपने बेटे के बारे में बताएं" :
+//           profileFor === 'My Daughter' ? "अपनी बेटी के बारे में बताएं" :
+//           profileFor === 'My Sister' ? "अपनी बहन के बारे में बताएं" :
+//           profileFor === 'My Brother' ? "अपने भाई के बारे में बताएं" :
+//           profileFor === 'My Friend' ? "अपने दोस्त के बारे में बताएं" :
+//           profileFor === 'Cousin' ? "अपने चचेरे भाई के बारे में बताएं" :
+//           "अपने रिश्तेदार के बारे में बताएं"
+//     },
+//     placeholder: {
+//       ENG: `Describe ${getPrefix().toLowerCase()}self (minimum 50 characters)...`,
+//       HI: profileFor === 'MySelf' ? "अपने बारे में वर्णन करें (कम से कम 50 अक्षर)..." :
+//           profileFor === 'My Son' ? "अपने बेटे के बारे में वर्णन करें (कम से कम 50 अक्षर)..." :
+//           profileFor === 'My Daughter' ? "अपनी बेटी के बारे में वर्णन करें (कम से कम 50 अक्षर)..." :
+//           profileFor === 'My Sister' ? "अपनी बहन के बारे में वर्णन करें (कम से कम 50 अक्षर)..." :
+//           profileFor === 'My Brother' ? "अपने भाई के बारे में वर्णन करें (कम से कम 50 अक्षर)..." :
+//           profileFor === 'My Friend' ? "अपने दोस्त के बारे में वर्णन करें (कम से कम 50 अक्षर)..." :
+//           profileFor === 'Cousin' ? "अपने चचेरे भाई के बारे में वर्णन करें (कम से कम 50 अक्षर)..." :
+//           "अपने रिश्तेदार के बारे में वर्णन करें (कम से कम 50 अक्षर)..."
+//     },
+//     help: {
+//       ENG: "Need help writing about yourself?",
+//       HI: profileFor === 'MySelf' ? "अपने बारे में लिखने में मदद चाहिए?" :
+//           profileFor === 'My Son' ? "अपने बेटे के बारे में लिखने में मदद चाहिए?" :
+//           profileFor === 'My Daughter' ? "अपनी बेटी के बारे में लिखने में मदद चाहिए?" :
+//           profileFor === 'My Sister' ? "अपनी बहन के बारे में लिखने में मदद चाहिए?" :
+//           profileFor === 'My Brother' ? "अपने भाई के बारे में लिखने में मदद चाहिए?" :
+//           profileFor === 'My Friend' ? "अपने दोस्त के बारे में लिखने में मदद चाहिए?" :
+//           profileFor === 'Cousin' ? "अपने चचेरे भाई के बारे में लिखने में मदद चाहिए?" :
+//           "अपने रिश्तेदार के बारे में लिखने में मदद चाहिए?"
+//     },
+//     characters: {
+//       ENG: `${charCount}/${minChars} characters`,
+//       HI: `${charCount}/${minChars} अक्षर`
+//     },
+//     submit: {
+//       ENG: "Continue",
+//       HI: "जारी रखें"
+//     },
+//     loading: {
+//       ENG: "Saving...",
+//       HI: "सहेजा जा रहा है..."
+//     },
+//     moreNeeded: {
+//       ENG: "more needed",
+//       HI: "और आवश्यक"
+//     }
+//   };
+
+//   return (
+//     <View style={styles.container}>
+//       {/* Header with fixed buttons */}
+//       <View style={styles.header}>
+//         <TouchableOpacity
+//           style={styles.backButton}
+//           onPress={() => router.push(getPreviousScreen('homescreens/info12'))}
+//         >
+//           <MaterialIcons name="arrow-back" size={24} color="#333" />
+//         </TouchableOpacity>
+
+//         <View style={styles.languageToggleContainer}>
+//           <Text style={styles.languageLabel}>ENG</Text>
+//           <TouchableOpacity
+//             style={styles.toggleContainer}
+//             onPress={toggleLanguage}
+//             activeOpacity={0.8}
+//           >
+//             <View style={[
+//               styles.toggleButton,
+//               {
+//                 transform: [{ translateX: language === 'ENG' ? 0 : 32 }],
+//                 backgroundColor: language === 'ENG' ? '#6C63FF' : '#FF6B6B'
+//               }
+//             ]}>
+//               <Image
+//                 source={language === 'ENG'
+//                   ? require('../../assets/uk-flag.png')
+//                   : require('../../assets/india-flag.png')}
+//                 style={styles.flag}
+//               />
+//             </View>
+//           </TouchableOpacity>
+//           <Text style={styles.languageLabel}>हिंदी</Text>
+//         </View>
+//       </View>
+
+//       <View style={styles.contentContainer}>
+//         <ScrollView
+//           contentContainerStyle={styles.scrollContent}
+//           showsVerticalScrollIndicator={false}
+//           keyboardShouldPersistTaps="handled"
+//         >
+//           {/* Header */}
+//           <View style={styles.headerSection}>
+//             <Feather name="edit-3" size={24} color="#7e57c2" />
+//             <Text style={styles.title}>{translations.title[language]}</Text>
+//           </View>
+
+//           <View style={styles.iconContainer}>
+//             <Feather name="edit-3" size={40} color="white" />
+//           </View>
+
+//           <TextInput
+//             ref={inputRef}
+//             style={[
+//               styles.input,
+//               showWarning && styles.inputWarning
+//             ]}
+//             multiline
+//             numberOfLines={6}
+//             placeholder={translations.placeholder[language]}
+//             placeholderTextColor="#999"
+//             value={aboutMe}
+//             onChangeText={setAboutMe}
+//             textAlignVertical="top"
+//             autoFocus={true}
+//           />
+
+//           <View style={styles.helpContainer}>
+//             <TouchableOpacity
+//               style={styles.helpButton}
+//               onPress={handleHelpPress}
+//             >
+//               <Feather name="help-circle" size={20} color="#7e57c2" />
+//               <Text style={styles.helpText}>{translations.help[language]}</Text>
+//             </TouchableOpacity>
+//           </View>
+
+//           <View style={styles.counterContainer}>
+//             <Text style={[
+//               styles.counterText,
+//               showWarning && styles.counterWarning
+//             ]}>
+//               {translations.characters[language]}
+//             </Text>
+//             {showWarning && (
+//               <View style={styles.warningBadge}>
+//                 <Text style={styles.warningText}>
+//                   {minChars - charCount} {translations.moreNeeded[language]}
+//                 </Text>
+//               </View>
+//             )}
+//           </View>
+//         </ScrollView>
+
+//         {/* Continue Button */}
+//         <View style={styles.buttonContainer}>
+//           <TouchableOpacity
+//             style={[
+//               styles.continueButton,
+//               {
+//                 backgroundColor: charCount >= minChars ? '#7e57c2' : '#ADB5BD',
+//                 opacity: loading ? 0.7 : 1
+//               }
+//             ]}
+//             onPress={saveAboutMe}
+//             disabled={charCount < minChars || loading}
+//           >
+//             {loading ? (
+//               <ActivityIndicator size="small" color="white" />
+//             ) : (
+//               <Text style={styles.continueButtonText}>
+//                 {translations.submit[language]}
+//               </Text>
+//             )}
+//           </TouchableOpacity>
+//         </View>
+//       </View>
+//     </View>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: '#f8f9fa',
+//   },
+//   header: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     paddingHorizontal: 20,
+//     paddingTop: 50,
+//     paddingBottom: 15,
+//     backgroundColor: 'white',
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#E9ECEF',
+//   },
+//   backButton: {
+//     padding: 10,
+//     backgroundColor: 'white',
+//     borderRadius: 20,
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.1,
+//     shadowRadius: 3,
+//     elevation: 3,
+//   },
+//   languageToggleContainer: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     justifyContent: 'flex-end',
+//     gap: 6,
+//     backgroundColor: 'white',
+//     paddingHorizontal: 10,
+//     paddingVertical: 5,
+//     borderRadius: 20,
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.1,
+//     shadowRadius: 3,
+//     elevation: 3,
+//   },
+//   languageLabel: {
+//     fontWeight: '600',
+//     fontSize: 14,
+//     color: '#495057',
+//   },
+//   toggleContainer: {
+//     width: 60,
+//     height: 28,
+//     borderRadius: 14,
+//     backgroundColor: '#E9ECEF',
+//     justifyContent: 'center',
+//     paddingHorizontal: 2,
+//   },
+//   toggleButton: {
+//     width: 24,
+//     height: 24,
+//     borderRadius: 12,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.2,
+//     shadowRadius: 3,
+//     elevation: 3,
+//   },
+//   flag: {
+//     width: 18,
+//     height: 13,
+//     borderRadius: 2,
+//   },
+//   contentContainer: {
+//     flex: 1,
+//   },
+//   loadingContainer: {
+//     flex: 1,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     backgroundColor: '#fff',
+//   },
+//   scrollContent: {
+//     padding: 20,
+//     paddingBottom: 100,
+//   },
+//   headerSection: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     marginBottom: 20,
+//   },
+//   title: {
+//     fontSize: 24,
+//     fontWeight: 'bold',
+//     color: '#333',
+//     marginLeft: 10,
+//   },
+//   iconContainer: {
+//     alignSelf: 'center',
+//     backgroundColor: '#7e57c2',
+//     borderRadius: 50,
+//     width: 80,
+//     height: 80,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     marginBottom: 25,
+//     shadowColor: '#7e57c2',
+//     shadowOffset: { width: 0, height: 4 },
+//     shadowOpacity: 0.3,
+//     shadowRadius: 8,
+//     elevation: 6,
+//   },
+//   input: {
+//     minHeight: 200,
+//     borderWidth: 1,
+//     borderColor: '#e0e0e0',
+//     borderRadius: 16,
+//     padding: 20,
+//     fontSize: 16,
+//     backgroundColor: '#fafafa',
+//     textAlign: 'left',
+//     lineHeight: 24,
+//     textAlignVertical: 'top',
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.05,
+//     shadowRadius: 8,
+//     elevation: 2,
+//   },
+//   inputWarning: {
+//     borderColor: '#FF6B6B',
+//     backgroundColor: '#FFF9F9',
+//   },
+//   helpContainer: {
+//     marginTop: 16,
+//     marginBottom: 8,
+//   },
+//   helpButton: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     gap: 8,
+//     alignSelf: 'flex-start',
+//     padding: 8,
+//     paddingLeft: 0,
+//   },
+//   helpText: {
+//     color: '#7e57c2',
+//     fontSize: 16,
+//     fontWeight: '500',
+//   },
+//   counterContainer: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     justifyContent: 'space-between',
+//     marginBottom: 24,
+//     marginTop: 8,
+//   },
+//   counterText: {
+//     fontSize: 14,
+//     color: '#666',
+//   },
+//   counterWarning: {
+//     color: '#FF6B6B',
+//     fontWeight: '500',
+//   },
+//   warningBadge: {
+//     backgroundColor: '#FFEBEE',
+//     paddingHorizontal: 12,
+//     paddingVertical: 6,
+//     borderRadius: 12,
+//   },
+//   warningText: {
+//     fontSize: 13,
+//     color: '#FF6B6B',
+//     fontWeight: '500',
+//   },
+//   buttonContainer: {
+//     position: 'absolute',
+//     bottom: 20,
+//     left: 0,
+//     right: 0,
+//     paddingHorizontal: 20,
+//   },
+//   continueButton: {
+//     borderRadius: 30,
+//     padding: 16,
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//     width: '100%',
+//     shadowColor: '#7e57c2',
+//     shadowOffset: { width: 0, height: 4 },
+//     shadowOpacity: 0.3,
+//     shadowRadius: 8,
+//     elevation: 5,
+//   },
+//   continueButtonText: {
+//     color: 'white',
+//     fontSize: 16,
+//     fontWeight: 'bold',
+//   },
+// });
+
+
+
+
+
+
+
+//20/09/2025
+//app/homescreens/info12.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   View, 
@@ -3193,7 +3688,8 @@ import {
   ActivityIndicator, 
   ScrollView,
   Alert,
-  Image
+  Image,
+  Platform
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useUser } from "@clerk/clerk-expo";
@@ -3441,30 +3937,30 @@ export default function Info12() {
               </View>
             )}
           </View>
-        </ScrollView>
 
-        {/* Continue Button */}
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[
-              styles.continueButton,
-              { 
-                backgroundColor: charCount >= minChars ? '#7e57c2' : '#ADB5BD',
-                opacity: loading ? 0.7 : 1
-              }
-            ]}
-            onPress={saveAboutMe}
-            disabled={charCount < minChars || loading}
-          >
-            {loading ? (
-              <ActivityIndicator size="small" color="white" />
-            ) : (
-              <Text style={styles.continueButtonText}>
-                {translations.submit[language]}
-              </Text>
-            )}
-          </TouchableOpacity>
-        </View>
+          {/* Continue Button - Now inside ScrollView */}
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={[
+                styles.continueButton,
+                { 
+                  backgroundColor: charCount >= minChars ? '#7e57c2' : '#ADB5BD',
+                  opacity: loading ? 0.7 : 1
+                }
+              ]}
+              onPress={saveAboutMe}
+              disabled={charCount < minChars || loading}
+            >
+              {loading ? (
+                <ActivityIndicator size="small" color="white" />
+              ) : (
+                <Text style={styles.continueButtonText}>
+                  {translations.submit[language]}
+                </Text>
+              )}
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
       </View>
     </View>
   );
@@ -3480,11 +3976,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 50,
+    paddingTop: Platform.OS === 'ios' ? 50 : 30,
     paddingBottom: 15,
     backgroundColor: 'white',
     borderBottomWidth: 1,
     borderBottomColor: '#E9ECEF',
+    zIndex: 10,
   },
   backButton: {
     padding: 10,
@@ -3552,7 +4049,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 20,
-    paddingBottom: 100,
+    paddingBottom: 40,
   },
   headerSection: {
     flexDirection: 'row',
@@ -3645,11 +4142,9 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   buttonContainer: {
-    position: 'absolute',
-    bottom: 20,
-    left: 0,
-    right: 0,
-    paddingHorizontal: 20,
+    marginTop: 20,
+    marginBottom: 40,
+    paddingHorizontal: 10,
   },
   continueButton: {
     borderRadius: 30,

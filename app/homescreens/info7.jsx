@@ -1481,11 +1481,614 @@
 
 //23/08/2025
 
+//app/homescreens/info7.jsx
+// import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, ActivityIndicator } from 'react-native'
+// import React, { useState, useEffect } from 'react'
+// import { Brothers, Sisters, WorkDetailMom, WorkDetailsFather } from '../../constant/Info'
+// import { Picker } from '@react-native-picker/picker'
+// import AntDesign from '@expo/vector-icons/AntDesign';
+// import { MaterialIcons } from '@expo/vector-icons';
+// import { useRouter } from 'expo-router';
+// import { useLanguage } from '../context/LanguageContext';
+// import Animated from 'react-native-reanimated';
+// import { useProfile } from '../context/ProfileContext';
+// import { useFirestore } from '../hooks/useFirebase';
+// import { serverTimestamp } from 'firebase/firestore';
+// import { useProfileNavigation } from '../utils/navigationHelper';
 
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, ActivityIndicator } from 'react-native'
+// export default function Info7() {
+//   const router = useRouter();
+//   const [fatherStatus, setFatherStatus] = useState(null);
+//   const [motherStatus, setMotherStatus] = useState(null);
+//   const [sistersCount, setSistersCount] = useState(null);
+//   const [brothersCount, setBrothersCount] = useState(null);
+//   const [isLoading, setIsLoading] = useState(false);
+//   const { language, toggleLanguage } = useLanguage();
+//   const { profileFor, getPrefix } = useProfile();
+//   const { saveUserProfile, userData } = useFirestore();
+//   const { getNextScreen, getPreviousScreen } = useProfileNavigation();
+
+//   // Load existing data
+//   useEffect(() => {
+//     if (userData?.familyInfo) {
+//       if (userData.familyInfo.fatherStatus) {
+//         setFatherStatus(userData.familyInfo.fatherStatus);
+//       }
+//       if (userData.familyInfo.motherStatus) {
+//         setMotherStatus(userData.familyInfo.motherStatus);
+//       }
+//       if (userData.familyInfo.sistersCount) {
+//         setSistersCount(userData.familyInfo.sistersCount);
+//       }
+//       if (userData.familyInfo.brothersCount) {
+//         setBrothersCount(userData.familyInfo.brothersCount);
+//       }
+//     }
+//   }, [userData]);
+
+//   // Helper function to get the proper prefix for translations
+//   const getProperPrefix = (field) => {
+//     if (profileFor === 'MySelf') {
+//       return language === 'ENG' ? 'your' : 'अपना/अपनी';
+//     }
+//     return getPrefix().toLowerCase();
+//   };
+
+//   // Complete translations
+//   const translations = {
+//     headerText: {
+//       ENG: `${getPrefix()} Family Information`,
+//       HI: profileFor === 'MySelf' ? "पारिवारिक जानकारी" :
+//           profileFor === 'My Son' ? "बेटे की पारिवारिक जानकारी" :
+//           profileFor === 'My Daughter' ? "बेटी की पारिवारिक जानकारी" :
+//           profileFor === 'My Sister' ? "बहन की पारिवारिक जानकारी" :
+//           profileFor === 'My Brother' ? "भाई की पारिवारिक जानकारी" :
+//           profileFor === 'My Friend' ? "दोस्त की पारिवारिक जानकारी" :
+//           profileFor === 'Cousin' ? "चचेरे भाई की पारिवारिक जानकारी" :
+//           "रिश्तेदार की पारिवारिक जानकारी"
+//     },
+//     fatherStatus: {
+//       ENG: "Father's Status",
+//       HI: profileFor === 'MySelf' ? "पिता की स्थिति" :
+//           profileFor === 'My Son' ? "पिता की स्थिति" :
+//           profileFor === 'My Daughter' ? "पिता की स्थिति" :
+//           profileFor === 'My Sister' ? "पिता की स्थिति" :
+//           profileFor === 'My Brother' ? "पिता की स्थिति" :
+//           profileFor === 'My Friend' ? "दोस्त के पिता की स्थिति" :
+//           profileFor === 'Cousin' ? "चचेरे भाई के पिता की स्थिति" :
+//           "रिश्तेदार के पिता की स्थिति"
+//     },
+//     motherStatus: {
+//       ENG: "Mother's Status",
+//       HI: profileFor === 'MySelf' ? "माता की स्थिति" :
+//           profileFor === 'My Son' ? "माता की स्थिति" :
+//           profileFor === 'My Daughter' ? "माता की स्थिति" :
+//           profileFor === 'My Sister' ? "माता की स्थिति" :
+//           profileFor === 'My Brother' ? "माता की स्थिति" :
+//           profileFor === 'My Friend' ? "दोस्त की माता की स्थिति" :
+//           profileFor === 'Cousin' ? "चचेरे भाई की माता की स्थिति" :
+//           "रिश्तेदार की माता की स्थिति"
+//     },
+//     totalSisters: {
+//       ENG: "Total Sisters",
+//       HI: profileFor === 'MySelf' ? "कुल बहनें" :
+//           profileFor === 'My Son' ? "कुल बहनें" :
+//           profileFor === 'My Daughter' ? "कुल बहनें" :
+//           profileFor === 'My Sister' ? "कुल बहनें" :
+//           profileFor === 'My Brother' ? "कुल बहनें" :
+//           profileFor === 'My Friend' ? "कुल बहनें" :
+//           profileFor === 'Cousin' ? "कुल बहनें" :
+//           "कुल बहनें"
+//     },
+//     totalBrothers: {
+//       ENG: "Total Brothers",
+//       HI: profileFor === 'MySelf' ? "कुल भाई" :
+//           profileFor === 'My Son' ? "कुल भाई" :
+//           profileFor === 'My Daughter' ? "कुल भाई" :
+//           profileFor === 'My Sister' ? "कुल भाई" :
+//           profileFor === 'My Brother' ? "कुल भाई" :
+//           profileFor === 'My Friend' ? "कुल भाई" :
+//           profileFor === 'Cousin' ? "कुल भाई" :
+//           "कुल भाई"
+//     },
+//     selectFatherStatus: {
+//       ENG: `Select ${getProperPrefix('father')} father's status`,
+//       HI: profileFor === 'MySelf' ? "पिता की स्थिति चुनें" :
+//           profileFor === 'My Son' ? "पिता की स्थिति चुनें" :
+//           profileFor === 'My Daughter' ? "पिता की स्थिति चुनें" :
+//           profileFor === 'My Sister' ? "पिता की स्थिति चुनें" :
+//           profileFor === 'My Brother' ? "पिता की स्थिति चुनें" :
+//           profileFor === 'My Friend' ? "दोस्त के पिता की स्थिति चुनें" :
+//           profileFor === 'Cousin' ? "चचेरे भाई के पिता की स्थिति चुनें" :
+//           "रिश्तेदार के पिता की स्थिति चुनें"
+//     },
+//     selectMotherStatus: {
+//       ENG: `Select ${getProperPrefix('mother')} mother's status`,
+//       HI: profileFor === 'MySelf' ? "माता की स्थिति चुनें" :
+//           profileFor === 'My Son' ? "माता की स्थिति चुनें" :
+//           profileFor === 'My Daughter' ? "माता की स्थिति चुनें" :
+//           profileFor === 'My Sister' ? "माता की स्थिति चुनें" :
+//           profileFor === 'My Brother' ? "माता की स्थिति चुनें" :
+//           profileFor === 'My Friend' ? "दोस्त की माता की स्थिति चुनें" :
+//           profileFor === 'Cousin' ? "चचेरे भाई की माता की स्थिति चुनें" :
+//           "रिश्तेदार की माता की स्थिति चुनें"
+//     },
+//     selectSistersCount: {
+//       ENG: `Select ${getProperPrefix('sisters')} sisters count`,
+//       HI: profileFor === 'MySelf' ? "बहनों की संख्या चुनें" :
+//           profileFor === 'My Son' ? "बहनों की संख्या चुनें" :
+//           profileFor === 'My Daughter' ? "बहनों की संख्या चुनें" :
+//           profileFor === 'My Sister' ? "बहनों की संख्या चुनें" :
+//           profileFor === 'My Brother' ? "बहनों की संख्या चुनें" :
+//           profileFor === 'My Friend' ? "बहनों की संख्या चुनें" :
+//           profileFor === 'Cousin' ? "बहनों की संख्या चुनें" :
+//           "बहनों की संख्या चुनें"
+//     },
+//     selectBrothersCount: {
+//       ENG: `Select ${getProperPrefix('brothers')} brothers count`,
+//       HI: profileFor === 'MySelf' ? "भाइयों की संख्या चुनें" :
+//           profileFor === 'My Son' ? "भाइयों की संख्या चुनें" :
+//           profileFor === 'My Daughter' ? "भाइयों की संख्या चुनें" :
+//           profileFor === 'My Sister' ? "भाइयों की संख्या चुनें" :
+//           profileFor === 'My Brother' ? "भाइयों की संख्या चुनें" :
+//           profileFor === 'My Friend' ? "भाइयों की संख्या चुनें" :
+//           profileFor === 'Cousin' ? "भाइयों की संख्या चुनें" :
+//           "भाइयों की संख्या चुनें"
+//     },
+//     continue: {
+//       ENG: "Continue",
+//       HI: "जारी रखें"
+//     },
+//     fatherOptions: {
+//       ENG: WorkDetailsFather,
+//       HI: ["जीवित (नौकरीपेशा)", "जीवित (स्व-नियोजित)", "जीवित (अवकाशप्राप्त)", "निधन हो गया"]
+//     },
+//     motherOptions: {
+//       ENG: WorkDetailMom,
+//       HI: ["गृहिणी", "नौकरीपेशा", "स्व-नियोजित", "अवकाशप्राप्त", "निधन हो गया"]
+//     },
+//     sistersOptions: {
+//       ENG: Sisters,
+//       HI: ["0", "1", "2", "3", "4", "5+"]
+//     },
+//     brothersOptions: {
+//       ENG: Brothers,
+//       HI: ["0", "1", "2", "3", "4", "5+"]
+//     }
+//   };
+
+//   const isButtonDisabled = !fatherStatus || !motherStatus || !sistersCount || !brothersCount;
+
+//   const handleContinue = async () => {
+//     if (isButtonDisabled) return;
+    
+//     try {
+//       setIsLoading(true);
+      
+//       // Prepare family data
+//       const profileData = {
+//         ...userData,
+//         familyInfo: {
+//           fatherStatus,
+//           motherStatus,
+//           sistersCount,
+//           brothersCount
+//         },
+//         profileProgress: 70,
+//         updatedAt: serverTimestamp()
+//       };
+
+//       // Save to Firestore with screen number
+//       await saveUserProfile(profileData, 7);
+
+//       // Navigate to next screen
+//       router.push(getNextScreen('homescreens/info7'));
+//     } catch (error) {
+//       console.error('Error saving family info:', error);
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   return (
+//     <View style={styles.container}>
+//       {/* Header with fixed buttons */}
+//       <View style={styles.header}>
+//         <TouchableOpacity
+//           style={styles.backButton}
+//           onPress={() => router.push(getPreviousScreen('homescreens/info7'))}
+//         >
+//           <MaterialIcons name="arrow-back" size={24} color="#333" />
+//         </TouchableOpacity>
+
+//         <View style={styles.languageToggleContainer}>
+//           <Text style={styles.languageLabel}>ENG</Text>
+//           <TouchableOpacity
+//             style={styles.toggleContainer}
+//             onPress={toggleLanguage}
+//             activeOpacity={0.8}
+//           >
+//             <Animated.View style={[
+//               styles.toggleButton,
+//               {
+//                 transform: [{ translateX: language === 'ENG' ? 0 : 32 }],
+//                 backgroundColor: language === 'ENG' ? '#6C63FF' : '#FF6B6B'
+//               }
+//             ]}>
+//               <Image
+//                 source={language === 'ENG'
+//                   ? require('../../assets/uk-flag.png')
+//                   : require('../../assets/india-flag.png')}
+//                 style={styles.flag}
+//               />
+//             </Animated.View>
+//           </TouchableOpacity>
+//           <Text style={styles.languageLabel}>हिंदी</Text>
+//         </View>
+//       </View>
+
+//       <View style={styles.contentContainer}>
+//         {isLoading && (
+//           <View style={styles.loaderContainer}>
+//             <ActivityIndicator size="large" color="#7e57c2" />
+//           </View>
+//         )}
+
+//         {/* Header Section */}
+//         <View style={styles.headerSection}>
+//           <View style={styles.iconCircle}>
+//             <AntDesign name="addusergroup" size={32} color="#7e57c2" />
+//           </View>
+//           <Text style={styles.headerText}>{translations.headerText[language]}</Text>
+//         </View>
+
+//         <ScrollView
+//           contentContainerStyle={styles.scrollContent}
+//           showsVerticalScrollIndicator={false}
+//         >
+//           {/* Father's Status */}
+//           <View style={styles.inputGroup}>
+//             <View style={styles.labelContainer}>
+//               <MaterialIcons name="family-restroom" size={24} color="#555" />
+//               <Text style={styles.label}>{translations.fatherStatus[language]}</Text>
+//             </View>
+//             <View style={[
+//               styles.pickerContainer,
+//               fatherStatus && styles.pickerContainerActive
+//             ]}>
+//               <Picker
+//                 selectedValue={fatherStatus}
+//                 onValueChange={(itemValue) => setFatherStatus(itemValue)}
+//                 style={styles.picker}
+//                 dropdownIconColor="#7e57c2"
+//                 mode="dropdown"
+//               >
+//                 <Picker.Item
+//                   label={translations.selectFatherStatus[language]}
+//                   value={null}
+//                   style={styles.placeholderText}
+//                 />
+//                 {WorkDetailsFather.map((work, index) => (
+//                   <Picker.Item
+//                     key={index}
+//                     label={translations.fatherOptions[language][index]}
+//                     value={work}
+//                     style={styles.pickerItemText}
+//                   />
+//                 ))}
+//               </Picker>
+//             </View>
+//           </View>
+
+//           {/* Mother's Status */}
+//           <View style={styles.inputGroup}>
+//             <View style={styles.labelContainer}>
+//               <MaterialIcons name="family-restroom" size={24} color="#555" />
+//               <Text style={styles.label}>{translations.motherStatus[language]}</Text>
+//             </View>
+//             <View style={[
+//               styles.pickerContainer,
+//               motherStatus && styles.pickerContainerActive
+//             ]}>
+//               <Picker
+//                 selectedValue={motherStatus}
+//                 onValueChange={(itemValue) => setMotherStatus(itemValue)}
+//                 style={styles.picker}
+//                 dropdownIconColor="#7e57c2"
+//                 mode="dropdown"
+//               >
+//                 <Picker.Item
+//                   label={translations.selectMotherStatus[language]}
+//                   value={null}
+//                   style={styles.placeholderText}
+//                 />
+//                 {WorkDetailMom.map((mom, index) => (
+//                   <Picker.Item
+//                     key={index}
+//                     label={translations.motherOptions[language][index]}
+//                     value={mom}
+//                     style={styles.pickerItemText}
+//                   />
+//                 ))}
+//               </Picker>
+//             </View>
+//           </View>
+
+//           {/* Sisters Count */}
+//           <View style={styles.inputGroup}>
+//             <View style={styles.labelContainer}>
+//               <MaterialIcons name="female" size={24} color="#e91e63" />
+//               <Text style={styles.label}>{translations.totalSisters[language]}</Text>
+//             </View>
+//             <View style={[
+//               styles.pickerContainer,
+//               sistersCount && styles.pickerContainerActive
+//             ]}>
+//               <Picker
+//                 selectedValue={sistersCount}
+//                 onValueChange={(itemValue) => setSistersCount(itemValue)}
+//                 style={styles.picker}
+//                 dropdownIconColor="#7e57c2"
+//                 mode="dropdown"
+//               >
+//                 <Picker.Item
+//                   label={translations.selectSistersCount[language]}
+//                   value={null}
+//                   style={styles.placeholderText}
+//                 />
+//                 {Sisters.map((count, index) => (
+//                   <Picker.Item
+//                     key={index}
+//                     label={translations.sistersOptions[language][index]}
+//                     value={count}
+//                     style={styles.pickerItemText}
+//                   />
+//                 ))}
+//               </Picker>
+//             </View>
+//           </View>
+
+//           {/* Brothers Count */}
+//           <View style={styles.inputGroup}>
+//             <View style={styles.labelContainer}>
+//               <MaterialIcons name="male" size={24} color="#2196f3" />
+//               <Text style={styles.label}>{translations.totalBrothers[language]}</Text>
+//             </View>
+//             <View style={[
+//               styles.pickerContainer,
+//               brothersCount && styles.pickerContainerActive
+//             ]}>
+//               <Picker
+//                 selectedValue={brothersCount}
+//                 onValueChange={(itemValue) => setBrothersCount(itemValue)}
+//                 style={styles.picker}
+//                 dropdownIconColor="#7e57c2"
+//                 mode="dropdown"
+//               >
+//                 <Picker.Item
+//                   label={translations.selectBrothersCount[language]}
+//                   value={null}
+//                   style={styles.placeholderText}
+//                 />
+//                 {Brothers.map((count, index) => (
+//                   <Picker.Item
+//                     key={index}
+//                     label={translations.brothersOptions[language][index]}
+//                     value={count}
+//                     style={styles.pickerItemText}
+//                   />
+//                 ))}
+//               </Picker>
+//             </View>
+//           </View>
+
+//           {/* Continue Button */}
+//           <View style={styles.buttonContainer}>
+//             <TouchableOpacity
+//               onPress={handleContinue}
+//               style={[
+//                 styles.button,
+//                 {
+//                   backgroundColor: isButtonDisabled ? '#ADB5BD' : '#7e57c2',
+//                   opacity: isButtonDisabled ? 0.7 : 1
+//                 }
+//               ]}
+//               disabled={isButtonDisabled || isLoading}
+//             >
+//               {isLoading ? (
+//                 <ActivityIndicator size="small" color="white" />
+//               ) : (
+//                 <Text style={styles.buttonText}>{translations.continue[language]}</Text>
+//               )}
+//             </TouchableOpacity>
+//           </View>
+//         </ScrollView>
+//       </View>
+//     </View>
+//   )
+// }
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: '#f5f5f5',
+//   },
+//   header: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     paddingHorizontal: 20,
+//     paddingTop: 50,
+//     paddingBottom: 15,
+//     backgroundColor: 'white',
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#E9ECEF',
+//   },
+//   backButton: {
+//     padding: 10,
+//     backgroundColor: 'white',
+//     borderRadius: 20,
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.1,
+//     shadowRadius: 3,
+//     elevation: 3,
+//   },
+//   languageToggleContainer: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     justifyContent: 'flex-end',
+//     gap: 6,
+//     backgroundColor: 'white',
+//     paddingHorizontal: 10,
+//     paddingVertical: 5,
+//     borderRadius: 20,
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.1,
+//     shadowRadius: 3,
+//     elevation: 3,
+//   },
+//     languageLabel: {
+//     fontWeight: '600',
+//     fontSize: 14,
+//     color: '#495057',
+//   },
+//   toggleContainer: {
+//     width: 60,
+//     height: 28,
+//     borderRadius: 14,
+//     backgroundColor: '#E9ECEF',
+//     justifyContent: 'center',
+//     paddingHorizontal: 2,
+//   },
+//   toggleButton: {
+//     width: 24,
+//     height: 24,
+//     borderRadius: 12,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.2,
+//     shadowRadius: 3,
+//     elevation: 3,
+//   },
+//   flag: {
+//     width: 18,
+//     height: 13,
+//     borderRadius: 2,
+//   },
+//   contentContainer: {
+//     flex: 1,
+//   },
+//   loaderContainer: {
+//     ...StyleSheet.absoluteFillObject,
+//     backgroundColor: 'rgba(255,255,255,0.8)',
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     zIndex: 1000,
+//   },
+//   headerSection: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     padding: 20,
+//     backgroundColor: 'white',
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#E9ECEF',
+//   },
+//   iconCircle: {
+//     width: 50,
+//     height: 50,
+//     borderRadius: 25,
+//     backgroundColor: '#f3e5f5',
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     marginRight: 15,
+//   },
+//   headerText: {
+//     fontSize: 20,
+//     fontWeight: 'bold',
+//     color: '#333',
+//   },
+//   scrollContent: {
+//     padding: 20,
+//     paddingBottom: 100,
+//   },
+//   inputGroup: {
+//     marginBottom: 25,
+//   },
+//   labelContainer: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     marginBottom: 10,
+//   },
+//   label: {
+//     fontSize: 16,
+//     fontWeight: '600',
+//     color: '#333',
+//     marginLeft: 10,
+//   },
+//   pickerContainer: {
+//     backgroundColor: 'white',
+//     borderRadius: 12,
+//     borderWidth: 1,
+//     borderColor: '#E9ECEF',
+//     overflow: 'hidden',
+//   },
+//   pickerContainerActive: {
+//     borderColor: '#7e57c2',
+//     shadowColor: '#7e57c2',
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.1,
+//     shadowRadius: 4,
+//     elevation: 2,
+//   },
+//   picker: {
+//     height: 50,
+//     width: '100%',
+//   },
+//   placeholderText: {
+//     color: '#999',
+//     fontSize: 14,
+//   },
+//   pickerItemText: {
+//     fontSize: 14,
+//     color: '#333',
+//   },
+//   buttonContainer: {
+//     marginTop: 30,
+//     paddingHorizontal: 10,
+//   },
+//   button: {
+//     backgroundColor: '#7e57c2',
+//     padding: 16,
+//     borderRadius: 30,
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//     shadowColor: '#7e57c2',
+//     shadowOffset: { width: 0, height: 4 },
+//     shadowOpacity: 0.3,
+//     shadowRadius: 8,
+//     elevation: 5,
+//   },
+//   buttonText: {
+//     color: 'white',
+//     fontSize: 16,
+//     fontWeight: 'bold',
+//   },
+// });
+
+
+
+
+
+
+//30/09/2025
+//app/homescreens/info7.jsx
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, ActivityIndicator, Modal, FlatList, TextInput } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { Brothers, Sisters, WorkDetailMom, WorkDetailsFather } from '../../constant/Info'
-import { Picker } from '@react-native-picker/picker'
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -1508,6 +2111,24 @@ export default function Info7() {
   const { saveUserProfile, userData } = useFirestore();
   const { getNextScreen, getPreviousScreen } = useProfileNavigation();
 
+  // Modal states
+  const [fatherModalVisible, setFatherModalVisible] = useState(false);
+  const [motherModalVisible, setMotherModalVisible] = useState(false);
+  const [sistersModalVisible, setSistersModalVisible] = useState(false);
+  const [brothersModalVisible, setBrothersModalVisible] = useState(false);
+
+  // Search states
+  const [fatherSearch, setFatherSearch] = useState('');
+  const [motherSearch, setMotherSearch] = useState('');
+  const [sistersSearch, setSistersSearch] = useState('');
+  const [brothersSearch, setBrothersSearch] = useState('');
+
+  // Filtered data
+  const [filteredFatherOptions, setFilteredFatherOptions] = useState([]);
+  const [filteredMotherOptions, setFilteredMotherOptions] = useState([]);
+  const [filteredSistersOptions, setFilteredSistersOptions] = useState([]);
+  const [filteredBrothersOptions, setFilteredBrothersOptions] = useState([]);
+
   // Load existing data
   useEffect(() => {
     if (userData?.familyInfo) {
@@ -1525,6 +2146,14 @@ export default function Info7() {
       }
     }
   }, [userData]);
+
+  // Initialize filtered data
+  useEffect(() => {
+    setFilteredFatherOptions(WorkDetailsFather);
+    setFilteredMotherOptions(WorkDetailMom);
+    setFilteredSistersOptions(Sisters);
+    setFilteredBrothersOptions(Brothers);
+  }, []);
 
   // Helper function to get the proper prefix for translations
   const getProperPrefix = (field) => {
@@ -1639,6 +2268,30 @@ export default function Info7() {
       ENG: "Continue",
       HI: "जारी रखें"
     },
+    close: {
+      ENG: "Close",
+      HI: "बंद करें"
+    },
+    searchFather: {
+      ENG: "Search father status...",
+      HI: "पिता की स्थिति खोजें..."
+    },
+    searchMother: {
+      ENG: "Search mother status...",
+      HI: "माता की स्थिति खोजें..."
+    },
+    searchSisters: {
+      ENG: "Search sisters count...",
+      HI: "बहनों की संख्या खोजें..."
+    },
+    searchBrothers: {
+      ENG: "Search brothers count...",
+      HI: "भाइयों की संख्या खोजें..."
+    },
+    noResults: {
+      ENG: "No matching results found",
+      HI: "कोई मिलते परिणाम नहीं मिले"
+    },
     fatherOptions: {
       ENG: WorkDetailsFather,
       HI: ["जीवित (नौकरीपेशा)", "जीवित (स्व-नियोजित)", "जीवित (अवकाशप्राप्त)", "निधन हो गया"]
@@ -1656,6 +2309,39 @@ export default function Info7() {
       HI: ["0", "1", "2", "3", "4", "5+"]
     }
   };
+
+  // Filter functions
+  useEffect(() => {
+    setFilteredFatherOptions(
+      WorkDetailsFather.filter(option => 
+        option.toLowerCase().includes(fatherSearch.toLowerCase())
+      )
+    );
+  }, [fatherSearch]);
+
+  useEffect(() => {
+    setFilteredMotherOptions(
+      WorkDetailMom.filter(option => 
+        option.toLowerCase().includes(motherSearch.toLowerCase())
+      )
+    );
+  }, [motherSearch]);
+
+  useEffect(() => {
+    setFilteredSistersOptions(
+      Sisters.filter(option => 
+        option.toLowerCase().includes(sistersSearch.toLowerCase())
+      )
+    );
+  }, [sistersSearch]);
+
+  useEffect(() => {
+    setFilteredBrothersOptions(
+      Brothers.filter(option => 
+        option.toLowerCase().includes(brothersSearch.toLowerCase())
+      )
+    );
+  }, [brothersSearch]);
 
   const isButtonDisabled = !fatherStatus || !motherStatus || !sistersCount || !brothersCount;
 
@@ -1689,6 +2375,92 @@ export default function Info7() {
       setIsLoading(false);
     }
   };
+
+  // Selection handlers
+  const handleFatherSelect = async (item) => {
+    try {
+      setIsLoading(true);
+      setFatherStatus(item);
+      setFatherModalVisible(false);
+      setFatherSearch('');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleMotherSelect = async (item) => {
+    try {
+      setIsLoading(true);
+      setMotherStatus(item);
+      setMotherModalVisible(false);
+      setMotherSearch('');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSistersSelect = async (item) => {
+    try {
+      setIsLoading(true);
+      setSistersCount(item);
+      setSistersModalVisible(false);
+      setSistersSearch('');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleBrothersSelect = async (item) => {
+    try {
+      setIsLoading(true);
+      setBrothersCount(item);
+      setBrothersModalVisible(false);
+      setBrothersSearch('');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Render list items
+  const renderFatherItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.listItem}
+      onPress={() => handleFatherSelect(item)}
+      disabled={isLoading}
+    >
+      <Text style={styles.listText}>{item}</Text>
+    </TouchableOpacity>
+  );
+
+  const renderMotherItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.listItem}
+      onPress={() => handleMotherSelect(item)}
+      disabled={isLoading}
+    >
+      <Text style={styles.listText}>{item}</Text>
+    </TouchableOpacity>
+  );
+
+  const renderSistersItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.listItem}
+      onPress={() => handleSistersSelect(item)}
+      disabled={isLoading}
+    >
+      <Text style={styles.listText}>{item}</Text>
+    </TouchableOpacity>
+  );
+
+  const renderBrothersItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.listItem}
+      onPress={() => handleBrothersSelect(item)}
+      disabled={isLoading}
+    >
+      <Text style={styles.listText}>{item}</Text>
+    </TouchableOpacity>
+  );
 
   return (
     <View style={styles.container}>
@@ -1752,31 +2524,18 @@ export default function Info7() {
               <MaterialIcons name="family-restroom" size={24} color="#555" />
               <Text style={styles.label}>{translations.fatherStatus[language]}</Text>
             </View>
-            <View style={[
-              styles.pickerContainer,
-              fatherStatus && styles.pickerContainerActive
-            ]}>
-              <Picker
-                selectedValue={fatherStatus}
-                onValueChange={(itemValue) => setFatherStatus(itemValue)}
-                style={styles.picker}
-                dropdownIconColor="#7e57c2"
-                mode="dropdown"
+            <View style={styles.box}>
+              <TouchableOpacity 
+                style={styles.pickerTouchable}
+                onPress={() => setFatherModalVisible(true)}
+                disabled={isLoading}
               >
-                <Picker.Item 
-                  label={translations.selectFatherStatus[language]} 
-                  value={null} 
-                  style={styles.placeholderText}
-                />
-                {WorkDetailsFather.map((work, index) => (
-                  <Picker.Item 
-                    key={index} 
-                    label={translations.fatherOptions[language][index]} 
-                    value={work} 
-                    style={styles.pickerItemText}
-                  />
-                ))}
-              </Picker>
+                {fatherStatus ? (
+                  <Text style={styles.selectedValue}>{fatherStatus}</Text>
+                ) : (
+                  <Text style={styles.placeholderText}>{translations.selectFatherStatus[language]}</Text>
+                )}
+              </TouchableOpacity>
             </View>
           </View>
 
@@ -1786,31 +2545,18 @@ export default function Info7() {
               <MaterialIcons name="family-restroom" size={24} color="#555" />
               <Text style={styles.label}>{translations.motherStatus[language]}</Text>
             </View>
-            <View style={[
-              styles.pickerContainer,
-              motherStatus && styles.pickerContainerActive
-            ]}>
-              <Picker
-                selectedValue={motherStatus}
-                onValueChange={(itemValue) => setMotherStatus(itemValue)}
-                style={styles.picker}
-                dropdownIconColor="#7e57c2"
-                mode="dropdown"
+            <View style={styles.box}>
+              <TouchableOpacity 
+                style={styles.pickerTouchable}
+                onPress={() => setMotherModalVisible(true)}
+                disabled={isLoading}
               >
-                <Picker.Item 
-                  label={translations.selectMotherStatus[language]} 
-                  value={null} 
-                  style={styles.placeholderText}
-                />
-                {WorkDetailMom.map((mom, index) => (
-                  <Picker.Item 
-                    key={index} 
-                    label={translations.motherOptions[language][index]} 
-                    value={mom} 
-                    style={styles.pickerItemText}
-                  />
-                ))}
-              </Picker>
+                {motherStatus ? (
+                  <Text style={styles.selectedValue}>{motherStatus}</Text>
+                ) : (
+                  <Text style={styles.placeholderText}>{translations.selectMotherStatus[language]}</Text>
+                )}
+              </TouchableOpacity>
             </View>
           </View>
 
@@ -1820,31 +2566,18 @@ export default function Info7() {
               <MaterialIcons name="female" size={24} color="#e91e63" />
               <Text style={styles.label}>{translations.totalSisters[language]}</Text>
             </View>
-            <View style={[
-              styles.pickerContainer,
-              sistersCount && styles.pickerContainerActive
-            ]}>
-              <Picker
-                selectedValue={sistersCount}
-                onValueChange={(itemValue) => setSistersCount(itemValue)}
-                style={styles.picker}
-                dropdownIconColor="#7e57c2"
-                mode="dropdown"
+            <View style={styles.box}>
+              <TouchableOpacity 
+                style={styles.pickerTouchable}
+                onPress={() => setSistersModalVisible(true)}
+                disabled={isLoading}
               >
-                <Picker.Item 
-                  label={translations.selectSistersCount[language]} 
-                  value={null} 
-                  style={styles.placeholderText}
-                />
-                {Sisters.map((count, index) => (
-                  <Picker.Item 
-                    key={index} 
-                    label={translations.sistersOptions[language][index]} 
-                    value={count} 
-                    style={styles.pickerItemText}
-                  />
-                ))}
-              </Picker>
+                {sistersCount ? (
+                  <Text style={styles.selectedValue}>{sistersCount}</Text>
+                ) : (
+                  <Text style={styles.placeholderText}>{translations.selectSistersCount[language]}</Text>
+                )}
+              </TouchableOpacity>
             </View>
           </View>
 
@@ -1854,31 +2587,18 @@ export default function Info7() {
               <MaterialIcons name="male" size={24} color="#2196f3" />
               <Text style={styles.label}>{translations.totalBrothers[language]}</Text>
             </View>
-            <View style={[
-              styles.pickerContainer,
-              brothersCount && styles.pickerContainerActive
-            ]}>
-              <Picker
-                selectedValue={brothersCount}
-                onValueChange={(itemValue) => setBrothersCount(itemValue)}
-                style={styles.picker}
-                dropdownIconColor="#7e57c2"
-                mode="dropdown"
+            <View style={styles.box}>
+              <TouchableOpacity 
+                style={styles.pickerTouchable}
+                onPress={() => setBrothersModalVisible(true)}
+                disabled={isLoading}
               >
-                <Picker.Item 
-                  label={translations.selectBrothersCount[language]} 
-                  value={null} 
-                  style={styles.placeholderText}
-                />
-                {Brothers.map((count, index) => (
-                  <Picker.Item 
-                    key={index} 
-                    label={translations.brothersOptions[language][index]} 
-                    value={count} 
-                    style={styles.pickerItemText}
-                  />
-                ))}
-              </Picker>
+                {brothersCount ? (
+                  <Text style={styles.selectedValue}>{brothersCount}</Text>
+                ) : (
+                  <Text style={styles.placeholderText}>{translations.selectBrothersCount[language]}</Text>
+                )}
+              </TouchableOpacity>
             </View>
           </View>
 
@@ -1904,6 +2624,198 @@ export default function Info7() {
           </View>
         </ScrollView>
       </View>
+
+      {/* Father Status Modal */}
+      <Modal
+        visible={fatherModalVisible}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => !isLoading && setFatherModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <View style={styles.searchContainer}>
+              <MaterialIcons name="search" size={24} color="#888" style={styles.searchIcon} />
+              <TextInput
+                style={styles.searchInput}
+                placeholder={translations.searchFather[language]}
+                value={fatherSearch}
+                onChangeText={setFatherSearch}
+                autoFocus={true}
+                editable={!isLoading}
+              />
+              <TouchableOpacity 
+                onPress={() => !isLoading && setFatherModalVisible(false)}
+                disabled={isLoading}
+              >
+                <MaterialIcons name="close" size={24} color="#888" />
+              </TouchableOpacity>
+            </View>
+            {isLoading ? (
+              <View style={styles.loaderInsideModal}>
+                <ActivityIndicator size="large" color="#7e57c2" />
+              </View>
+            ) : (
+              <FlatList
+                data={filteredFatherOptions}
+                renderItem={renderFatherItem}
+                keyExtractor={(item, index) => index.toString()}
+                style={styles.list}
+                ListEmptyComponent={
+                  <View style={styles.emptyContainer}>
+                    <MaterialIcons name="search-off" size={50} color="#ddd" />
+                    <Text style={styles.noResultsText}>{translations.noResults[language]}</Text>
+                  </View>
+                }
+              />
+            )}
+          </View>
+        </View>
+      </Modal>
+
+      {/* Mother Status Modal */}
+      <Modal
+        visible={motherModalVisible}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => !isLoading && setMotherModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <View style={styles.searchContainer}>
+              <MaterialIcons name="search" size={24} color="#888" style={styles.searchIcon} />
+              <TextInput
+                style={styles.searchInput}
+                placeholder={translations.searchMother[language]}
+                value={motherSearch}
+                onChangeText={setMotherSearch}
+                autoFocus={true}
+                editable={!isLoading}
+              />
+              <TouchableOpacity 
+                onPress={() => !isLoading && setMotherModalVisible(false)}
+                disabled={isLoading}
+              >
+                <MaterialIcons name="close" size={24} color="#888" />
+              </TouchableOpacity>
+            </View>
+            {isLoading ? (
+              <View style={styles.loaderInsideModal}>
+                <ActivityIndicator size="large" color="#7e57c2" />
+              </View>
+            ) : (
+              <FlatList
+                data={filteredMotherOptions}
+                renderItem={renderMotherItem}
+                keyExtractor={(item, index) => index.toString()}
+                style={styles.list}
+                ListEmptyComponent={
+                  <View style={styles.emptyContainer}>
+                    <MaterialIcons name="search-off" size={50} color="#ddd" />
+                    <Text style={styles.noResultsText}>{translations.noResults[language]}</Text>
+                  </View>
+                }
+              />
+            )}
+          </View>
+        </View>
+      </Modal>
+
+      {/* Sisters Count Modal */}
+      <Modal
+        visible={sistersModalVisible}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => !isLoading && setSistersModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <View style={styles.searchContainer}>
+              <MaterialIcons name="search" size={24} color="#888" style={styles.searchIcon} />
+              <TextInput
+                style={styles.searchInput}
+                placeholder={translations.searchSisters[language]}
+                value={sistersSearch}
+                onChangeText={setSistersSearch}
+                autoFocus={true}
+                editable={!isLoading}
+              />
+              <TouchableOpacity 
+                onPress={() => !isLoading && setSistersModalVisible(false)}
+                disabled={isLoading}
+              >
+                <MaterialIcons name="close" size={24} color="#888" />
+              </TouchableOpacity>
+            </View>
+            {isLoading ? (
+              <View style={styles.loaderInsideModal}>
+                <ActivityIndicator size="large" color="#7e57c2" />
+              </View>
+            ) : (
+              <FlatList
+                data={filteredSistersOptions}
+                renderItem={renderSistersItem}
+                keyExtractor={(item, index) => index.toString()}
+                style={styles.list}
+                ListEmptyComponent={
+                  <View style={styles.emptyContainer}>
+                    <MaterialIcons name="search-off" size={50} color="#ddd" />
+                    <Text style={styles.noResultsText}>{translations.noResults[language]}</Text>
+                  </View>
+                }
+              />
+            )}
+          </View>
+        </View>
+      </Modal>
+
+      {/* Brothers Count Modal */}
+      <Modal
+        visible={brothersModalVisible}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => !isLoading && setBrothersModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <View style={styles.searchContainer}>
+              <MaterialIcons name="search" size={24} color="#888" style={styles.searchIcon} />
+              <TextInput
+                style={styles.searchInput}
+                placeholder={translations.searchBrothers[language]}
+                value={brothersSearch}
+                onChangeText={setBrothersSearch}
+                autoFocus={true}
+                editable={!isLoading}
+              />
+              <TouchableOpacity 
+                onPress={() => !isLoading && setBrothersModalVisible(false)}
+                disabled={isLoading}
+              >
+                <MaterialIcons name="close" size={24} color="#888" />
+              </TouchableOpacity>
+            </View>
+            {isLoading ? (
+              <View style={styles.loaderInsideModal}>
+                <ActivityIndicator size="large" color="#7e57c2" />
+              </View>
+            ) : (
+              <FlatList
+                data={filteredBrothersOptions}
+                renderItem={renderBrothersItem}
+                keyExtractor={(item, index) => index.toString()}
+                style={styles.list}
+                ListEmptyComponent={
+                  <View style={styles.emptyContainer}>
+                    <MaterialIcons name="search-off" size={50} color="#ddd" />
+                    <Text style={styles.noResultsText}>{translations.noResults[language]}</Text>
+                  </View>
+                }
+              />
+            )}
+          </View>
+        </View>
+      </Modal>
     </View>
   )
 }
@@ -1949,7 +2861,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 3,
   },
-    languageLabel: {
+  languageLabel: {
     fontWeight: '600',
     fontSize: 14,
     color: '#495057',
@@ -2029,32 +2941,24 @@ const styles = StyleSheet.create({
     color: '#333',
     marginLeft: 10,
   },
-  pickerContainer: {
-    backgroundColor: 'white',
-    borderRadius: 12,
+  box: {
     borderWidth: 1,
-    borderColor: '#E9ECEF',
+    borderColor: '#ddd',
+    borderRadius: 8,
     overflow: 'hidden',
+    backgroundColor: '#f9f9f9'
   },
-  pickerContainerActive: {
-    borderColor: '#7e57c2',
-    shadowColor: '#7e57c2',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  picker: {
-    height: 50,
+  pickerTouchable: {
+    padding: 15,
     width: '100%',
   },
-  placeholderText: {
-    color: '#999',
-    fontSize: 14,
-  },
-  pickerItemText: {
-    fontSize: 14,
+  selectedValue: {
+    fontSize: 16,
     color: '#333',
+  },
+  placeholderText: {
+    fontSize: 16,
+    color: '#888',
   },
   buttonContainer: {
     marginTop: 30,
@@ -2076,5 +2980,62 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  // Modal Styles
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    marginHorizontal: 20,
+    borderRadius: 10,
+    maxHeight: '70%',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    alignItems: 'center',
+  },
+  searchIcon: {
+    marginRight: 10,
+  },
+  searchInput: {
+    flex: 1,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 5,
+    marginRight: 10,
+  },
+  list: {
+    paddingHorizontal: 10,
+  },
+  listItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  listText: {
+    fontSize: 16,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 30
+  },
+  noResultsText: {
+    padding: 20,
+    textAlign: 'center',
+    color: '#888',
+  },
+  loaderInsideModal: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
 });

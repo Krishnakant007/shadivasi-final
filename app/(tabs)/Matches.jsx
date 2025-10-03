@@ -27302,8 +27302,8 @@
 //                 </View>
 
 //                 {/* Profile Info Area - Tappable for scrolling down */}
-//                 <TouchableOpacity 
-//                   activeOpacity={0.9} 
+//                 <TouchableOpacity
+//                   activeOpacity={0.9}
 //                   onPress={handleProfileInfoTap}
 //                   style={styles.profileInfoArea}
 //                 >
@@ -28627,7 +28627,7 @@
 //                 {...panResponder.panHandlers}
 //               >
 //                 {/* Main Profile Image with Gallery Icon */}
-//                 <TouchableOpacity 
+//                 <TouchableOpacity
 //                   style={styles.profileImageContainer}
 //                   onPress={openGallery}
 //                   activeOpacity={0.9}
@@ -28650,8 +28650,8 @@
 //                 </TouchableOpacity>
 
 //                 {/* Profile Info Area - Tappable for scrolling down */}
-//                 <TouchableOpacity 
-//                   activeOpacity={1} 
+//                 <TouchableOpacity
+//                   activeOpacity={1}
 //                   style={styles.profileInfoArea}
 //                 >
 //                   <View style={styles.profileHeader}>
@@ -29659,7 +29659,7 @@
 //         // Navigate to existing chat with proper parameters
 //         router.push({
 //           pathname: `/chat/${existingChat.id}`,
-//           params: { 
+//           params: {
 //             name: selectedProfile.firstName || 'User',
 //             profileId: selectedProfile.id
 //           }
@@ -29696,7 +29696,7 @@
 //         // Navigate to new chat with proper parameters
 //         router.push({
 //           pathname: `/chat/${chatRef.id}`,
-//           params: { 
+//           params: {
 //             name: selectedProfile.firstName || 'User',
 //             profileId: selectedProfile.id
 //           }
@@ -29957,7 +29957,7 @@
 //                 {...panResponder.panHandlers}
 //               >
 //                 {/* Main Profile Image with Gallery Icon */}
-//                 <TouchableOpacity 
+//                 <TouchableOpacity
 //                   style={styles.profileImageContainer}
 //                   onPress={openGallery}
 //                   activeOpacity={0.9}
@@ -29980,8 +29980,8 @@
 //                 </TouchableOpacity>
 
 //                 {/* Profile Info Area - Tappable for scrolling down */}
-//                 <TouchableOpacity 
-//                   activeOpacity={1} 
+//                 <TouchableOpacity
+//                   activeOpacity={1}
 //                   style={styles.profileInfoArea}
 //                 >
 //                   <View style={styles.profileHeader}>
@@ -30998,7 +30998,7 @@
 //       if (existingChat) {
 //         router.push({
 //           pathname: `/chat/${existingChat.id}`,
-//           params: { 
+//           params: {
 //             name: selectedProfile.firstName || 'User',
 //             profileId: selectedProfile.id
 //           }
@@ -31034,7 +31034,7 @@
         
 //         router.push({
 //           pathname: `/chat/${chatRef.id}`,
-//           params: { 
+//           params: {
 //             name: selectedProfile.firstName || 'User',
 //             profileId: selectedProfile.id
 //           }
@@ -31295,7 +31295,7 @@
 //                 {...panResponder.panHandlers}
 //               >
 //                 {/* Main Profile Image with Gallery Icon */}
-//                 <TouchableOpacity 
+//                 <TouchableOpacity
 //                   style={styles.profileImageContainer}
 //                   onPress={openGallery}
 //                   activeOpacity={0.9}
@@ -31318,8 +31318,8 @@
 //                 </TouchableOpacity>
 
 //                 {/* Profile Info Area - Tappable for scrolling down */}
-//                 <TouchableOpacity 
-//                   activeOpacity={1} 
+//                 <TouchableOpacity
+//                   activeOpacity={1}
 //                   style={styles.profileInfoArea}
 //                 >
 //                   <View style={styles.profileHeader}>
@@ -32371,7 +32371,7 @@
 //       if (existingChat) {
 //         router.push({
 //           pathname: `/chat/${existingChat.id}`,
-//           params: { 
+//           params: {
 //             name: selectedProfile.firstName || 'User',
 //             profileId: selectedProfile.id
 //           }
@@ -32407,7 +32407,7 @@
         
 //         router.push({
 //           pathname: `/chat/${chatRef.id}`,
-//           params: { 
+//           params: {
 //             name: selectedProfile.firstName || 'User',
 //             profileId: selectedProfile.id
 //           }
@@ -32668,7 +32668,7 @@
 //                 {...panResponder.panHandlers}
 //               >
 //                 {/* Main Profile Image with Gallery Icon */}
-//                 <TouchableOpacity 
+//                 <TouchableOpacity
 //                   style={styles.profileImageContainer}
 //                   onPress={openGallery}
 //                   activeOpacity={0.9}
@@ -32691,8 +32691,8 @@
 //                 </TouchableOpacity>
 
 //                 {/* Profile Info Area - Tappable for scrolling down */}
-//                 <TouchableOpacity 
-//                   activeOpacity={1} 
+//                 <TouchableOpacity
+//                   activeOpacity={1}
 //                   style={styles.profileInfoArea}
 //                 >
 //                   <View style={styles.profileHeader}>
@@ -33748,7 +33748,7 @@
 //       if (existingChat) {
 //         router.push({
 //           pathname: `/chat/${existingChat.id}`,
-//           params: { 
+//           params: {
 //             name: selectedProfile.firstName || 'User',
 //             profileId: selectedProfile.id
 //           }
@@ -33784,7 +33784,7 @@
         
 //         router.push({
 //           pathname: `/chat/${chatRef.id}`,
-//           params: { 
+//           params: {
 //             name: selectedProfile.firstName || 'User',
 //             profileId: selectedProfile.id
 //           }
@@ -34045,7 +34045,7 @@
 //                 {...panResponder.panHandlers}
 //               >
 //                 {/* Main Profile Image with Gallery Icon and Verification Badge */}
-//                 <TouchableOpacity 
+//                 <TouchableOpacity
 //                   style={styles.profileImageContainer}
 //                   onPress={openGallery}
 //                   activeOpacity={0.9}
@@ -34076,8 +34076,8 @@
 //                 </TouchableOpacity>
 
 //                 {/* Profile Info Area - Tappable for scrolling down */}
-//                 <TouchableOpacity 
-//                   activeOpacity={1} 
+//                 <TouchableOpacity
+//                   activeOpacity={1}
 //                   style={styles.profileInfoArea}
 //                 >
 //                   <View style={styles.profileHeader}>
@@ -36102,11 +36102,1409 @@
 
 
 //20/09/2025
+// //app/(tabs)/Matches.jsx
+// import { View, Text, Image, TouchableOpacity, ScrollView, StyleSheet, Platform, ActivityIndicator, Modal, Dimensions, Alert, Animated, PanResponder } from 'react-native';
+// import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+// import { Ionicons, Feather, MaterialIcons, FontAwesome, AntDesign, Entypo } from '@expo/vector-icons';
+// import { SafeAreaView } from 'react-native-safe-area-context';
+// import { collection, query, where, getDocs, limit, doc, getDoc, addDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
+// import { db } from '../../config/firebase';
+// import { useLanguage } from '../context/LanguageContext';
+// import { useAuth } from '../context/AuthContext';
+// import { useRouter, useLocalSearchParams } from 'expo-router';
+// import { useFocusEffect } from '@react-navigation/native';
+// import { useFirestore } from '../hooks/useFirebase';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+
+// export default function Matches() {
+//   const [selectedOption, setSelectedOption] = useState('Newly Joined');
+//   const [selectedProfile, setSelectedProfile] = useState(null);
+//   const [allProfiles, setAllProfiles] = useState([]);
+//   const [filteredProfiles, setFilteredProfiles] = useState([]);
+//   const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
+//   const [loading, setLoading] = useState(true);
+//   const [loadingProfiles, setLoadingProfiles] = useState(true);
+//   const [showFullMobile, setShowFullMobile] = useState(false);
+//   const [galleryModalVisible, setGalleryModalVisible] = useState(false);
+//   const [selectedGalleryImageIndex, setSelectedGalleryImageIndex] = useState(0);
+//   const [hasLoaded, setHasLoaded] = useState(false);
+//   const { user } = useAuth();
+//   const { language } = useLanguage();
+//   const router = useRouter();
+//   const params = useLocalSearchParams();
+//   const { fetchProfiles } = useFirestore();
+
+//   // Animation values for swipe gestures
+//   const swipeX = useRef(new Animated.Value(0)).current;
+//   const swipeY = useRef(new Animated.Value(0)).current;
+//   const scale = useRef(new Animated.Value(1)).current;
+
+//   // Ref for scroll view
+//   const scrollViewRef = useRef(null);
+
+//   const options = ['Newly Joined', 'Recently Active', 'Most Viewed'];
+
+//   // Cache expiration time (5 minutes)
+//   const CACHE_EXPIRY = 5 * 60 * 1000;
+
+//   // Get cached data with expiration check
+//   const getCachedData = async (key) => {
+//     try {
+//       const cached = await AsyncStorage.getItem(key);
+//       if (!cached) return null;
+     
+//       const { data, timestamp } = JSON.parse(cached);
+//       if (Date.now() - timestamp > CACHE_EXPIRY) {
+//         await AsyncStorage.removeItem(key);
+//         return null;
+//       }
+     
+//       return data;
+//     } catch (error) {
+//       console.error('Error getting cached data:', error);
+//       return null;
+//     }
+//   };
+
+//   // Set data to cache with timestamp
+//   const setCachedData = async (key, data) => {
+//     try {
+//       const cacheData = {
+//         data,
+//         timestamp: Date.now()
+//       };
+//       await AsyncStorage.setItem(key, JSON.stringify(cacheData));
+//     } catch (error) {
+//       console.error('Error setting cached data:', error);
+//     }
+//   };
+
+//   // Translations - memoized to prevent recreation
+//   const translations = useMemo(() => ({
+//     newlyJoined: {
+//       ENG: "Newly Joined",
+//       HI: "नए जुड़े"
+//     },
+//     recentlyActive: {
+//       ENG: "Recently Active",
+//       HI: "हाल ही में सक्रिय"
+//     },
+//     mostViewed: {
+//       ENG: "Most Viewed",
+//       HI: "सबसे अधिक देखे गए"
+//     },
+//     personalInfo: {
+//       ENG: "Personal Information",
+//       HI: "व्यक्तिगत जानकारी"
+//     },
+//     contactInfo: {
+//       ENG: "Contact Information",
+//       HI: "संपर्क जानकारी"
+//     },
+//     familyInfo: {
+//       ENG: "Family Information",
+//       HI: "पारिवारिक जानकारी"
+//     },
+//     aboutMyself: {
+//       ENG: "About Myself",
+//       HI: "मेरे बारे में"
+//     },
+//     lifestyle: {
+//       ENG: "Lifestyle",
+//       HI: "जीवन शैली"
+//     },
+//     profilesYouMayLike: {
+//       ENG: "Profiles you may like",
+//       HI: "आपको पसंद आ सकने वाले प्रोफाइल"
+//     },
+//     seeAll: {
+//       ENG: "See All",
+//       HI: "सभी देखें"
+//     },
+//     dontShow: {
+//       ENG: "Don't Show Again",
+//       HI: "फिर से न दिखाएं"
+//     },
+//     sendMessage: {
+//       ENG: "Send Message",
+//       HI: "संदेश भेजें"
+//     },
+//     sendInterest: {
+//       ENG: "Send Interest",
+//       HI: "रुचि भेजें"
+//     },
+//     activeToday: {
+//       ENG: "Active today",
+//       HI: "आज सक्रिय"
+//     },
+//     match: {
+//       ENG: "match",
+//       HI: "मेल"
+//     },
+//     notUpdated: {
+//       ENG: "Not updated",
+//       HI: "अपडेट नहीं किया गया"
+//     },
+//     loading: {
+//       ENG: "Loading...",
+//       HI: "लोड हो रहा है..."
+//     },
+//     mobileNumber: {
+//       ENG: "Mobile Number",
+//       HI: "मोबाइल नंबर"
+//     },
+//     upgradeToView: {
+//       ENG: "Upgrade to view",
+//       HI: "देखने के लिए अपग्रेड करें"
+//     },
+//     viewGallery: {
+//       ENG: "View Gallery",
+//       HI: "गैलरी देखें"
+//     },
+//     close: {
+//       ENG: "Close",
+//       HI: "बंद करें"
+//     },
+//     noProfilesAvailable: {
+//       ENG: "No profiles available",
+//       HI: "कोई प्रोफाइल उपलब्ध नहीं"
+//     },
+//     viewDetails: {
+//       ENG: "View Details",
+//       HI: "विवरण देखें"
+//     },
+//     verifiedProfile: {
+//       ENG: "Verified Profile",
+//       HI: "सत्यापित प्रोफाइल"
+//     }
+//   }), []);
+
+//   // Check if we have a specific profile from params
+//   useEffect(() => {
+//     if (params.selectedProfile) {
+//       try {
+//         const profile = JSON.parse(params.selectedProfile);
+//         setSelectedProfile(profile);
+//         setFilteredProfiles([profile]);
+//         setCurrentProfileIndex(0);
+//         setLoading(false);
+//         setLoadingProfiles(false);
+//         setHasLoaded(true);
+//       } catch (error) {
+//         console.error('Error parsing profile from params:', error);
+//       }
+//     } else if (params.profiles && params.viewAll === 'true') {
+//       try {
+//         const profiles = JSON.parse(params.profiles);
+//         setFilteredProfiles(profiles.map(p => p.fullData || p));
+//         setAllProfiles(profiles.map(p => p.fullData || p));
+//         if (profiles.length > 0) {
+//           setSelectedProfile(profiles[0].fullData || profiles[0]);
+//           setCurrentProfileIndex(0);
+//         }
+//         setLoading(false);
+//         setLoadingProfiles(false);
+//         setHasLoaded(true);
+//       } catch (error) {
+//         console.error('Error parsing profiles from params:', error);
+//       }
+//     }
+//   }, [params]);
+
+//   // Fetch all profiles from the opposite gender - memoized to prevent recreation
+//   const fetchAllProfiles = useCallback(async () => {
+//     if (!user) return;
+   
+//     try {
+//       setLoading(true);
+//       const genderToFetch = user.gender === 'Male' ? 'Female' : 'Male';
+     
+//       // Check cache first
+//       const cacheKey = `matches_${genderToFetch}`;
+//       const cachedProfiles = await getCachedData(cacheKey);
+     
+//       if (cachedProfiles) {
+//         setAllProfiles(cachedProfiles);
+//         setFilteredProfiles(cachedProfiles);
+       
+//         if (cachedProfiles.length > 0) {
+//           setSelectedProfile(cachedProfiles[0]);
+//           setCurrentProfileIndex(0);
+//         } else {
+//           setSelectedProfile({
+//             id: 'fallback',
+//             firstName: 'No profiles',
+//             lastName: 'available',
+//             profilePhoto: 'https://via.placeholder.com/300',
+//             galleryPhotos: []
+//           });
+//         }
+       
+//         setHasLoaded(true);
+//         setLoading(false);
+//         setLoadingProfiles(false);
+//         return;
+//       }
+     
+//       // Use the optimized fetchProfiles function
+//       const profiles = await fetchProfiles(genderToFetch, 20);
+     
+//       setAllProfiles(profiles);
+//       setFilteredProfiles(profiles);
+     
+//       // Set the first profile as selected if available
+//       if (profiles.length > 0) {
+//         setSelectedProfile(profiles[0]);
+//         setCurrentProfileIndex(0);
+//       } else {
+//         // Set a fallback profile if no profiles found
+//         setSelectedProfile({
+//           id: 'fallback',
+//           firstName: 'No profiles',
+//           lastName: 'available',
+//           profilePhoto: 'https://via.placeholder.com/300',
+//           galleryPhotos: []
+//         });
+//       }
+     
+//       // Cache the results
+//       await setCachedData(cacheKey, profiles);
+//       setHasLoaded(true);
+//     } catch (error) {
+//       console.error('Error fetching profiles:', error);
+//       // Set fallback data on error
+//       setSelectedProfile({
+//         id: 'error',
+//         firstName: 'Error loading',
+//         lastName: 'profile',
+//         profilePhoto: 'https://via.placeholder.com/300',
+//         galleryPhotos: []
+//       });
+//     } finally {
+//       setLoading(false);
+//       setLoadingProfiles(false);
+//     }
+//   }, [user, fetchProfiles]);
+
+//   // PanResponder for swipe gestures (only on profile card)
+//   const panResponder = useRef(
+//     PanResponder.create({
+//       onStartShouldSetPanResponder: () => true,
+//       onMoveShouldSetPanResponder: (_, gestureState) => {
+//         return Math.abs(gestureState.dx) > 10;
+//       },
+//       onPanResponderMove: (_, gestureState) => {
+//         swipeX.setValue(gestureState.dx);
+//         swipeY.setValue(gestureState.dy);
+       
+//         // Scale down slightly during drag
+//         scale.setValue(1 - Math.min(Math.abs(gestureState.dx) / 500, 0.1));
+//       },
+//       onPanResponderRelease: (_, gestureState) => {
+//         // If swipe distance is significant, navigate to next/previous profile
+//         if (Math.abs(gestureState.dx) > 100) {
+//           if (gestureState.dx > 0) {
+//             // Swipe right - previous profile
+//             goToPreviousProfile();
+//           } else {
+//             // Swipe left - next profile
+//             goToNextProfile();
+//           }
+//         }
+       
+//         // Reset animation values
+//         Animated.parallel([
+//           Animated.spring(swipeX, {
+//             toValue: 0,
+//             useNativeDriver: true
+//           }),
+//           Animated.spring(swipeY, {
+//             toValue: 0,
+//             useNativeDriver: true
+//           }),
+//           Animated.spring(scale, {
+//             toValue: 1,
+//             useNativeDriver: true
+//           })
+//         ]).start();
+//       }
+//     })
+//   ).current;
+
+//   // Navigate to next profile
+//   const goToNextProfile = () => {
+//     if (filteredProfiles.length === 0) return;
+   
+//     const nextIndex = (currentProfileIndex + 1) % filteredProfiles.length;
+//     setCurrentProfileIndex(nextIndex);
+//     setSelectedProfile(filteredProfiles[nextIndex]);
+//     // Reset mobile number visibility
+//     setShowFullMobile(false);
+//     // Scroll to top when changing profiles
+//     scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+//   };
+
+//   // Navigate to previous profile
+//   const goToPreviousProfile = () => {
+//     if (filteredProfiles.length === 0) return;
+   
+//     const prevIndex = (currentProfileIndex - 1 + filteredProfiles.length) % filteredProfiles.length;
+//     setCurrentProfileIndex(prevIndex);
+//     setSelectedProfile(filteredProfiles[prevIndex]);
+//     // Reset mobile number visibility
+//     setShowFullMobile(false);
+//     // Scroll to top when changing profiles
+//     scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+//   };
+
+//   // Remove profile from list (Don't Show functionality)
+//   const removeProfile = () => {
+//     if (filteredProfiles.length <= 1) {
+//       Alert.alert('Info', 'This is the only profile available');
+//       return;
+//     }
+   
+//     // Create a new array without the current profile
+//     const updatedProfiles = filteredProfiles.filter((_, index) => index !== currentProfileIndex);
+//     setFilteredProfiles(updatedProfiles);
+   
+//     // If we removed the last profile, go to the previous one
+//     let newIndex = currentProfileIndex;
+//     if (currentProfileIndex >= updatedProfiles.length) {
+//       newIndex = updatedProfiles.length - 1;
+//     }
+   
+//     // Set the new current profile
+//     setCurrentProfileIndex(newIndex);
+//     setSelectedProfile(updatedProfiles[newIndex]);
+//     // Scroll to top when changing profiles
+//     scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+//   };
+
+//   // Scroll to information section
+//   const scrollToInformation = () => {
+//     scrollViewRef.current?.scrollTo({ y: 400, animated: true });
+//   };
+
+//   // Send interest to a profile
+//   const sendInterest = async (profileId, profileName) => {
+//     try {
+//       if (!user?.id) {
+//         Alert.alert('Error', 'User not available');
+//         return;
+//       }
+
+//       // Add to sent interests
+//       const sentInterestRef = collection(db, 'Users', user.id, 'sentInterests');
+//       await addDoc(sentInterestRef, {
+//         toUserId: profileId,
+//         toUserName: profileName,
+//         timestamp: serverTimestamp(),
+//         status: 'pending'
+//       });
+
+//       // Add to received interests of the target user
+//       const receivedInterestRef = collection(db, 'Users', profileId, 'receivedInterests');
+//       await addDoc(receivedInterestRef, {
+//         fromUserId: user.id,
+//         fromUserName: user.displayName || `${user.firstName} ${user.lastName}`,
+//         fromUserImage: user.profilePhoto || '',
+//         timestamp: serverTimestamp(),
+//         status: 'pending'
+//       });
+
+//       Alert.alert('Success', 'Interest sent successfully!');
+//     } catch (error) {
+//       console.error('Error sending interest:', error);
+//       Alert.alert('Error', 'Failed to send interest. Please try again.');
+//     }
+//   };
+
+//   // Start a chat with the selected profile
+//   const startChat = async () => {
+//     if (!selectedProfile || !user?.id) {
+//       Alert.alert('Error', 'Cannot start chat. User information missing.');
+//       return;
+//     }
+
+//     try {
+//       // Check if chat already exists
+//       const chatsRef = collection(db, 'chats');
+//       const q = query(
+//         chatsRef,
+//         where('participantIds', 'array-contains', user.id)
+//       );
+     
+//       const querySnapshot = await getDocs(q);
+//       let existingChat = null;
+     
+//       querySnapshot.forEach((doc) => {
+//         const chatData = doc.data();
+//         if (chatData.participantIds && chatData.participantIds.includes(selectedProfile.id)) {
+//           existingChat = { id: doc.id, ...chatData };
+//         }
+//       });
+     
+//       if (existingChat) {
+//         router.push({
+//           pathname: `/chat/${existingChat.id}`,
+//           params: {
+//             name: selectedProfile.firstName || 'User',
+//             profileId: selectedProfile.id
+//           }
+//         });
+//       } else {
+//         // Create new chat
+//         const chatData = {
+//           participants: [
+//             `${user.firstName} ${user.lastName}`,
+//             `${selectedProfile.firstName || ''} ${selectedProfile.lastName || ''}`.trim()
+//           ],
+//           participantIds: [user.id, selectedProfile.id],
+//           lastMessage: '',
+//           lastMessageTime: serverTimestamp(),
+//           createdAt: serverTimestamp()
+//         };
+       
+//         const chatRef = await addDoc(collection(db, 'chats'), chatData);
+       
+//         // Create participants subcollection
+//         await Promise.all([
+//           addDoc(collection(chatRef, 'participants'), {
+//             userId: user.id,
+//             userName: `${user.firstName} ${user.lastName}`,
+//             joinedAt: serverTimestamp()
+//           }),
+//           addDoc(collection(chatRef, 'participants'), {
+//             userId: selectedProfile.id,
+//             userName: `${selectedProfile.firstName || ''} ${selectedProfile.lastName || ''}`.trim(),
+//             joinedAt: serverTimestamp()
+//           })
+//         ]);
+       
+//         router.push({
+//           pathname: `/chat/${chatRef.id}`,
+//           params: {
+//             name: selectedProfile.firstName || 'User',
+//             profileId: selectedProfile.id
+//           }
+//         });
+//       }
+//     } catch (error) {
+//       console.error('Error starting chat:', error);
+//       Alert.alert('Error', 'Failed to start chat. Please try again.');
+//     }
+//   };
+
+//   // Calculate age from date of birth
+//   const calculateAge = (dateOfBirth) => {
+//     if (!dateOfBirth) return '';
+//     try {
+//       // Handle different date formats
+//       let birthDate;
+//       if (dateOfBirth.includes('/')) {
+//         const [day, month, year] = dateOfBirth.split('/');
+//         birthDate = new Date(`${year}-${month}-${day}`);
+//       } else {
+//         birthDate = new Date(dateOfBirth);
+//       }
+     
+//       const today = new Date();
+//       let age = today.getFullYear() - birthDate.getFullYear();
+//       const monthDiff = today.getMonth() - birthDate.getMonth();
+     
+//       if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+//         age--;
+//       }
+     
+//       return age;
+//     } catch (error) {
+//       return '';
+//     }
+//   };
+
+//   // Format mobile number with hidden digits
+//   const formatMobileNumber = (mobileNumber) => {
+//     if (!mobileNumber) return translations.notUpdated[language];
+//     if (showFullMobile) return mobileNumber;
+   
+//     // Show first 2 digits and hide the rest with *
+//     if (mobileNumber.length > 2) {
+//       return mobileNumber.substring(0, 2) + '*'.repeat(mobileNumber.length - 2);
+//     }
+//     return mobileNumber;
+//   };
+
+//   // Format personal information data
+//   const getPersonalInfo = () => {
+//     if (!selectedProfile) return [];
+   
+//     return [
+//       { label: 'Age', value: selectedProfile.age ? `${selectedProfile.age} years` : calculateAge(selectedProfile.dateOfBirth) || translations.notUpdated[language] },
+//       { label: 'Height', value: selectedProfile.height || translations.notUpdated[language] },
+//       { label: 'Spoken Language', value: selectedProfile.language || translations.notUpdated[language] },
+//       { label: 'Profile created by', value: selectedProfile.profileFor || translations.notUpdated[language] },
+//       { label: 'Marital Status', value: selectedProfile.maritalStatus || translations.notUpdated[language] },
+//       { label: 'Lives in', value: selectedProfile.city ? `${selectedProfile.city}, ${selectedProfile.state || ''}`.trim() : translations.notUpdated[language] },
+//       { label: 'Eating Habits', value: selectedProfile.diet || translations.notUpdated[language] },
+//       { label: 'Religion', value: selectedProfile.religion || translations.notUpdated[language] },
+//       { label: 'Caste', value: selectedProfile.community || translations.notUpdated[language] },
+//       { label: 'Subcaste', value: selectedProfile.subCaste || translations.notUpdated[language] },
+//       { label: 'Gotra', value: selectedProfile.gotra || translations.notUpdated[language] },
+//       { label: 'Date Of Birth', value: selectedProfile.dateOfBirth || translations.notUpdated[language] },
+//       { label: 'Rassi', value: translations.upgradeToView[language], icon: 'lock' },
+//       { label: 'Employment', value: selectedProfile.employmentType || translations.notUpdated[language] },
+//       { label: 'Annual Income', value: selectedProfile.incomeRange || translations.notUpdated[language] },
+//       { label: 'Education', value: selectedProfile.qualification || translations.notUpdated[language] },
+//       { label: 'Occupation', value: selectedProfile.occupation || translations.notUpdated[language] },
+//       { label: 'Studied at', value: translations.upgradeToView[language], icon: 'lock' },
+//       { label: 'Works at', value: translations.upgradeToView[language], icon: 'lock' },
+//     ];
+//   };
+
+//   // Format contact information data
+//   const getContactInfo = () => {
+//     if (!selectedProfile) return [];
+   
+//     return [
+//       {
+//         label: translations.mobileNumber[language],
+//         value: formatMobileNumber(selectedProfile.mobileNumber),
+//         icon: selectedProfile.mobileNumber && !showFullMobile ? 'lock' : null,
+//         onPress: () => selectedProfile.mobileNumber && setShowFullMobile(!showFullMobile)
+//       },
+//       { label: 'Email', value: selectedProfile.email || translations.notUpdated[language] },
+//     ];
+//   };
+
+//   // Format family information data
+//   const getFamilyInfo = () => {
+//     if (!selectedProfile) return [];
+   
+//     const familyInfo = selectedProfile.familyInfo || {};
+//     return [
+//       { label: 'Family Status', value: familyInfo.familyStatus || translations.notUpdated[language] },
+//       { label: 'Father', value: familyInfo.fatherStatus || translations.notUpdated[language] },
+//       { label: 'Mother', value: familyInfo.motherStatus || translations.notUpdated[language] },
+//       { label: 'Brothers', value: familyInfo.brothersCount ? `${familyInfo.brothersCount} brothers` : translations.notUpdated[language] },
+//       { label: 'Sisters', value: familyInfo.sistersCount ? `${familyInfo.sistersCount} sisters` : translations.notUpdated[language] },
+//       { label: 'Ancestral Origin', value: selectedProfile.village || translations.notUpdated[language] },
+//     ];
+//   };
+
+//   // Format lifestyle information data
+//   const getLifestyleInfo = () => {
+//     if (!selectedProfile) return [];
+   
+//     // Format alcohol information
+//     let alcoholInfo = translations.notUpdated[language];
+//     if (selectedProfile.drinksAlcohol === 'Yes' && selectedProfile.alcoholFrequency) {
+//       alcoholInfo = `Yes/${selectedProfile.alcoholFrequency}`;
+//     } else if (selectedProfile.drinksAlcohol) {
+//       alcoholInfo = selectedProfile.drinksAlcohol;
+//     }
+   
+//     // Format tobacco information
+//     let tobaccoInfo = translations.notUpdated[language];
+//     if (selectedProfile.usesTobacco === 'Yes' && selectedProfile.tobaccoFrequency) {
+//       tobaccoInfo = `Yes/${selectedProfile.tobaccoFrequency}`;
+//     } else if (selectedProfile.usesTobacco) {
+//       tobaccoInfo = selectedProfile.usesTobacco;
+//     }
+   
+//     // Format disability information
+//     const disabilityInfo = selectedProfile.hasDisability || translations.notUpdated[language];
+   
+//     return [
+//       { label: 'Cuisine', value: selectedProfile.favoriteCuisine || translations.notUpdated[language] },
+//       { label: 'Hobbies', value: selectedProfile.interests ? (Array.isArray(selectedProfile.interests) ? selectedProfile.interests.join(', ') : selectedProfile.interests) : translations.notUpdated[language] },
+//       { label: 'Movies', value: selectedProfile.favoriteMovies || translations.notUpdated[language] },
+//       { label: 'Music', value: selectedProfile.favoriteMusic || translations.notUpdated[language] },
+//       { label: 'Smoking Habits', value: tobaccoInfo },
+//       { label: 'Drinking Habits', value: alcoholInfo },
+//       { label: 'Disability', value: disabilityInfo },
+//     ];
+//   };
+
+//   // Open gallery with all images
+//   const openGallery = () => {
+//     setSelectedGalleryImageIndex(0);
+//     setGalleryModalVisible(true);
+//   };
+
+//   // Get all images including profile photo and gallery photos
+//   const getAllImages = () => {
+//     if (!selectedProfile) return [];
+//     const images = [];
+//     if (selectedProfile.profilePhoto) {
+//       images.push(selectedProfile.profilePhoto);
+//     }
+//     if (selectedProfile.galleryPhotos && Array.isArray(selectedProfile.galleryPhotos)) {
+//       images.push(...selectedProfile.galleryPhotos);
+//     }
+//     return images;
+//   };
+
+//   // Get total photo count
+//   const getTotalPhotoCount = () => {
+//     return getAllImages().length;
+//   };
+
+//   // Manual refresh function
+//   const refreshProfiles = () => {
+//     setHasLoaded(false);
+//     setLoading(true);
+//     setLoadingProfiles(true);
+//     fetchAllProfiles();
+//   };
+
+//   // Navigate to Upgrade screen
+//   const navigateToUpgrade = () => {
+//     router.push('/(tabs)/Upgrade');
+//   };
+
+//   // Load data only once when screen focuses
+//   useFocusEffect(
+//     useCallback(() => {
+//       if (!hasLoaded && user && !params.selectedProfile && !params.viewAll) {
+//         fetchAllProfiles();
+//       }
+
+//       // Cleanup function to reset loading state when screen loses focus
+//       return () => {
+//         // Keep the data but reset loading states if needed
+//       };
+//     }, [hasLoaded, user, params.selectedProfile, params.viewAll, fetchAllProfiles])
+//   );
+
+//   if (loading) {
+//     return (
+//       <SafeAreaView style={styles.safeArea}>
+//         <View style={styles.loadingContainer}>
+//           <ActivityIndicator size="large" color="#FF6B6B" />
+//           <Text style={styles.loadingText}>{translations.loading[language]}</Text>
+//         </View>
+//       </SafeAreaView>
+//     );
+//   }
+
+//   return (
+//     <SafeAreaView style={styles.safeArea}>
+//       <View style={styles.container}>
+//         {/* Header */}
+//         <View style={styles.header}>
+//           <View style={styles.toggleContainer}>
+//             <TouchableOpacity style={[styles.toggleButton, styles.activeToggle]}>
+//               <Text style={styles.toggleText}>Regular</Text>
+//             </TouchableOpacity>
+//             <TouchableOpacity style={styles.toggleButton} onPress={navigateToUpgrade}>
+//               <Text style={styles.toggleText}>Prime</Text>
+//             </TouchableOpacity>
+//           </View>
+//           <TouchableOpacity style={styles.languageButton} onPress={refreshProfiles}>
+//             <Ionicons name="refresh" size={24} color="#FF6B6B" />
+//           </TouchableOpacity>
+//         </View>
+
+//         {/* Options */}
+//         <View style={styles.optionsContainer}>
+//           {options.map((option) => (
+//             <TouchableOpacity
+//               key={option}
+//               style={[styles.option, selectedOption === option && styles.selectedOption]}
+//               onPress={() => setSelectedOption(option)}
+//             >
+//               <Text style={[styles.optionText, selectedOption === option && styles.selectedOptionText]}>
+//                 {translations[option.toLowerCase().replace(' ', '')]?.[language] || option}
+//               </Text>
+//             </TouchableOpacity>
+//           ))}
+//         </View>
+
+//         <ScrollView
+//           ref={scrollViewRef}
+//           contentContainerStyle={styles.scrollContent}
+//           showsVerticalScrollIndicator={true}
+//           scrollEventThrottle={16}
+//         >
+//           {/* Profile Section with Swipe Gestures */}
+//           {selectedProfile ? (
+//             <View style={styles.profileSection}>
+//               {/* Swipeable Profile Card */}
+//               <Animated.View
+//                 style={[
+//                   styles.profileContainer,
+//                   {
+//                     transform: [
+//                       { translateX: swipeX },
+//                       { translateY: swipeY },
+//                       { scale: scale }
+//                     ]
+//                   }
+//                 ]}
+//                 {...panResponder.panHandlers}
+//               >
+//                 {/* Main Profile Image with Gallery Icon and Verification Badge */}
+//                 <TouchableOpacity
+//                   style={styles.profileImageContainer}
+//                   onPress={openGallery}
+//                   activeOpacity={0.9}
+//                 >
+//                   <Image
+//                     source={{ uri: selectedProfile.profilePhoto || 'https://via.placeholder.com/300' }}
+//                     style={styles.profileImage}
+//                     resizeMode="cover"
+//                   />
+                 
+//                   {/* Verification Badge */}
+//                   {selectedProfile.verificationStatus === 'verified' && (
+//                     <View style={styles.verificationBadge}>
+//                       <Image
+//                         source={require('../../assets/badge.png')}
+//                         style={styles.verificationBadgeImage}
+//                       />
+//                     </View>
+//                   )}
+                 
+//                   {/* Gallery Icon with Count (bottom-right corner) */}
+//                   {getTotalPhotoCount() > 0 && (
+//                     <View style={styles.galleryIconContainer}>
+//                       <Ionicons name="images" size={20} color="#fff" />
+//                       <Text style={styles.galleryCount}>{getTotalPhotoCount()}</Text>
+//                     </View>
+//                   )}
+//                 </TouchableOpacity>
+
+//                 {/* Profile Info Area - Tappable for scrolling down */}
+//                 <TouchableOpacity
+//                   activeOpacity={1}
+//                   style={styles.profileInfoArea}
+//                 >
+//                   <View style={styles.profileHeader}>
+//                     <View>
+//                       <Text style={styles.profileName}>
+//                         {selectedProfile.firstName || 'User'} {selectedProfile.lastName || ''}
+//                       </Text>
+//                       <Text style={styles.profileDetails}>
+//                         {selectedProfile.age || calculateAge(selectedProfile.dateOfBirth) || 'N/A'}yrs,{' '}
+//                         {selectedProfile.height || "N/A"}, {selectedProfile.city || ''}
+//                       </Text>
+//                       <Text style={styles.profileDetails}>
+//                         {selectedProfile.qualification || ''}, {selectedProfile.occupation || translations.notUpdated[language]}
+//                       </Text>
+//                     </View>
+//                     <View style={styles.matchBadge}>
+//                       <Text style={styles.matchText}>99% {translations.match[language]}</Text>
+//                     </View>
+//                   </View>
+//                   <Text style={styles.lastSeen}>{translations.activeToday[language]}</Text>
+
+//                   {/* Action Buttons */}
+//                   <View style={styles.actionButtons}>
+//                     <TouchableOpacity
+//                       style={styles.interestButton}
+//                       onPress={() => sendInterest(selectedProfile.id, `${selectedProfile.firstName} ${selectedProfile.lastName}`)}
+//                     >
+//                       <Ionicons name="heart" size={20} color="#FF6B6B" />
+//                       <Text style={styles.interestButtonText}>{translations.sendInterest[language]}</Text>
+//                     </TouchableOpacity>
+//                     <TouchableOpacity style={styles.actionButton}>
+//                       <MaterialIcons name="call" size={24} color="#4CAF50" />
+//                     </TouchableOpacity>
+//                     <TouchableOpacity style={styles.actionButton}>
+//                       <FontAwesome name="whatsapp" size={24} color="#25D366" />
+//                     </TouchableOpacity>
+//                   </View>
+//                 </TouchableOpacity>
+//               </Animated.View>
+//             </View>
+//           ) : (
+//             <View style={styles.noProfilesContainer}>
+//               <Text style={styles.noProfilesText}>{translations.noProfilesAvailable[language]}</Text>
+//             </View>
+//           )}
+
+//           {/* Information Sections */}
+//           {selectedProfile && (
+//             <>
+//               <View style={styles.section}>
+//                 <Text style={styles.sectionTitle}>{translations.personalInfo[language]}</Text>
+//                 <View style={styles.infoList}>
+//                   {getPersonalInfo().map((item, index) => (
+//                     <View key={index} style={styles.infoListItem}>
+//                       <View style={styles.infoLabelContainer}>
+//                         <Text style={styles.infoLabel}>{item.label}</Text>
+//                       </View>
+//                       <Text style={styles.colon}>:</Text>
+//                       <View style={styles.infoValueContainer}>
+//                         <Text style={styles.infoValue}>{item.value}</Text>
+//                         {item.icon && <Feather name={item.icon} size={16} color="#888" style={styles.lockIcon} />}
+//                       </View>
+//                     </View>
+//                   ))}
+//                 </View>
+//               </View>
+
+//               {/* Contact Information Section */}
+//               <View style={styles.section}>
+//                 <Text style={styles.sectionTitle}>{translations.contactInfo[language]}</Text>
+//                 <View style={styles.infoList}>
+//                   {getContactInfo().map((item, index) => (
+//                     <TouchableOpacity
+//                       key={index}
+//                       style={styles.infoListItem}
+//                       onPress={item.onPress}
+//                       disabled={!item.onPress}
+//                     >
+//                       <View style={styles.infoLabelContainer}>
+//                         <Text style={styles.infoLabel}>{item.label}</Text>
+//                       </View>
+//                       <Text style={styles.colon}>:</Text>
+//                       <View style={styles.infoValueContainer}>
+//                         <Text style={styles.infoValue}>{item.value}</Text>
+//                         {item.icon && <Feather name={item.icon} size={16} color="#888" style={styles.lockIcon} />}
+//                       </View>
+//                     </TouchableOpacity>
+//                   ))}
+//                 </View>
+//               </View>
+
+//               <View style={styles.section}>
+//                 <Text style={styles.sectionTitle}>{translations.familyInfo[language]}</Text>
+//                 <View style={styles.infoList}>
+//                   {getFamilyInfo().map((item, index) => (
+//                     <View key={index} style={styles.infoListItem}>
+//                       <View style={styles.infoLabelContainer}>
+//                         <Text style={styles.infoLabel}>{item.label}</Text>
+//                       </View>
+//                       <Text style={styles.colon}>:</Text>
+//                       <Text style={styles.infoValue}>{item.value}</Text>
+//                     </View>
+//                   ))}
+//                 </View>
+//               </View>
+
+//               <View style={styles.section}>
+//                 <Text style={styles.sectionTitle}>{translations.aboutMyself[language]}</Text>
+//                 <Text style={styles.aboutText}>
+//                   {selectedProfile?.aboutMe || 'No description available yet.'}
+//                 </Text>
+//               </View>
+
+//               <View style={styles.section}>
+//                 <Text style={styles.sectionTitle}>{translations.lifestyle[language]}</Text>
+//                 <View style={styles.infoList}>
+//                   {getLifestyleInfo().map((item, index) => (
+//                     <View key={index} style={styles.infoListItem}>
+//                       <View style={styles.infoLabelContainer}>
+//                         <Text style={styles.infoLabel}>{item.label}</Text>
+//                       </View>
+//                       <Text style={styles.colon}>:</Text>
+//                       <Text style={styles.infoValue}>{item.value}</Text>
+//                     </View>
+//                   ))}
+//                 </View>
+//               </View>
+//             </>
+//           )}
+         
+//           {/* Spacer for bottom buttons */}
+//           <View style={{ height: 80 }} />
+//         </ScrollView>
+
+//         {/* Fixed Bottom Action Buttons */}
+//         {selectedProfile && filteredProfiles.length > 0 && (
+//           <View style={styles.bottomActions}>
+//             <TouchableOpacity
+//               style={styles.bottomButton}
+//               onPress={removeProfile}
+//             >
+//               <AntDesign name="close" size={20} color="#FF6B6B" />
+//               <Text style={styles.bottomButtonText}>{translations.dontShow[language]}</Text>
+//             </TouchableOpacity>
+//             <TouchableOpacity
+//               style={[styles.bottomButton, styles.messageButton]}
+//               onPress={startChat}
+//             >
+//               <Feather name="message-square" size={20} color="#fff" />
+//               <Text style={styles.bottomButtonText}>{translations.sendMessage[language]}</Text>
+//             </TouchableOpacity>
+//           </View>
+//         )}
+
+//         {/* Navigation Arrows - Fixed at screen edges (outside of ScrollView) */}
+//         {selectedProfile && filteredProfiles.length > 1 && (
+//           <>
+//             <TouchableOpacity
+//               style={[styles.navArrow, styles.prevArrow]}
+//               onPress={goToPreviousProfile}
+//             >
+//               <Ionicons name="chevron-back" size={30} color="#FF6B6B" />
+//             </TouchableOpacity>
+//             <TouchableOpacity
+//               style={[styles.navArrow, styles.nextArrow]}
+//               onPress={goToNextProfile}
+//             >
+//               <Ionicons name="chevron-forward" size={30} color="#FF6B6B" />
+//             </TouchableOpacity>
+//           </>
+//         )}
+//       </View>
+
+//       {/* Gallery Modal - Full Screen Image Viewer with Horizontal Scroll */}
+//       <Modal
+//         visible={galleryModalVisible}
+//         transparent={true}
+//         animationType="fade"
+//         onRequestClose={() => setGalleryModalVisible(false)}
+//       >
+//         <View style={styles.modalContainer}>
+//           <View style={styles.modalContent}>
+//             <ScrollView
+//               horizontal
+//               pagingEnabled
+//               showsHorizontalScrollIndicator={false}
+//               style={styles.galleryScrollView}
+//               onMomentumScrollEnd={(event) => {
+//                 const contentOffset = event.nativeEvent.contentOffset;
+//                 const viewSize = event.nativeEvent.layoutMeasurement;
+//                 const pageNum = Math.floor(contentOffset.x / viewSize.width);
+//                 setSelectedGalleryImageIndex(pageNum);
+//               }}
+//             >
+//               {getAllImages().map((image, index) => (
+//                 <View key={index} style={styles.gallerySlide}>
+//                   <Image
+//                     source={{ uri: image }}
+//                     style={styles.modalImage}
+//                     resizeMode="contain"
+//                   />
+//                 </View>
+//               ))}
+//             </ScrollView>
+           
+//             {/* Image counter */}
+//             <View style={styles.imageCounter}>
+//               <Text style={styles.imageCounterText}>
+//                 {selectedGalleryImageIndex + 1} / {getTotalPhotoCount()}
+//               </Text>
+//             </View>
+           
+//             <TouchableOpacity
+//               style={styles.closeButton}
+//               onPress={() => setGalleryModalVisible(false)}
+//             >
+//               <Entypo name="cross" size={24} color="#fff" />
+//             </TouchableOpacity>
+//           </View>
+//         </View>
+//       </Modal>
+//     </SafeAreaView>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   safeArea: {
+//     flex: 1,
+//     backgroundColor: '#fff',
+//   },
+//   container: {
+//     flex: 1,
+//     position: 'relative',
+//   },
+//   scrollContent: {
+//     paddingBottom: 80,
+//   },
+//   header: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     padding: 15,
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#eee',
+//   },
+//   toggleContainer: {
+//     flexDirection: 'row',
+//     backgroundColor: 'rgba(255, 107, 107, 0.1)',
+//     borderRadius: 20,
+//     padding: 2,
+//   },
+//   toggleButton: {
+//     paddingHorizontal: 15,
+//     paddingVertical: 8,
+//     borderRadius: 15,
+//   },
+//   activeToggle: {
+//     backgroundColor: '#FF6B6B',
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.1,
+//     shadowRadius: 4,
+//     elevation: 2,
+//   },
+//   toggleText: {
+//     fontWeight: 'bold',
+//     color: '#555',
+//   },
+//   activeToggleText: {
+//     color: '#fff',
+//   },
+//   languageButton: {
+//     padding: 5,
+//   },
+//   optionsContainer: {
+//     flexDirection: 'row',
+//     paddingHorizontal: 15,
+//     marginBottom: 15,
+//   },
+//   option: {
+//     paddingHorizontal: 12,
+//     paddingVertical: 6,
+//     marginRight: 10,
+//     borderRadius: 15,
+//     borderWidth: 1,
+//     borderColor: '#eee',
+//   },
+//   selectedOption: {
+//     backgroundColor: '#FF6B6B',
+//     borderColor: '#FF6B6B',
+//   },
+//   optionText: {
+//     color: '#555',
+//     fontSize: 12,
+//   },
+//   selectedOptionText: {
+//     color: '#fff',
+//   },
+//   profileSection: {
+//     position: 'relative',
+//     marginBottom: 10,
+//   },
+//   profileContainer: {
+//     padding: 15,
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#eee',
+//   },
+//   profileImageContainer: {
+//     position: 'relative',
+//     marginBottom: 15,
+//   },
+//   profileImage: {
+//     width: '100%',
+//     height: 300,
+//     borderRadius: 10,
+//   },
+//   verificationBadge: {
+//     position: 'absolute',
+//     top: 10,
+//     left: 10,
+//     backgroundColor: 'rgba(255, 255, 255, 0.9)',
+//     borderRadius: 12,
+//     padding: 4,
+//     zIndex: 10,
+//   },
+//   verificationBadgeImage: {
+//     width: 24,
+//     height: 24,
+//     borderRadius: 12,
+//   },
+//   profileInfoArea: {
+//     // This makes the entire area below the image tappable for scrolling
+//   },
+//   navArrow: {
+//     position: 'absolute',
+//     top: '40%',
+//     zIndex: 10,
+//     backgroundColor: 'rgba(255, 255, 255, 0.9)',
+//     width: 40,
+//     height: 60,
+//     borderRadius: 8,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.3,
+//     shadowRadius: 4,
+//     elevation: 5,
+//   },
+//   prevArrow: {
+//     left: 10,
+//     borderTopRightRadius: 20,
+//     borderBottomRightRadius: 20,
+//   },
+//   nextArrow: {
+//     right: 10,
+//     borderTopLeftRadius: 20,
+//     borderBottomLeftRadius: 20,
+//   },
+//   galleryIconContainer: {
+//     position: 'absolute',
+//     bottom: 10,
+//     right: 10,
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+//     padding: 5,
+//     borderRadius: 15,
+//   },
+//   galleryCount: {
+//     color: '#fff',
+//     fontWeight: 'bold',
+//     marginLeft: 5,
+//     fontSize: 14,
+//   },
+//   profileHeader: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'flex-start',
+//     marginBottom: 10,
+//   },
+//   profileName: {
+//     fontSize: 20,
+//     fontWeight: 'bold',
+//     marginBottom: 5,
+//     color: '#333',
+//   },
+//   profileDetails: {
+//     color: '#666',
+//     marginBottom: 2,
+//     fontSize: 14,
+//   },
+//   matchBadge: {
+//     backgroundColor: '#FF6B6B',
+//     paddingHorizontal: 10,
+//     paddingVertical: 5,
+//     borderRadius: 15,
+//   },
+//   matchText: {
+//     color: '#fff',
+//     fontWeight: 'bold',
+//     fontSize: 12,
+//   },
+//   lastSeen: {
+//     color: '#4CAF50',
+//     marginBottom: 15,
+//     fontSize: 12,
+//   },
+//   actionButtons: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     marginVertical: 10,
+//   },
+//   interestButton: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     backgroundColor: '#FFF0F0',
+//     paddingHorizontal: 15,
+//     paddingVertical: 10,
+//     borderRadius: 25,
+//     flex: 1,
+//     marginRight: 10,
+//     justifyContent: 'center',
+//   },
+//   interestButtonText: {
+//     color: '#FF6B6B',
+//     fontWeight: 'bold',
+//     marginLeft: 5,
+//   },
+//   actionButton: {
+//     padding: 10,
+//     borderRadius: 50,
+//     borderWidth: 1,
+//     borderColor: '#eee',
+//     width: 50,
+//     alignItems: 'center',
+//     backgroundColor: '#f9f9f9',
+//     marginHorizontal: 5,
+//   },
+//   bottomActions: {
+//     flexDirection: 'row',
+//     padding: 15,
+//     borderTopWidth: 1,
+//     borderTopColor: '#eee',
+//     backgroundColor: '#fff',
+//     position: 'absolute',
+//     bottom: 0,
+//     left: 0,
+//     right: 0,
+//     ...Platform.select({
+//       ios: {
+//         shadowColor: '#000',
+//         shadowOffset: { width: 0, height: -2 },
+//         shadowOpacity: 0.1,
+//         shadowRadius: 4,
+//       },
+//       android: {
+//         elevation: 10,
+//       },
+//     }),
+//   },
+//   bottomButton: {
+//     flex: 1,
+//     flexDirection: 'row',
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     padding: 15,
+//     borderRadius: 10,
+//     borderWidth: 1,
+//     borderColor: '#eee',
+//     marginHorizontal: 5,
+//     backgroundColor: '#f9f9f9',
+//   },
+//   messageButton: {
+//     backgroundColor: '#FF6B6B',
+//     borderColor: '#FF6B6B',
+//   },
+//   bottomButtonText: {
+//     marginLeft: 5,
+//     fontWeight: '600',
+//   },
+//   messageButtonText: {
+//     color: '#fff',
+//   },
+//   section: {
+//     padding: 15,
+//     borderBottomWidth: 1,
+//     borderBottomColor: 'rgba(0, 0, 0, 0.1)',
+//     backgroundColor: '#fff',
+//   },
+//   sectionTitle: {
+//     fontSize: 18,
+//     fontWeight: 'bold',
+//     marginBottom: 15,
+//     color: '#333',
+//   },
+//   infoList: {
+//     // Single column layout
+//   },
+//   infoListItem: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     marginBottom: 12,
+//     paddingVertical: 5,
+//   },
+//   infoLabelContainer: {
+//     flex: 1,
+//     alignItems: 'flex-start',
+//     marginLeft: 0,
+//     paddingLeft: 0,
+//   },
+//   infoLabel: {
+//     color: '#666',
+//     fontSize: 14,
+//     fontWeight: '500',
+//     textAlign: 'left',
+//     marginLeft: 0,
+//     paddingLeft: 0,
+//   },
+//   colon: {
+//     fontWeight: 'bold',
+//     color: '#333',
+//     fontSize: 14,
+//     width: 10,
+//     textAlign: 'center',
+//     position: 'absolute',
+//     left: '50%',
+//     marginLeft: -5,
+//   },
+//   infoValue: {
+//     fontWeight: '500',
+//     color: '#333',
+//     fontSize: 14,
+//     flex: 1,
+//     marginLeft: 20,
+//   },
+//     infoValueContainer: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     flex: 1,
+//     marginLeft: 20,
+//   },
+//   lockIcon: {
+//     marginLeft: 4,
+//   },
+//   aboutText: {
+//     lineHeight: 22,
+//     color: '#555',
+//   },
+//   loadingContainer: {
+//     flex: 1,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//   },
+//   loadingText: {
+//     marginTop: 10,
+//     color: '#666',
+//   },
+//   noProfilesContainer: {
+//     padding: 40,
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//   },
+//   noProfilesText: {
+//     fontSize: 18,
+//     color: '#666',
+//     textAlign: 'center',
+//   },
+//   modalContainer: {
+//     flex: 1,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     backgroundColor: 'rgba(0, 0, 0, 0.9)',
+//   },
+//   modalContent: {
+//     width: '100%',
+//     height: '100%',
+//     position: 'relative',
+//   },
+//   galleryScrollView: {
+//     flex: 1,
+//   },
+//   gallerySlide: {
+//     width: screenWidth,
+//     height: '100%',
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//   },
+//   modalImage: {
+//     width: '100%',
+//     height: '100%',
+//   },
+//   imageCounter: {
+//     position: 'absolute',
+//     top: 40,
+//     alignSelf: 'center',
+//     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+//     paddingHorizontal: 12,
+//     paddingVertical: 6,
+//     borderRadius: 15,
+//   },
+//   imageCounterText: {
+//     color: '#fff',
+//     fontWeight: 'bold',
+//   },
+//   closeButton: {
+//     position: 'absolute',
+//     top: 40,
+//     right: 20,
+//     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+//     borderRadius: 20,
+//     padding: 8,
+//     zIndex: 10,
+//   },
+// });
+
+
+//23/09/2025
+// app/(tabs)/Matches.jsx
 import { View, Text, Image, TouchableOpacity, ScrollView, StyleSheet, Platform, ActivityIndicator, Modal, Dimensions, Alert, Animated, PanResponder } from 'react-native';
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Ionicons, Feather, MaterialIcons, FontAwesome, AntDesign, Entypo } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { collection, query, where, getDocs, limit, doc, getDoc, addDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, getDocs, limit, doc, getDoc, addDoc, serverTimestamp, onSnapshot, updateDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
@@ -36129,6 +37527,7 @@ export default function Matches() {
   const [galleryModalVisible, setGalleryModalVisible] = useState(false);
   const [selectedGalleryImageIndex, setSelectedGalleryImageIndex] = useState(0);
   const [hasLoaded, setHasLoaded] = useState(false);
+  const [sentInterests, setSentInterests] = useState({});
   const { user } = useAuth();
   const { language } = useLanguage();
   const router = useRouter();
@@ -36179,6 +37578,30 @@ export default function Matches() {
       console.error('Error setting cached data:', error);
     }
   };
+
+  // Load sent interests
+  const loadSentInterests = useCallback(async () => {
+    if (!user?.id) return;
+    
+    try {
+      const interestsRef = collection(db, 'Users', user.id, 'sentInterests');
+      const q = query(interestsRef);
+      
+      const querySnapshot = await getDocs(q);
+      const interestsMap = {};
+      
+      querySnapshot.forEach((doc) => {
+        const interestData = doc.data();
+        if (interestData.toUserId) {
+          interestsMap[interestData.toUserId] = interestData.status || 'pending';
+        }
+      });
+      
+      setSentInterests(interestsMap);
+    } catch (error) {
+      console.error('Error loading sent interests:', error);
+    }
+  }, [user]);
 
   // Translations - memoized to prevent recreation
   const translations = useMemo(() => ({
@@ -36233,6 +37656,10 @@ export default function Matches() {
     sendInterest: {
       ENG: "Send Interest",
       HI: "रुचि भेजें"
+    },
+    interestSent: {
+      ENG: "Interest Sent",
+      HI: "रुचि भेज दी गई"
     },
     activeToday: {
       ENG: "Active today",
@@ -36495,9 +37922,15 @@ export default function Matches() {
         return;
       }
 
+      // Check if interest was already sent
+      if (sentInterests[profileId]) {
+        Alert.alert('Info', 'Interest already sent to this profile');
+        return;
+      }
+
       // Add to sent interests
       const sentInterestRef = collection(db, 'Users', user.id, 'sentInterests');
-      await addDoc(sentInterestRef, {
+      const interestDoc = await addDoc(sentInterestRef, {
         toUserId: profileId,
         toUserName: profileName,
         timestamp: serverTimestamp(),
@@ -36511,8 +37944,15 @@ export default function Matches() {
         fromUserName: user.displayName || `${user.firstName} ${user.lastName}`,
         fromUserImage: user.profilePhoto || '',
         timestamp: serverTimestamp(),
-        status: 'pending'
+        status: 'pending',
+        interestId: interestDoc.id
       });
+
+      // Update local state
+      setSentInterests(prev => ({
+        ...prev,
+        [profileId]: 'pending'
+      }));
 
       Alert.alert('Success', 'Interest sent successfully!');
     } catch (error) {
@@ -36757,6 +38197,7 @@ export default function Matches() {
     setLoading(true);
     setLoadingProfiles(true);
     fetchAllProfiles();
+    loadSentInterests();
   };
 
   // Navigate to Upgrade screen
@@ -36769,13 +38210,14 @@ export default function Matches() {
     useCallback(() => {
       if (!hasLoaded && user && !params.selectedProfile && !params.viewAll) {
         fetchAllProfiles();
+        loadSentInterests();
       }
 
       // Cleanup function to reset loading state when screen loses focus
       return () => {
         // Keep the data but reset loading states if needed
       };
-    }, [hasLoaded, user, params.selectedProfile, params.viewAll, fetchAllProfiles])
+    }, [hasLoaded, user, params.selectedProfile, params.viewAll, fetchAllProfiles, loadSentInterests])
   );
 
   if (loading) {
@@ -36903,11 +38345,26 @@ export default function Matches() {
                   {/* Action Buttons */}
                   <View style={styles.actionButtons}>
                     <TouchableOpacity
-                      style={styles.interestButton}
+                      style={[
+                        styles.interestButton,
+                        sentInterests[selectedProfile.id] && styles.interestSentButton
+                      ]}
                       onPress={() => sendInterest(selectedProfile.id, `${selectedProfile.firstName} ${selectedProfile.lastName}`)}
+                      disabled={!!sentInterests[selectedProfile.id]}
                     >
-                      <Ionicons name="heart" size={20} color="#FF6B6B" />
-                      <Text style={styles.interestButtonText}>{translations.sendInterest[language]}</Text>
+                      {sentInterests[selectedProfile.id] ? (
+                        <>
+                          <Ionicons name="checkmark" size={20} color="#4CAF50" />
+                          <Text style={[styles.interestButtonText, styles.interestSentText]}>
+                            {translations.interestSent[language]}
+                          </Text>
+                        </>
+                      ) : (
+                        <>
+                          <Ionicons name="heart" size={20} color="#FF6B6B" />
+                          <Text style={styles.interestButtonText}>{translations.sendInterest[language]}</Text>
+                        </>
+                      )}
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.actionButton}>
                       <MaterialIcons name="call" size={24} color="#4CAF50" />
@@ -37010,7 +38467,7 @@ export default function Matches() {
           )}
          
           {/* Spacer for bottom buttons */}
-          <View style={{ height: 80 }} />
+          <View style={{ height: 100 }} />
         </ScrollView>
 
         {/* Fixed Bottom Action Buttons */}
@@ -37028,7 +38485,7 @@ export default function Matches() {
               onPress={startChat}
             >
               <Feather name="message-square" size={20} color="#fff" />
-              <Text style={styles.bottomButtonText}>{translations.sendMessage[language]}</Text>
+              <Text style={[styles.bottomButtonText, styles.messageButtonText]}>{translations.sendMessage[language]}</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -37114,7 +38571,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   scrollContent: {
-    paddingBottom: 80,
+    paddingBottom: 10, // Increased padding for bottom buttons
   },
   header: {
     flexDirection: 'row',
@@ -37303,10 +38760,16 @@ const styles = StyleSheet.create({
     marginRight: 10,
     justifyContent: 'center',
   },
+  interestSentButton: {
+    backgroundColor: '#E8F5E9',
+  },
   interestButtonText: {
     color: '#FF6B6B',
     fontWeight: 'bold',
     marginLeft: 5,
+  },
+  interestSentText: {
+    color: '#4CAF50',
   },
   actionButton: {
     padding: 10,
@@ -37320,7 +38783,7 @@ const styles = StyleSheet.create({
   },
   bottomActions: {
     flexDirection: 'row',
-    padding: 15,
+    padding: 20, // Increased padding
     borderTopWidth: 1,
     borderTopColor: '#eee',
     backgroundColor: '#fff',
@@ -37341,17 +38804,19 @@ const styles = StyleSheet.create({
     }),
   },
   bottomButton: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 15,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#eee',
-    marginHorizontal: 5,
-    backgroundColor: '#f9f9f9',
-  },
+  flex: 1,
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: 15,
+  borderRadius: 10,
+  borderWidth: 1,
+  borderColor: '#eee',
+  marginHorizontal: 10, // Increased margin
+  backgroundColor: '#f9f9f9',
+  marginBottom: 5, // ✅ space outside the button
+},
+
   messageButton: {
     backgroundColor: '#FF6B6B',
     borderColor: '#FF6B6B',
@@ -37416,7 +38881,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 20,
   },
-    infoValueContainer: {
+  infoValueContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,

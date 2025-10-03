@@ -3317,7 +3317,1298 @@
 
 //22/08/2025
 //app/homescreens/info2.jsx
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Dimensions, Keyboard, Platform, ScrollView, Image, Animated, ActivityIndicator } from 'react-native';
+// import { View, Text, TextInput, StyleSheet, TouchableOpacity, Dimensions, Keyboard, Platform, ScrollView, Image, Animated, ActivityIndicator } from 'react-native';
+// import React, { useState, useEffect } from 'react';
+// import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+// import { useRouter } from 'expo-router';
+// import { useLanguage } from '../context/LanguageContext';
+// import { useProfile } from '../context/ProfileContext';
+// import { useFirestore } from '../hooks/useFirebase';
+// import { serverTimestamp } from 'firebase/firestore';
+// import { MaterialIcons } from '@expo/vector-icons';
+// import { useProfileNavigation } from '../utils/navigationHelper';
+
+// const { width, height } = Dimensions.get('window');
+
+// const scaleFont = (size) => Math.min(width / 360, 1.5) * size;
+// const scaleHeight = (size) => Math.min(height / 700, 1.5) * size;
+
+// export default function Info2() {
+//   const router = useRouter();
+//   const { language, toggleLanguage, translateX } = useLanguage();
+//   const { profileFor, getPrefix, gender } = useProfile();
+//   const { saveUserProfile, userData } = useFirestore();
+//   const { getNextScreen, getPreviousScreen } = useProfileNavigation();
+  
+//   // Load existing data
+//   const [firstName, setFirstName] = useState(userData?.firstName || '');
+//   const [lastName, setLastName] = useState(userData?.lastName || '');
+//   const [day, setDay] = useState(userData?.birthDay || '');
+//   const [month, setMonth] = useState(userData?.birthMonth || '');
+//   const [year, setYear] = useState(userData?.birthYear || '');
+//   const [formattedDate, setFormattedDate] = useState(userData?.dateOfBirth || '');
+//   const [age, setAge] = useState(userData?.age || null);
+  
+//   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+//   const [isSubmitting, setIsSubmitting] = useState(false);
+//   const [errors, setErrors] = useState({
+//     day: '',
+//     month: '',
+//     year: '',
+//     date: ''
+//   });
+
+//   const [firstNameFocused, setFirstNameFocused] = useState(false);
+//   const [lastNameFocused, setLastNameFocused] = useState(false);
+//   const [dayFocused, setDayFocused] = useState(false);
+//   const [monthFocused, setMonthFocused] = useState(false);
+//   const [yearFocused, setYearFocused] = useState(false);
+
+//   const translations = {
+//     title: {
+//       ENG: `${getPrefix()} name`,
+//       HI: profileFor === 'MySelf' ? "आपका नाम" :
+//         profileFor === 'My Son' ? "आपके बेटे का नाम" :
+//         profileFor === 'My Daughter' ? "आपकी बेटी का नाम" :
+//         profileFor === 'My Sister' ? "आपकी बहन का नाम" :
+//         profileFor === 'My Brother' ? "आपके भाई का नाम" :
+//         profileFor === 'My Friend' ? "आपके दोस्त का नाम" :
+//         profileFor === 'Cousin' ? "आपके चचेरे भाई का नाम" :
+//         "आपके रिश्तेदार का नाम"
+//     },
+//     subtitle: {
+//       ENG: "Date of birth",
+//       HI: "जन्म तिथि"
+//     },
+//     firstNamePlaceholder: {
+//       ENG: "First name",
+//       HI: "पहला नाम"
+//     },
+//     lastNamePlaceholder: {
+//       ENG: "Last name",
+//       HI: "उपनाम"
+//     },
+//     continue: {
+//       ENG: "Continue",
+//       HI: "जारी रखें"
+//     },
+//     day: {
+//       ENG: "Day",
+//       HI: "दिन"
+//     },
+//     month: {
+//       ENG: "Month",
+//       HI: "महीना"
+//     },
+//     year: {
+//       ENG: "Year",
+//       HI: "साल"
+//     },
+//     invalidDay: {
+//       ENG: "Please enter a valid day (1-31)",
+//       HI: "कृपया एक वैध दिन दर्ज करें (1-31)"
+//     },
+//     invalidMonth: {
+//       ENG: "Please enter a valid month (1-12)",
+//       HI: "कृपया एक वैध महीना दर्ज करें (1-12)"
+//     },
+//     invalidYear: {
+//       ENG: "Please enter a valid 4-digit year",
+//       HI: "कृपया एक वैध 4-अंकीय वर्ष दर्ज करें"
+//     },
+//     invalidDate: {
+//       ENG: "Please enter a valid date",
+//       HI: "कृपया एक वैध तिथि दर्ज करें"
+//     },
+//     age: {
+//       ENG: "Age",
+//       HI: "उम्र"
+//     },
+//     submitting: {
+//       ENG: "Saving...",
+//       HI: "सहेजा जा रहा है..."
+//     }
+//   };
+
+//   useEffect(() => {
+//     const keyboardDidShowListener = Keyboard.addListener(
+//       Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+//       () => setKeyboardVisible(true)
+//     );
+//     const keyboardDidHideListener = Keyboard.addListener(
+//       Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+//       () => setKeyboardVisible(false)
+//     );
+
+//     return () => {
+//       keyboardDidShowListener.remove();
+//       keyboardDidHideListener.remove();
+//     };
+//   }, []);
+
+//   useEffect(() => {
+//     if (day && month && year) {
+//       validateAndCalculateAge();
+//     }
+//   }, [day, month, year]);
+
+//   const validateAndCalculateAge = () => {
+//     const dayNum = parseInt(day, 10);
+//     const monthNum = parseInt(month, 10);
+//     const yearNum = parseInt(year, 10);
+
+//     // Basic validation
+//     if (isNaN(dayNum) || dayNum < 1 || dayNum > 31) {
+//       setErrors(prev => ({ ...prev, day: translations.invalidDay[language] }));
+//       return false;
+//     }
+
+//     if (isNaN(monthNum) || monthNum < 1 || monthNum > 12) {
+//       setErrors(prev => ({ ...prev, month: translations.invalidMonth[language] }));
+//       return false;
+//     }
+
+//     if (isNaN(yearNum) || year.length !== 4) {
+//       setErrors(prev => ({ ...prev, year: translations.invalidYear[language] }));
+//       return false;
+//     }
+
+//     // Advanced date validation
+//     const date = new Date(yearNum, monthNum - 1, dayNum);
+//     if (
+//       date.getFullYear() !== yearNum ||
+//       date.getMonth() !== monthNum - 1 ||
+//       date.getDate() !== dayNum
+//     ) {
+//       setErrors(prev => ({ ...prev, date: translations.invalidDate[language] }));
+//       return false;
+//     }
+
+//     // Check if date is in the future
+//     const today = new Date();
+//     if (date > today) {
+//       setErrors(prev => ({ ...prev, date: translations.invalidDate[language] }));
+//       return false;
+//     }
+
+//     // Clear errors if valid
+//     setErrors({ day: '', month: '', year: '', date: '' });
+
+//     // Format date as DD/MM/YYYY
+//     const formatted = `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`;
+//     setFormattedDate(formatted);
+
+//     // Calculate age
+//     const ageDiff = today.getFullYear() - date.getFullYear();
+//     const monthDiff = today.getMonth() - date.getMonth();
+//     const dayDiff = today.getDate() - date.getDate();
+    
+//     const calculatedAge = monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)
+//       ? ageDiff - 1
+//       : ageDiff;
+    
+//     setAge(calculatedAge);
+//     return true;
+//   };
+
+//   const handleDayChange = (text) => {
+//     const numericText = text.replace(/[^0-9]/g, '');
+//     setDay(numericText.slice(0, 2));
+//   };
+
+//   const handleMonthChange = (text) => {
+//     const numericText = text.replace(/[^0-9]/g, '');
+//     setMonth(numericText.slice(0, 2));
+//   };
+
+//   const handleYearChange = (text) => {
+//     const numericText = text.replace(/[^0-9]/g, '');
+//     setYear(numericText.slice(0, 4));
+//   };
+
+//   const handleContinue = async () => {
+//     if (!validateAndCalculateAge()) return;
+//     if (isButtonDisabled) return;
+
+//     try {
+//       setIsSubmitting(true);
+
+//       // Prepare profile data
+//       const profileData = {
+//         firstName,
+//         lastName,
+//         fullName: `${firstName} ${lastName}`,
+//         dateOfBirth: formattedDate,
+//         birthDay: day.padStart(2, '0'),
+//         birthMonth: month.padStart(2, '0'),
+//         birthYear: year,
+//         age,
+//         profileFor,
+//         gender
+//       };
+
+//       // Save to Firestore with screen number
+//       await saveUserProfile(profileData, 2);
+
+//       // Navigate to next screen
+//       router.push(getNextScreen('homescreens/info2'));
+//     } catch (error) {
+//       console.error('Error saving profile:', error);
+//     } finally {
+//       setIsSubmitting(false);
+//     }
+//   };
+
+//   const isButtonDisabled = !firstName || !lastName || !day || !month || !year ||
+//                           !!errors.day || !!errors.month || !!errors.year || !!errors.date;
+
+//   return (
+//     <View style={styles.container}>
+//       {/* Header with fixed buttons */}
+//       <View style={styles.header}>
+//         <TouchableOpacity
+//           style={styles.backButton}
+//           onPress={() => router.push(getPreviousScreen('homescreens/info2'))}
+//         >
+//           <MaterialIcons name="arrow-back" size={24} color="#333" />
+//         </TouchableOpacity>
+
+//         <View style={styles.languageToggleContainer}>
+//           <Text style={styles.languageLabel}>ENG</Text>
+//           <TouchableOpacity
+//             style={styles.toggleContainer}
+//             onPress={toggleLanguage}
+//             activeOpacity={0.8}
+//           >
+//             <Animated.View style={[
+//               styles.toggleButton,
+//               {
+//                 transform: [{ translateX: language === 'ENG' ? 0 : 32 }],
+//                 backgroundColor: language === 'ENG' ? '#6C63FF' : '#FF6B6B'
+//               }
+//             ]}>
+//               <Image
+//                 source={language === 'ENG'
+//                   ? require('../../assets/uk-flag.png')
+//                   : require('../../assets/india-flag.png')}
+//                 style={styles.flag}
+//               />
+//             </Animated.View>
+//           </TouchableOpacity>
+//           <Text style={styles.languageLabel}>हिंदी</Text>
+//         </View>
+//       </View>
+
+//       <ScrollView
+//         contentContainerStyle={styles.scrollContent}
+//         keyboardShouldPersistTaps="handled"
+//         showsVerticalScrollIndicator={false}
+//       >
+//         <View style={styles.contentContainer}>
+//           <View style={styles.iconContainer}>
+//             <FontAwesome6 name="user" size={scaleFont(40)} color="#4c5211" />
+//           </View>
+
+//           <Text style={styles.title}>{translations.title[language]}</Text>
+
+//           <View style={styles.nameInputContainer}>
+//             <View style={styles.inputWrapper}>
+//               <TextInput
+//                 style={[styles.input, styles.nameInput]}
+//                 placeholder={translations.firstNamePlaceholder[language]}
+//                 placeholderTextColor="#888"
+//                 value={firstName}
+//                 onFocus={() => setFirstNameFocused(true)}
+//                 onBlur={() => setFirstNameFocused(false)}
+//                 onChangeText={setFirstName}
+//                 textAlign="left"
+//               />
+//               {firstNameFocused && <Text style={styles.nameLabel}>{translations.firstNamePlaceholder[language]}</Text>}
+//             </View>
+//             <View style={styles.inputWrapper}>
+//               <TextInput
+//                 style={[styles.input, styles.nameInput]}
+//                 placeholder={translations.lastNamePlaceholder[language]}
+//                 placeholderTextColor="#888"
+//                 value={lastName}
+//                 onFocus={() => setLastNameFocused(true)}
+//                 onBlur={() => setLastNameFocused(false)}
+//                 onChangeText={setLastName}
+//                 textAlign="left"
+//               />
+//               {lastNameFocused && <Text style={styles.nameLabel}>{translations.lastNamePlaceholder[language]}</Text>}
+//             </View>
+//           </View>
+
+//           <Text style={styles.subtitle}>{translations.subtitle[language]}</Text>
+
+//           <View style={styles.dateContainer}>
+//             <View style={styles.dateInputWrapper}>
+//               <TextInput
+//                 style={[styles.input, styles.dateInput, errors.day ? styles.errorInput : {}]}
+//                 placeholder={translations.day[language]}
+//                 placeholderTextColor="#888"
+//                 keyboardType="number-pad"
+//                 value={day}
+//                 onFocus={() => setDayFocused(true)}
+//                 onBlur={() => setDayFocused(false)}
+//                 onChangeText={handleDayChange}
+//                 maxLength={2}
+//                 textAlign="left"
+//               />
+//               {dayFocused && <Text style={styles.dateLabel}>{translations.day[language]}</Text>}
+//               {errors.day ? <Text style={styles.errorText}>{errors.day}</Text> : null}
+//             </View>
+//             <View style={styles.dateInputWrapper}>
+//               <TextInput
+//                 style={[styles.input, styles.dateInput, errors.month ? styles.errorInput : {}]}
+//                 placeholder={translations.month[language]}
+//                 placeholderTextColor="#888"
+//                 keyboardType="number-pad"
+//                 value={month}
+//                 onFocus={() => setMonthFocused(true)}
+//                 onBlur={() => setMonthFocused(false)}
+//                 onChangeText={handleMonthChange}
+//                 maxLength={2}
+//                 textAlign="left"
+//               />
+//               {monthFocused && <Text style={styles.dateLabel}>{translations.month[language]}</Text>}
+//               {errors.month ? <Text style={styles.errorText}>{errors.month}</Text> : null}
+//             </View>
+//             <View style={styles.dateInputWrapper}>
+//               <TextInput
+//                 style={[styles.input, styles.dateInput, errors.year ? styles.errorInput : {}]}
+//                 placeholder={translations.year[language]}
+//                 placeholderTextColor="#888"
+//                 keyboardType="number-pad"
+//                 value={year}
+//                 onFocus={() => setYearFocused(true)}
+//                 onBlur={() => setYearFocused(false)}
+//                 onChangeText={handleYearChange}
+//                 maxLength={4}
+//                 textAlign="left"
+//               />
+//               {yearFocused && <Text style={styles.dateLabel}>{translations.year[language]}</Text>}
+//               {errors.year ? <Text style={styles.errorText}>{errors.year}</Text> : null}
+//             </View>
+//           </View>
+
+//           {errors.date && (
+//             <Text style={[styles.errorText, { alignSelf: 'center', marginBottom: 10 }]}>
+//               {errors.date}
+//             </Text>
+//           )}
+
+//           {formattedDate && (
+//             <View style={styles.dateDisplayContainer}>
+//               <Text style={styles.dateDisplayText}>
+//                 {translations.subtitle[language]}: {formattedDate}
+//               </Text>
+//             </View>
+//           )}
+
+//           {age !== null && (
+//             <View style={styles.dateDisplayContainer}>
+//               <Text style={styles.dateDisplayText}>
+//                 {translations.age[language]}: {age}
+//               </Text>
+//             </View>
+//           )}
+
+//           {!isKeyboardVisible && (
+//             <View style={styles.buttonContainer}>
+//               <TouchableOpacity
+//                 onPress={handleContinue}
+//                 style={[styles.button, { backgroundColor: isButtonDisabled ? '#ADB5BD' : '#f79598ff' }]}
+//                 disabled={isButtonDisabled || isSubmitting}
+//               >
+//                 {isSubmitting ? (
+//                   <ActivityIndicator color="white" />
+//                 ) : (
+//                   <Text style={styles.buttonText}>{translations.continue[language]}</Text>
+//                 )}
+//               </TouchableOpacity>
+//             </View>
+//           )}
+//         </View>
+//       </ScrollView>
+//     </View>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: 'white',
+//   },
+//   header: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     paddingHorizontal: 20,
+//     paddingTop: 50,
+//     paddingBottom: 15,
+//     backgroundColor: 'white',
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#E9ECEF',
+//   },
+//   backButton: {
+//     padding: 10,
+//     backgroundColor: 'white',
+//     borderRadius: 20,
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.1,
+//     shadowRadius: 3,
+//     elevation: 3,
+//   },
+//   languageToggleContainer: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     justifyContent: 'flex-end',
+//     gap: 6,
+//     backgroundColor: 'white',
+//     paddingHorizontal: 10,
+//     paddingVertical: 5,
+//     borderRadius: 20,
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.1,
+//     shadowRadius: 3,
+//     elevation: 3,
+//   },
+//   languageLabel: {
+//     fontWeight: '600',
+//     fontSize: 14,
+//     color: '#495057',
+//   },
+//   toggleContainer: {
+//     width: 60,
+//     height: 28,
+//     borderRadius: 14,
+//     backgroundColor: '#E9ECEF',
+//     justifyContent: 'center',
+//     paddingHorizontal: 2,
+//   },
+//   toggleButton: {
+//     width: 24,
+//     height: 24,
+//     borderRadius: 12,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.2,
+//     shadowRadius: 3,
+//     elevation: 3,
+//   },
+//   flag: {
+//     width: 18,
+//     height: 13,
+//     borderRadius: 2,
+//   },
+//   scrollContent: {
+//     flexGrow: 1,
+//     paddingBottom: scaleHeight(20),
+//   },
+//   contentContainer: {
+//     paddingTop: scaleHeight(20),
+//     paddingHorizontal: scaleHeight(20),
+//     alignItems: 'center',
+//     paddingBottom: scaleHeight(80),
+//   },
+//   buttonContainer: {
+//     marginTop: scaleHeight(20),
+//     width: '100%',
+//     paddingHorizontal: scaleHeight(20),
+//   },
+//   button: {
+//     width: '100%',
+//     padding: scaleHeight(18),
+//     borderRadius: 30,
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//     shadowColor: '#f79598ff',
+//     shadowOffset: { width: 0, height: 4 },
+//     shadowOpacity: 0.3,
+//     shadowRadius: 8,
+//     elevation: 6,
+//   },
+//   buttonText: {
+//     fontSize: scaleFont(20),
+//     fontWeight: 'bold',
+//     color: 'white',
+//   },
+//   iconContainer: {
+//     alignItems: 'center',
+//     backgroundColor: '#f7b5b7',
+//     borderRadius: 99,
+//     width: scaleHeight(80),
+//     height: scaleHeight(80),
+//     justifyContent: 'center',
+//     marginBottom: scaleHeight(20),
+//   },
+//   title: {
+//     fontSize: scaleFont(30),
+//     fontWeight: 'bold',
+//     alignSelf: 'flex-start',
+//     marginBottom: scaleHeight(20),
+//     color: '#333',
+//   },
+//   subtitle: {
+//     fontSize: scaleFont(30),
+//     fontWeight: 'bold',
+//     alignSelf: 'flex-start',
+//     marginBottom: scaleHeight(20),
+//     color: '#333',
+//   },
+//   nameInputContainer: {
+//     width: '100%',
+//     marginBottom: scaleHeight(30),
+//   },
+//   inputWrapper: {
+//     marginBottom: scaleHeight(20),
+//     position: 'relative',
+//   },
+//   input: {
+//     borderWidth: 1,
+//     borderColor: '#ddd',
+//     borderRadius: 10,
+//     padding: scaleHeight(15),
+//     fontSize: scaleFont(16),
+//     backgroundColor: '#fff',
+//   },
+//   errorInput: {
+//     borderColor: '#FF6B6B',
+//   },
+//   nameInput: {
+//     width: '100%',
+//     textAlign: 'left',
+//     paddingLeft: scaleHeight(15),
+//   },
+//   nameLabel: {
+//     position: 'absolute',
+//     top: -scaleHeight(10),
+//     left: scaleHeight(15),
+//     backgroundColor: 'white',
+//     paddingHorizontal: scaleHeight(5),
+//     fontSize: scaleFont(12),
+//     color: '#888',
+//   },
+//   dateContainer: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     width: '100%',
+//     marginBottom: scaleHeight(20),
+//   },
+//   dateInputWrapper: {
+//     width: '30%',
+//     position: 'relative',
+//   },
+//   dateInput: {
+//     height: scaleHeight(50),
+//     textAlign: 'left',
+//     paddingLeft: scaleHeight(15),
+//   },
+//   dateLabel: {
+//     position: 'absolute',
+//     top: -scaleHeight(10),
+//     left: scaleHeight(15),
+//     backgroundColor: 'white',
+//     paddingHorizontal: scaleHeight(5),
+//     fontSize: scaleFont(12),
+//     color: '#888',
+//   },
+//   errorText: {
+//     color: '#FF6B6B',
+//     fontSize: scaleFont(12),
+//     marginTop: scaleHeight(5),
+//     marginLeft: scaleHeight(5),
+//   },
+//   dateDisplayContainer: {
+//     width: '100%',
+//     padding: scaleHeight(10),
+//     backgroundColor: '#f8f9fa',
+//     borderRadius: 8,
+//     marginBottom: scaleHeight(10),
+//   },
+//   dateDisplayText: {
+//     fontSize: scaleFont(16),
+//     color: '#495057',
+//   },
+// });
+
+
+
+
+
+
+
+
+//30/09/2025
+// app/homescreens/info2.jsx
+// import { View, Text, TextInput, StyleSheet, TouchableOpacity, Dimensions, Keyboard, Platform, ScrollView, Image, Animated, ActivityIndicator } from 'react-native';
+// import React, { useState, useEffect } from 'react';
+// import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+// import { useRouter } from 'expo-router';
+// import { useLanguage } from '../context/LanguageContext';
+// import { useProfile } from '../context/ProfileContext';
+// import { useFirestore } from '../hooks/useFirebase';
+// import { serverTimestamp } from 'firebase/firestore';
+// import { MaterialIcons } from '@expo/vector-icons';
+// import { useProfileNavigation } from '../utils/navigationHelper';
+// import RNPickerSelect from 'react-native-picker-select';
+
+// const { width, height } = Dimensions.get('window');
+
+// const scaleFont = (size) => Math.min(width / 360, 1.5) * size;
+// const scaleHeight = (size) => Math.min(height / 700, 1.5) * size;
+
+// export default function Info2() {
+//   const router = useRouter();
+//   const { language, toggleLanguage, translateX } = useLanguage();
+//   const { profileFor, getPrefix, gender } = useProfile();
+//   const { saveUserProfile, userData } = useFirestore();
+//   const { getNextScreen, getPreviousScreen } = useProfileNavigation();
+  
+//   // Load existing data
+//   const [firstName, setFirstName] = useState(userData?.firstName || '');
+//   const [lastName, setLastName] = useState(userData?.lastName || '');
+//   const [day, setDay] = useState(userData?.birthDay || '');
+//   const [month, setMonth] = useState(userData?.birthMonth || '');
+//   const [year, setYear] = useState(userData?.birthYear || '');
+//   const [formattedDate, setFormattedDate] = useState(userData?.dateOfBirth || '');
+//   const [age, setAge] = useState(userData?.age || null);
+  
+//   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+//   const [isSubmitting, setIsSubmitting] = useState(false);
+//   const [errors, setErrors] = useState({
+//     day: '',
+//     month: '',
+//     year: '',
+//     date: ''
+//   });
+
+//   const [firstNameFocused, setFirstNameFocused] = useState(false);
+//   const [lastNameFocused, setLastNameFocused] = useState(false);
+//   const [dayFocused, setDayFocused] = useState(false);
+//   const [monthFocused, setMonthFocused] = useState(false);
+//   const [yearFocused, setYearFocused] = useState(false);
+
+//   // Generate days (1-31)
+//   const days = Array.from({ length: 31 }, (_, i) => ({
+//     label: (i + 1).toString().padStart(2, '0'),
+//     value: (i + 1).toString().padStart(2, '0')
+//   }));
+
+//   // Generate months
+//   const months = [
+//     { label: 'Jan', value: '01' },
+//     { label: 'Feb', value: '02' },
+//     { label: 'Mar', value: '03' },
+//     { label: 'Apr', value: '04' },
+//     { label: 'May', value: '05' },
+//     { label: 'Jun', value: '06' },
+//     { label: 'Jul', value: '07' },
+//     { label: 'Aug', value: '08' },
+//     { label: 'Sep', value: '09' },
+//     { label: 'Oct', value: '10' },
+//     { label: 'Nov', value: '11' },
+//     { label: 'Dec', value: '12' }
+//   ];
+
+//   // Generate years (from current year - 18 down to 1950)
+//   const currentYear = new Date().getFullYear();
+//   const startYear = currentYear - 18;
+//   const years = Array.from({ length: startYear - 1949 }, (_, i) => ({
+//     label: (startYear - i).toString(),
+//     value: (startYear - i).toString()
+//   }));
+
+//   const translations = {
+//     title: {
+//       ENG: `${getPrefix()} name`,
+//       HI: profileFor === 'MySelf' ? "आपका नाम" :
+//         profileFor === 'My Son' ? "आपके बेटे का नाम" :
+//         profileFor === 'My Daughter' ? "आपकी बेटी का नाम" :
+//         profileFor === 'My Sister' ? "आपकी बहन का नाम" :
+//         profileFor === 'My Brother' ? "आपके भाई का नाम" :
+//         profileFor === 'My Friend' ? "आपके दोस्त का नाम" :
+//         profileFor === 'Cousin' ? "आपके चचेरे भाई का नाम" :
+//         "आपके रिश्तेदार का नाम"
+//     },
+//     subtitle: {
+//       ENG: "Date of birth",
+//       HI: "जन्म तिथि"
+//     },
+//     firstNamePlaceholder: {
+//       ENG: "First name",
+//       HI: "पहला नाम"
+//     },
+//     lastNamePlaceholder: {
+//       ENG: "Last name",
+//       HI: "उपनाम"
+//     },
+//     continue: {
+//       ENG: "Continue",
+//       HI: "जारी रखें"
+//     },
+//     day: {
+//       ENG: "Day",
+//       HI: "दिन"
+//     },
+//     month: {
+//       ENG: "Month",
+//       HI: "महीना"
+//     },
+//     year: {
+//       ENG: "Year",
+//       HI: "साल"
+//     },
+//     selectDay: {
+//       ENG: "Select Day",
+//       HI: "दिन चुनें"
+//     },
+//     selectMonth: {
+//       ENG: "Select Month",
+//       HI: "महीना चुनें"
+//     },
+//     selectYear: {
+//       ENG: "Select Year",
+//       HI: "साल चुनें"
+//     },
+//     invalidDate: {
+//       ENG: "Please enter a valid date",
+//       HI: "कृपया एक वैध तिथि दर्ज करें"
+//     },
+//     age: {
+//       ENG: "Age",
+//       HI: "उम्र"
+//     },
+//     submitting: {
+//       ENG: "Saving...",
+//       HI: "सहेजा जा रहा है..."
+//     }
+//   };
+
+//   useEffect(() => {
+//     const keyboardDidShowListener = Keyboard.addListener(
+//       Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+//       () => setKeyboardVisible(true)
+//     );
+//     const keyboardDidHideListener = Keyboard.addListener(
+//       Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+//       () => setKeyboardVisible(false)
+//     );
+
+//     return () => {
+//       keyboardDidShowListener.remove();
+//       keyboardDidHideListener.remove();
+//     };
+//   }, []);
+
+//   useEffect(() => {
+//     if (day && month && year) {
+//       validateAndCalculateAge();
+//     }
+//   }, [day, month, year]);
+
+//   const validateAndCalculateAge = () => {
+//     const dayNum = parseInt(day, 10);
+//     const monthNum = parseInt(month, 10);
+//     const yearNum = parseInt(year, 10);
+
+//     // Advanced date validation
+//     const date = new Date(yearNum, monthNum - 1, dayNum);
+//     if (
+//       date.getFullYear() !== yearNum ||
+//       date.getMonth() !== monthNum - 1 ||
+//       date.getDate() !== dayNum
+//     ) {
+//       setErrors(prev => ({ ...prev, date: translations.invalidDate[language] }));
+//       return false;
+//     }
+
+//     // Check if date is in the future
+//     const today = new Date();
+//     if (date > today) {
+//       setErrors(prev => ({ ...prev, date: translations.invalidDate[language] }));
+//       return false;
+//     }
+
+//     // Check if user is at least 18 years old
+//     const ageDiff = today.getFullYear() - date.getFullYear();
+//     const monthDiff = today.getMonth() - date.getMonth();
+//     const dayDiff = today.getDate() - date.getDate();
+    
+//     const calculatedAge = monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)
+//       ? ageDiff - 1
+//       : ageDiff;
+    
+//     if (calculatedAge < 18) {
+//       setErrors(prev => ({ ...prev, date: "Must be at least 18 years old" }));
+//       return false;
+//     }
+
+//     // Clear errors if valid
+//     setErrors({ day: '', month: '', year: '', date: '' });
+
+//     // Format date as DD/MM/YYYY
+//     const formatted = `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`;
+//     setFormattedDate(formatted);
+//     setAge(calculatedAge);
+//     return true;
+//   };
+
+//   const handleDaySelect = (value) => {
+//     setDay(value);
+//   };
+
+//   const handleMonthSelect = (value) => {
+//     setMonth(value);
+//   };
+
+//   const handleYearSelect = (value) => {
+//     setYear(value);
+//   };
+
+//   const handleContinue = async () => {
+//     if (!validateAndCalculateAge()) return;
+//     if (isButtonDisabled) return;
+
+//     try {
+//       setIsSubmitting(true);
+
+//       // Prepare profile data
+//       const profileData = {
+//         firstName,
+//         lastName,
+//         fullName: `${firstName} ${lastName}`,
+//         dateOfBirth: formattedDate,
+//         birthDay: day.padStart(2, '0'),
+//         birthMonth: month.padStart(2, '0'),
+//         birthYear: year,
+//         age,
+//         profileFor,
+//         gender
+//       };
+
+//       // Save to Firestore with screen number
+//       await saveUserProfile(profileData, 2);
+
+//       // Navigate to next screen
+//       router.push(getNextScreen('homescreens/info2'));
+//     } catch (error) {
+//       console.error('Error saving profile:', error);
+//     } finally {
+//       setIsSubmitting(false);
+//     }
+//   };
+
+//   const isButtonDisabled = !firstName || !lastName || !day || !month || !year ||
+//                           !!errors.day || !!errors.month || !!errors.year || !!errors.date;
+
+//   // Picker select styles
+//   const pickerSelectStyles = StyleSheet.create({
+//     inputIOS: {
+//       fontSize: scaleFont(16),
+//       paddingVertical: scaleHeight(15),
+//       paddingHorizontal: scaleHeight(15),
+//       borderWidth: 1,
+//       borderColor: '#ddd',
+//       borderRadius: 10,
+//       color: 'black',
+//       paddingRight: scaleHeight(30),
+//       backgroundColor: '#fff',
+//     },
+//     inputAndroid: {
+//       fontSize: scaleFont(16),
+//       paddingHorizontal: scaleHeight(15),
+//       paddingVertical: scaleHeight(12),
+//       borderWidth: 1,
+//       borderColor: '#ddd',
+//       borderRadius: 10,
+//       color: 'black',
+//       paddingRight: scaleHeight(30),
+//       backgroundColor: '#fff',
+//     },
+//     placeholder: {
+//       color: '#888',
+//     },
+//   });
+
+//   return (
+//     <View style={styles.container}>
+//       {/* Header with fixed buttons */}
+//       <View style={styles.header}>
+//         <TouchableOpacity
+//           style={styles.backButton}
+//           onPress={() => router.push(getPreviousScreen('homescreens/info2'))}
+//         >
+//           <MaterialIcons name="arrow-back" size={24} color="#333" />
+//         </TouchableOpacity>
+
+//         <View style={styles.languageToggleContainer}>
+//           <Text style={styles.languageLabel}>ENG</Text>
+//           <TouchableOpacity
+//             style={styles.toggleContainer}
+//             onPress={toggleLanguage}
+//             activeOpacity={0.8}
+//           >
+//             <Animated.View style={[
+//               styles.toggleButton,
+//               {
+//                 transform: [{ translateX: language === 'ENG' ? 0 : 32 }],
+//                 backgroundColor: language === 'ENG' ? '#6C63FF' : '#FF6B6B'
+//               }
+//             ]}>
+//               <Image
+//                 source={language === 'ENG'
+//                   ? require('../../assets/uk-flag.png')
+//                   : require('../../assets/india-flag.png')}
+//                 style={styles.flag}
+//               />
+//             </Animated.View>
+//           </TouchableOpacity>
+//           <Text style={styles.languageLabel}>हिंदी</Text>
+//         </View>
+//       </View>
+
+//       <ScrollView
+//         contentContainerStyle={styles.scrollContent}
+//         keyboardShouldPersistTaps="handled"
+//         showsVerticalScrollIndicator={false}
+//       >
+//         <View style={styles.contentContainer}>
+//           <View style={styles.iconContainer}>
+//             <FontAwesome6 name="user" size={scaleFont(40)} color="#4c5211" />
+//           </View>
+
+//           <Text style={styles.title}>{translations.title[language]}</Text>
+
+//           <View style={styles.nameInputContainer}>
+//             <View style={styles.inputWrapper}>
+//               <TextInput
+//                 style={[styles.input, styles.nameInput]}
+//                 placeholder={translations.firstNamePlaceholder[language]}
+//                 placeholderTextColor="#888"
+//                 value={firstName}
+//                 onFocus={() => setFirstNameFocused(true)}
+//                 onBlur={() => setFirstNameFocused(false)}
+//                 onChangeText={setFirstName}
+//                 textAlign="left"
+//               />
+//               {firstNameFocused && <Text style={styles.nameLabel}>{translations.firstNamePlaceholder[language]}</Text>}
+//             </View>
+//             <View style={styles.inputWrapper}>
+//               <TextInput
+//                 style={[styles.input, styles.nameInput]}
+//                 placeholder={translations.lastNamePlaceholder[language]}
+//                 placeholderTextColor="#888"
+//                 value={lastName}
+//                 onFocus={() => setLastNameFocused(true)}
+//                 onBlur={() => setLastNameFocused(false)}
+//                 onChangeText={setLastName}
+//                 textAlign="left"
+//               />
+//               {lastNameFocused && <Text style={styles.nameLabel}>{translations.lastNamePlaceholder[language]}</Text>}
+//             </View>
+//           </View>
+
+//           <Text style={styles.subtitle}>{translations.subtitle[language]}</Text>
+
+//           <View style={styles.dateContainer}>
+//             <View style={styles.dateInputWrapper}>
+//               <Text style={styles.pickerLabel}>{translations.day[language]}</Text>
+//               <RNPickerSelect
+//                 onValueChange={handleDaySelect}
+//                 items={days}
+//                 value={day}
+//                 placeholder={{
+//                   label: translations.selectDay[language],
+//                   value: null,
+//                   color: '#888',
+//                 }}
+//                 style={pickerSelectStyles}
+//                 useNativeAndroidPickerStyle={false}
+//               />
+//             </View>
+//             <View style={styles.dateInputWrapper}>
+//               <Text style={styles.pickerLabel}>{translations.month[language]}</Text>
+//               <RNPickerSelect
+//                 onValueChange={handleMonthSelect}
+//                 items={months}
+//                 value={month}
+//                 placeholder={{
+//                   label: translations.selectMonth[language],
+//                   value: null,
+//                   color: '#888',
+//                 }}
+//                 style={pickerSelectStyles}
+//                 useNativeAndroidPickerStyle={false}
+//               />
+//             </View>
+//             <View style={styles.dateInputWrapper}>
+//               <Text style={styles.pickerLabel}>{translations.year[language]}</Text>
+//               <RNPickerSelect
+//                 onValueChange={handleYearSelect}
+//                 items={years}
+//                 value={year}
+//                 placeholder={{
+//                   label: translations.selectYear[language],
+//                   value: null,
+//                   color: '#888',
+//                 }}
+//                 style={pickerSelectStyles}
+//                 useNativeAndroidPickerStyle={false}
+//               />
+//             </View>
+//           </View>
+
+//           {errors.date && (
+//             <Text style={[styles.errorText, { alignSelf: 'center', marginBottom: 10 }]}>
+//               {errors.date}
+//             </Text>
+//           )}
+
+//           {formattedDate && (
+//             <View style={styles.dateDisplayContainer}>
+//               <Text style={styles.dateDisplayText}>
+//                 {translations.subtitle[language]}: {formattedDate}
+//               </Text>
+//             </View>
+//           )}
+
+//           {age !== null && (
+//             <View style={styles.dateDisplayContainer}>
+//               <Text style={styles.dateDisplayText}>
+//                 {translations.age[language]}: {age}
+//               </Text>
+//             </View>
+//           )}
+
+//           {!isKeyboardVisible && (
+//             <View style={styles.buttonContainer}>
+//               <TouchableOpacity
+//                 onPress={handleContinue}
+//                 style={[styles.button, { backgroundColor: isButtonDisabled ? '#ADB5BD' : '#f79598ff' }]}
+//                 disabled={isButtonDisabled || isSubmitting}
+//               >
+//                 {isSubmitting ? (
+//                   <ActivityIndicator color="white" />
+//                 ) : (
+//                   <Text style={styles.buttonText}>{translations.continue[language]}</Text>
+//                 )}
+//               </TouchableOpacity>
+//             </View>
+//           )}
+//         </View>
+//       </ScrollView>
+//     </View>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: 'white',
+//   },
+//   header: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     paddingHorizontal: 20,
+//     paddingTop: 50,
+//     paddingBottom: 15,
+//     backgroundColor: 'white',
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#E9ECEF',
+//   },
+//   backButton: {
+//     padding: 10,
+//     backgroundColor: 'white',
+//     borderRadius: 20,
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.1,
+//     shadowRadius: 3,
+//     elevation: 3,
+//   },
+//   languageToggleContainer: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     justifyContent: 'flex-end',
+//     gap: 6,
+//     backgroundColor: 'white',
+//     paddingHorizontal: 10,
+//     paddingVertical: 5,
+//     borderRadius: 20,
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.1,
+//     shadowRadius: 3,
+//     elevation: 3,
+//   },
+//   languageLabel: {
+//     fontWeight: '600',
+//     fontSize: 14,
+//     color: '#495057',
+//   },
+//   toggleContainer: {
+//     width: 60,
+//     height: 28,
+//     borderRadius: 14,
+//     backgroundColor: '#E9ECEF',
+//     justifyContent: 'center',
+//     paddingHorizontal: 2,
+//   },
+//   toggleButton: {
+//     width: 24,
+//     height: 24,
+//     borderRadius: 12,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.2,
+//     shadowRadius: 3,
+//     elevation: 3,
+//   },
+//   flag: {
+//     width: 18,
+//     height: 13,
+//     borderRadius: 2,
+//   },
+//   scrollContent: {
+//     flexGrow: 1,
+//     paddingBottom: scaleHeight(20),
+//   },
+//   contentContainer: {
+//     paddingTop: scaleHeight(20),
+//     paddingHorizontal: scaleHeight(20),
+//     alignItems: 'center',
+//     paddingBottom: scaleHeight(80),
+//   },
+//   buttonContainer: {
+//     marginTop: scaleHeight(20),
+//     width: '100%',
+//     paddingHorizontal: scaleHeight(20),
+//   },
+//   button: {
+//     width: '100%',
+//     padding: scaleHeight(18),
+//     borderRadius: 30,
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//     shadowColor: '#f79598ff',
+//     shadowOffset: { width: 0, height: 4 },
+//     shadowOpacity: 0.3,
+//     shadowRadius: 8,
+//     elevation: 6,
+//   },
+//   buttonText: {
+//     fontSize: scaleFont(20),
+//     fontWeight: 'bold',
+//     color: 'white',
+//   },
+//   iconContainer: {
+//     alignItems: 'center',
+//     backgroundColor: '#f7b5b7',
+//     borderRadius: 99,
+//     width: scaleHeight(80),
+//     height: scaleHeight(80),
+//     justifyContent: 'center',
+//     marginBottom: scaleHeight(20),
+//   },
+//   title: {
+//     fontSize: scaleFont(30),
+//     fontWeight: 'bold',
+//     alignSelf: 'flex-start',
+//     marginBottom: scaleHeight(20),
+//     color: '#333',
+//   },
+//   subtitle: {
+//     fontSize: scaleFont(30),
+//     fontWeight: 'bold',
+//     alignSelf: 'flex-start',
+//     marginBottom: scaleHeight(20),
+//     color: '#333',
+//   },
+//   nameInputContainer: {
+//     width: '100%',
+//     marginBottom: scaleHeight(30),
+//   },
+//   inputWrapper: {
+//     marginBottom: scaleHeight(20),
+//     position: 'relative',
+//   },
+//   input: {
+//     borderWidth: 1,
+//     borderColor: '#ddd',
+//     borderRadius: 10,
+//     padding: scaleHeight(15),
+//     fontSize: scaleFont(16),
+//     backgroundColor: '#fff',
+//   },
+//   errorInput: {
+//     borderColor: '#FF6B6B',
+//   },
+//   nameInput: {
+//     width: '100%',
+//     textAlign: 'left',
+//     paddingLeft: scaleHeight(15),
+//   },
+//   nameLabel: {
+//     position: 'absolute',
+//     top: -scaleHeight(10),
+//     left: scaleHeight(15),
+//     backgroundColor: 'white',
+//     paddingHorizontal: scaleHeight(5),
+//     fontSize: scaleFont(12),
+//     color: '#888',
+//   },
+//   dateContainer: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     width: '100%',
+//     marginBottom: scaleHeight(20),
+//   },
+//   dateInputWrapper: {
+//     width: '30%',
+//   },
+//   pickerLabel: {
+//     fontSize: scaleFont(14),
+//     fontWeight: '600',
+//     color: '#333',
+//     marginBottom: scaleHeight(8),
+//     textAlign: 'center',
+//   },
+//   errorText: {
+//     color: '#FF6B6B',
+//     fontSize: scaleFont(12),
+//     marginTop: scaleHeight(5),
+//     textAlign: 'center',
+//   },
+//   dateDisplayContainer: {
+//     width: '100%',
+//     padding: scaleHeight(10),
+//     backgroundColor: '#f8f9fa',
+//     borderRadius: 8,
+//     marginBottom: scaleHeight(10),
+//   },
+//   dateDisplayText: {
+//     fontSize: scaleFont(16),
+//     color: '#495057',
+//     textAlign: 'center',
+//   },
+// });
+
+
+
+
+//trail2
+// app/homescreens/info2.jsx
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Dimensions, Keyboard, Platform, ScrollView, Image, Animated, ActivityIndicator, Modal, FlatList } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { useRouter } from 'expo-router';
@@ -3360,9 +4651,42 @@ export default function Info2() {
 
   const [firstNameFocused, setFirstNameFocused] = useState(false);
   const [lastNameFocused, setLastNameFocused] = useState(false);
-  const [dayFocused, setDayFocused] = useState(false);
-  const [monthFocused, setMonthFocused] = useState(false);
-  const [yearFocused, setYearFocused] = useState(false);
+  
+  // Modal states
+  const [dayModalVisible, setDayModalVisible] = useState(false);
+  const [monthModalVisible, setMonthModalVisible] = useState(false);
+  const [yearModalVisible, setYearModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Generate days (1-31)
+  const days = Array.from({ length: 31 }, (_, i) => ({
+    label: (i + 1).toString().padStart(2, '0'),
+    value: (i + 1).toString().padStart(2, '0')
+  }));
+
+  // Generate months
+  const months = [
+    { label: 'Jan', value: '01' },
+    { label: 'Feb', value: '02' },
+    { label: 'Mar', value: '03' },
+    { label: 'Apr', value: '04' },
+    { label: 'May', value: '05' },
+    { label: 'Jun', value: '06' },
+    { label: 'Jul', value: '07' },
+    { label: 'Aug', value: '08' },
+    { label: 'Sep', value: '09' },
+    { label: 'Oct', value: '10' },
+    { label: 'Nov', value: '11' },
+    { label: 'Dec', value: '12' }
+  ];
+
+  // Generate years (from current year - 18 down to 1950)
+  const currentYear = new Date().getFullYear();
+  const startYear = currentYear - 18;
+  const years = Array.from({ length: startYear - 1949 }, (_, i) => ({
+    label: (startYear - i).toString(),
+    value: (startYear - i).toString()
+  }));
 
   const translations = {
     title: {
@@ -3404,17 +4728,17 @@ export default function Info2() {
       ENG: "Year",
       HI: "साल"
     },
-    invalidDay: {
-      ENG: "Please enter a valid day (1-31)",
-      HI: "कृपया एक वैध दिन दर्ज करें (1-31)"
+    selectDay: {
+      ENG: "Select Day",
+      HI: "दिन चुनें"
     },
-    invalidMonth: {
-      ENG: "Please enter a valid month (1-12)",
-      HI: "कृपया एक वैध महीना दर्ज करें (1-12)"
+    selectMonth: {
+      ENG: "Select Month",
+      HI: "महीना चुनें"
     },
-    invalidYear: {
-      ENG: "Please enter a valid 4-digit year",
-      HI: "कृपया एक वैध 4-अंकीय वर्ष दर्ज करें"
+    selectYear: {
+      ENG: "Select Year",
+      HI: "साल चुनें"
     },
     invalidDate: {
       ENG: "Please enter a valid date",
@@ -3427,6 +4751,10 @@ export default function Info2() {
     submitting: {
       ENG: "Saving...",
       HI: "सहेजा जा रहा है..."
+    },
+    close: {
+      ENG: "Close",
+      HI: "बंद करें"
     }
   };
 
@@ -3457,22 +4785,6 @@ export default function Info2() {
     const monthNum = parseInt(month, 10);
     const yearNum = parseInt(year, 10);
 
-    // Basic validation
-    if (isNaN(dayNum) || dayNum < 1 || dayNum > 31) {
-      setErrors(prev => ({ ...prev, day: translations.invalidDay[language] }));
-      return false;
-    }
-
-    if (isNaN(monthNum) || monthNum < 1 || monthNum > 12) {
-      setErrors(prev => ({ ...prev, month: translations.invalidMonth[language] }));
-      return false;
-    }
-
-    if (isNaN(yearNum) || year.length !== 4) {
-      setErrors(prev => ({ ...prev, year: translations.invalidYear[language] }));
-      return false;
-    }
-
     // Advanced date validation
     const date = new Date(yearNum, monthNum - 1, dayNum);
     if (
@@ -3491,14 +4803,7 @@ export default function Info2() {
       return false;
     }
 
-    // Clear errors if valid
-    setErrors({ day: '', month: '', year: '', date: '' });
-
-    // Format date as DD/MM/YYYY
-    const formatted = `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`;
-    setFormattedDate(formatted);
-
-    // Calculate age
+    // Check if user is at least 18 years old
     const ageDiff = today.getFullYear() - date.getFullYear();
     const monthDiff = today.getMonth() - date.getMonth();
     const dayDiff = today.getDate() - date.getDate();
@@ -3507,23 +4812,49 @@ export default function Info2() {
       ? ageDiff - 1 
       : ageDiff;
     
+    if (calculatedAge < 18) {
+      setErrors(prev => ({ ...prev, date: "Must be at least 18 years old" }));
+      return false;
+    }
+
+    // Clear errors if valid
+    setErrors({ day: '', month: '', year: '', date: '' });
+
+    // Format date as DD/MM/YYYY
+    const formatted = `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`;
+    setFormattedDate(formatted);
     setAge(calculatedAge);
     return true;
   };
 
-  const handleDayChange = (text) => {
-    const numericText = text.replace(/[^0-9]/g, '');
-    setDay(numericText.slice(0, 2));
+  const handleDaySelect = async (item) => {
+    try {
+      setIsLoading(true);
+      setDay(item.value);
+      setDayModalVisible(false);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleMonthChange = (text) => {
-    const numericText = text.replace(/[^0-9]/g, '');
-    setMonth(numericText.slice(0, 2));
+  const handleMonthSelect = async (item) => {
+    try {
+      setIsLoading(true);
+      setMonth(item.value);
+      setMonthModalVisible(false);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleYearChange = (text) => {
-    const numericText = text.replace(/[^0-9]/g, '');
-    setYear(numericText.slice(0, 4));
+  const handleYearSelect = async (item) => {
+    try {
+      setIsLoading(true);
+      setYear(item.value);
+      setYearModalVisible(false);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleContinue = async () => {
@@ -3561,6 +4892,37 @@ export default function Info2() {
 
   const isButtonDisabled = !firstName || !lastName || !day || !month || !year ||
                           !!errors.day || !!errors.month || !!errors.year || !!errors.date;
+
+  // Render list items for modals
+  const renderDayItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.listItem}
+      onPress={() => handleDaySelect(item)}
+      disabled={isLoading}
+    >
+      <Text style={styles.listText}>{item.label}</Text>
+    </TouchableOpacity>
+  );
+
+  const renderMonthItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.listItem}
+      onPress={() => handleMonthSelect(item)}
+      disabled={isLoading}
+    >
+      <Text style={styles.listText}>{item.label}</Text>
+    </TouchableOpacity>
+  );
+
+  const renderYearItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.listItem}
+      onPress={() => handleYearSelect(item)}
+      disabled={isLoading}
+    >
+      <Text style={styles.listText}>{item.label}</Text>
+    </TouchableOpacity>
+  );
 
   return (
     <View style={styles.container}>
@@ -3605,6 +4967,12 @@ export default function Info2() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.contentContainer}>
+          {isLoading && (
+            <View style={styles.loaderContainer}>
+              <ActivityIndicator size="large" color="#f79598ff" />
+            </View>
+          )}
+          
           <View style={styles.iconContainer}>
             <FontAwesome6 name="user" size={scaleFont(40)} color="#4c5211" />
           </View>
@@ -3643,53 +5011,60 @@ export default function Info2() {
           <Text style={styles.subtitle}>{translations.subtitle[language]}</Text>
 
           <View style={styles.dateContainer}>
+            {/* Day Picker */}
             <View style={styles.dateInputWrapper}>
-              <TextInput
-                style={[styles.input, styles.dateInput, errors.day ? styles.errorInput : {}]}
-                placeholder={translations.day[language]}
-                placeholderTextColor="#888"
-                keyboardType="number-pad"
-                value={day}
-                onFocus={() => setDayFocused(true)}
-                onBlur={() => setDayFocused(false)}
-                onChangeText={handleDayChange}
-                maxLength={2}
-                textAlign="left"
-              />
-              {dayFocused && <Text style={styles.dateLabel}>{translations.day[language]}</Text>}
-              {errors.day ? <Text style={styles.errorText}>{errors.day}</Text> : null}
+              <Text style={styles.pickerLabel}>{translations.day[language]}</Text>
+              <View style={styles.box}>
+                <TouchableOpacity 
+                  style={styles.pickerTouchable}
+                  onPress={() => setDayModalVisible(true)}
+                  disabled={isLoading}
+                >
+                  {day ? (
+                    <Text style={styles.selectedValue}>{day}</Text>
+                  ) : (
+                    <Text style={styles.placeholderText}>{translations.selectDay[language]}</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
             </View>
+
+            {/* Month Picker */}
             <View style={styles.dateInputWrapper}>
-              <TextInput
-                style={[styles.input, styles.dateInput, errors.month ? styles.errorInput : {}]}
-                placeholder={translations.month[language]}
-                placeholderTextColor="#888"
-                keyboardType="number-pad"
-                value={month}
-                onFocus={() => setMonthFocused(true)}
-                onBlur={() => setMonthFocused(false)}
-                onChangeText={handleMonthChange}
-                maxLength={2}
-                textAlign="left"
-              />
-              {monthFocused && <Text style={styles.dateLabel}>{translations.month[language]}</Text>}
-              {errors.month ? <Text style={styles.errorText}>{errors.month}</Text> : null}
+              <Text style={styles.pickerLabel}>{translations.month[language]}</Text>
+              <View style={styles.box}>
+                <TouchableOpacity 
+                  style={styles.pickerTouchable}
+                  onPress={() => setMonthModalVisible(true)}
+                  disabled={isLoading}
+                >
+                  {month ? (
+                    <Text style={styles.selectedValue}>
+                      {months.find(m => m.value === month)?.label || month}
+                    </Text>
+                  ) : (
+                    <Text style={styles.placeholderText}>{translations.selectMonth[language]}</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
             </View>
+
+            {/* Year Picker */}
             <View style={styles.dateInputWrapper}>
-              <TextInput
-                style={[styles.input, styles.dateInput, errors.year ? styles.errorInput : {}]}
-                placeholder={translations.year[language]}
-                placeholderTextColor="#888"
-                keyboardType="number-pad"
-                value={year}
-                onFocus={() => setYearFocused(true)}
-                onBlur={() => setYearFocused(false)}
-                onChangeText={handleYearChange}
-                maxLength={4}
-                textAlign="left"
-              />
-              {yearFocused && <Text style={styles.dateLabel}>{translations.year[language]}</Text>}
-              {errors.year ? <Text style={styles.errorText}>{errors.year}</Text> : null}
+              <Text style={styles.pickerLabel}>{translations.year[language]}</Text>
+              <View style={styles.box}>
+                <TouchableOpacity 
+                  style={styles.pickerTouchable}
+                  onPress={() => setYearModalVisible(true)}
+                  disabled={isLoading}
+                >
+                  {year ? (
+                    <Text style={styles.selectedValue}>{year}</Text>
+                  ) : (
+                    <Text style={styles.placeholderText}>{translations.selectYear[language]}</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
 
@@ -3732,6 +5107,111 @@ export default function Info2() {
           )}
         </View>
       </ScrollView>
+
+      {/* Day Modal */}
+      <Modal
+        visible={dayModalVisible}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => !isLoading && setDayModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{translations.selectDay[language]}</Text>
+              <TouchableOpacity 
+                onPress={() => !isLoading && setDayModalVisible(false)}
+                disabled={isLoading}
+              >
+                <MaterialIcons name="close" size={24} color="#888" />
+              </TouchableOpacity>
+            </View>
+            {isLoading ? (
+              <View style={styles.loaderInsideModal}>
+                <ActivityIndicator size="large" color="#f79598ff" />
+              </View>
+            ) : (
+              <FlatList
+                data={days}
+                renderItem={renderDayItem}
+                keyExtractor={(item, index) => index.toString()}
+                style={styles.list}
+                showsVerticalScrollIndicator={false}
+              />
+            )}
+          </View>
+        </View>
+      </Modal>
+
+      {/* Month Modal */}
+      <Modal
+        visible={monthModalVisible}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => !isLoading && setMonthModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{translations.selectMonth[language]}</Text>
+              <TouchableOpacity 
+                onPress={() => !isLoading && setMonthModalVisible(false)}
+                disabled={isLoading}
+              >
+                <MaterialIcons name="close" size={24} color="#888" />
+              </TouchableOpacity>
+            </View>
+            {isLoading ? (
+              <View style={styles.loaderInsideModal}>
+                <ActivityIndicator size="large" color="#f79598ff" />
+              </View>
+            ) : (
+              <FlatList
+                data={months}
+                renderItem={renderMonthItem}
+                keyExtractor={(item, index) => index.toString()}
+                style={styles.list}
+                showsVerticalScrollIndicator={false}
+              />
+            )}
+          </View>
+        </View>
+      </Modal>
+
+      {/* Year Modal */}
+      <Modal
+        visible={yearModalVisible}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => !isLoading && setYearModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{translations.selectYear[language]}</Text>
+              <TouchableOpacity 
+                onPress={() => !isLoading && setYearModalVisible(false)}
+                disabled={isLoading}
+              >
+                <MaterialIcons name="close" size={24} color="#888" />
+              </TouchableOpacity>
+            </View>
+            {isLoading ? (
+              <View style={styles.loaderInsideModal}>
+                <ActivityIndicator size="large" color="#f79598ff" />
+              </View>
+            ) : (
+              <FlatList
+                data={years}
+                renderItem={renderYearItem}
+                keyExtractor={(item, index) => index.toString()}
+                style={styles.list}
+                showsVerticalScrollIndicator={false}
+              />
+            )}
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -3903,27 +5383,40 @@ const styles = StyleSheet.create({
   },
   dateInputWrapper: {
     width: '30%',
-    position: 'relative',
   },
-  dateInput: {
-    height: scaleHeight(50),
-    textAlign: 'left',
-    paddingLeft: scaleHeight(15),
+  pickerLabel: {
+    fontSize: scaleFont(14),
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: scaleHeight(8),
+    textAlign: 'center',
   },
-  dateLabel: {
-    position: 'absolute',
-    top: -scaleHeight(10),
-    left: scaleHeight(15),
-    backgroundColor: 'white',
-    paddingHorizontal: scaleHeight(5),
-    fontSize: scaleFont(12),
+  box: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    overflow: 'hidden',
+    backgroundColor: '#f9f9f9'
+  },
+  pickerTouchable: {
+    padding: scaleHeight(15),
+    width: '100%',
+    alignItems: 'center',
+  },
+  selectedValue: {
+    fontSize: scaleFont(16),
+    color: '#333',
+    fontWeight: '500',
+  },
+  placeholderText: {
+    fontSize: scaleFont(16),
     color: '#888',
   },
   errorText: {
     color: '#FF6B6B',
     fontSize: scaleFont(12),
     marginTop: scaleHeight(5),
-    marginLeft: scaleHeight(5),
+    textAlign: 'center',
   },
   dateDisplayContainer: {
     width: '100%',
@@ -3935,5 +5428,56 @@ const styles = StyleSheet.create({
   dateDisplayText: {
     fontSize: scaleFont(16),
     color: '#495057',
+    textAlign: 'center',
+  },
+  // Modal Styles
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    marginHorizontal: 20,
+    borderRadius: 10,
+    maxHeight: '70%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
+  modalTitle: {
+    fontSize: scaleFont(18),
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  list: {
+    paddingHorizontal: 10,
+  },
+  listItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  listText: {
+    fontSize: scaleFont(16),
+    color: '#333',
+  },
+  loaderContainer: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+  },
+  loaderInsideModal: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
 });
