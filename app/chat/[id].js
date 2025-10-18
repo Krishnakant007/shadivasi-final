@@ -8154,6 +8154,1939 @@
 
 //13/09/2025
 //app/chat/[id].js
+// import {
+//   View,
+//   Text,
+//   StyleSheet,
+//   TextInput,
+//   TouchableOpacity,
+//   FlatList,
+//   KeyboardAvoidingView,
+//   Platform,
+//   Image,
+//   Alert,
+//   Modal,
+//   ScrollView,
+//   ActivityIndicator,
+//   Dimensions
+// } from 'react-native';
+// import React, { useState, useEffect, useRef, useCallback } from 'react';
+// import { SafeAreaView } from 'react-native-safe-area-context';
+// import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+// import {
+//   collection,
+//   doc,
+//   addDoc,
+//   onSnapshot,
+//   orderBy,
+//   query,
+//   updateDoc,
+//   serverTimestamp,
+//   getDoc,
+//   deleteDoc,
+//   setDoc,
+//   where
+// } from 'firebase/firestore';
+// import { db } from '../../config/firebase';
+// import { useAuth } from '../context/AuthContext';
+// import { useLocalSearchParams, useRouter } from 'expo-router';
+
+// const { width } = Dimensions.get('window');
+
+// // All emojis in one flat list
+// const allEmojis = [
+//   '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇',
+//   '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚',
+//   '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩',
+//   '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣',
+//   '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬',
+//   '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🫣',
+//   '🤗', '🫡', '🤔', '🫢', '🤭', '🤫', '🤥', '😶', '🫠', '😐',
+//   '🫤', '😑', '😬', '🙄', '😯', '😦', '😧', '😮', '😲', '🥱',
+//   '😴', '🤤', '😪', '😵', '🫥', '🤐', '🥴', '🤢', '🤮', '🤧',
+//   '😷', '🤒', '🤕', '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻',
+//   '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐽', '🐸', '🐵', '🙈',
+//   '🙉', '🙊', '🐒', '🐔', '🐧', '🐦', '🐤', '🦆', '🦅', '🦉',
+//   '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞',
+//   '🐜', '🦟', '🦗', '🕷️', '🦂', '🐢', '🐍', '🦎', '🦖', '🦕',
+//   '🐙', '🦑', '🦐', '🦞', '🦀', '🐡', '🐠', '🐟', '🐬', '🐳',
+//   '🐋', '🦈', '🐊', '🐅', '🐆', '🦓', '🦍', '🦧', '🦣', '🐘',
+//   '🦛', '🦏', '🐪', '🐫', '🦒', '🦘', '🦬', '🐃', '🐂', '🐄',
+//   '🐎', '🐖', '🐏', '🐑', '🦙', '🐐', '🦌', '🐕', '🐩', '🦮',
+//   '🐕‍🦺', '🐈', '🐈‍⬛', '🍏', '🍎', '🍐', '🍊', '🍋', '🍌', '🍉',
+//   '🍇', '🍓', '🫐', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝',
+//   '🍅', '🍆', '🥑', '🥦', '🥬', '🥒', '🌶️', '🫑', '🌽', '🥕',
+//   '🫒', '🧄', '🧅', '🥔', '🍠', '🥐', '🥯', '🍞', '🥖', '🥨',
+//   '🧀', '🥚', '🍳', '🧈', '🥞', '🧇', '🥓', '🥩', '🍗', '🍖',
+//   '🌭', '🍔', '🍟', '🍕', '🫓', '🥪', '🥙', '🧆', '🌮', '🌯',
+//   '🫔', '🥗', '🥘', '🫕', '🥫', '🍝', '🍜', '🍲', '🍛', '🍣',
+//   '🍱', '🥟', '🦪', '🍤', '🍙', '🍚', '🍘', '🍥', '🥠', '🥮',
+//   '🍢', '🍡', '🍧', '🍨', '🍦', '🥧', '🧁', '🍰', '🎂', '🍮',
+//   '🍭', '🍬', '🍫', '🍿', '🍩', '🍪', '🌰', '🥜', '🍯', '🥛',
+//   '🍼', '🫖', '☕️', '⌚️', '📱', '📲', '💻', '⌨️', '🖥️', '🖨️',
+//   '🖱️', '🖲️', '🕹️', '📷', '📸', '📹', '🎥', '📽️', '🎞️', '📞',
+//   '☎️', '📟', '📠', '📺', '📻', '🎙️', '🎚️', '🎛️', '🧭', '⏱️',
+//   '⏲️', '⏰', '🕰️', '⌛️', '⏳', '📡', '🔋', '🔌', '💡', '🔦',
+//   '🕯️', '🪔', '🧯', '💰', '💳', '💎', '⚖️', '🪜', '🧰', '🪛',
+//   '🔧', '🔨', '⚒️', '🛠️', '⛏️', '🔩', '⚙️', '🔗', '📎', '🖇️',
+//   '📐', '📏', '🧮', '📌', '📍', '✂️', '🖊️', '🖋️', '✒️', '🖌️',
+//   '🖍️', '📝', '✏️', '🔍', '🔎', '🔏', '🔐', '🔒', '🔓', '❤️',
+//   '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❤️‍🔥',
+//   '❤️‍🩹', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '☮️',
+//   '✝️', '☪️', '🕉️', '☸️', '✡️', '🔯', '🕎', '☯️', '☦️', '🛐',
+//   '⛎', '♈️', '♉️', '♊️', '♋️', '♌️', '♍️', '♎️', '♏️', '♐️',
+//   '♑️', '♒️', '♓️', '🆔', '⚛️', '🉑', '☢️', '☣️', '📴', '📳',
+//   '🈶', '🈚️', '🈸', '🈺', '🈷️', '✴️', '🆚', '💮', '🉐', '㊙️',
+//   '㊗️', '🈴', '🈵', '🈹', '🈲', '🅰️', '🅱️', '🆎', '🆑', '🅾️',
+//   '🆘', '❌', '⭕️', '🛑', '⛔️', '📛', '🚫', '💯', '💢', '♨️',
+//   '🚷', '🚯', '🚳', '🚱', '🔞', '📵', '🚭', '❗️', '❕', '❓',
+//   '❔', '‼️', '⁉️', '🔅', '🔆', '〽️', '⚠️', '🚸', '🔱', '⚜️',
+//   '🔰', '♻️', '✅', '🈯️', '💹', '❇️', '✳️', '❎', '🌐', '💠',
+//   'Ⓜ️', '🌀', '💤', '🏧', '🚾', '♿️', '🅿️', '🛗', '🈳'
+// ];
+
+// export default function ChatScreen() {
+//   const [messages, setMessages] = useState([]);
+//   const [newMessage, setNewMessage] = useState('');
+//   const [otherUserProfile, setOtherUserProfile] = useState(null);
+//   const [onlineUsers, setOnlineUsers] = useState([]);
+//   const [userTyping, setUserTyping] = useState(false);
+//   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+//   const [editingMessage, setEditingMessage] = useState(null);
+//   const [loading, setLoading] = useState(true);
+//   const [lastSeen, setLastSeen] = useState(null);
+//   const { user } = useAuth();
+//   const { id, name, profileId } = useLocalSearchParams();
+//   const router = useRouter();
+//   const flatListRef = useRef(null);
+//   const textInputRef = useRef(null);
+//   const typingTimeoutRef = useRef(null);
+
+//   // Calculate emoji size based on screen width
+//   const emojiSize = Math.floor(width / 10);
+
+//   // Get the other participant's ID and fetch their profile
+//   useEffect(() => {
+//     const fetchChatInfo = async () => {
+//       if (!id || !user?.id) return;
+
+//       try {
+//         setLoading(true);
+        
+//         // If we have profileId from params, use it directly
+//         if (profileId) {
+//           await fetchUserProfile(profileId);
+//         } else {
+//           // Get chat document to find other participant
+//           const chatRef = doc(db, 'chats', id);
+//           const chatSnap = await getDoc(chatRef);
+          
+//           if (chatSnap.exists()) {
+//             const chatData = chatSnap.data();
+//             const otherParticipantId = chatData.participantIds.find(pid => pid !== user.id);
+            
+//             if (otherParticipantId) {
+//               // Fetch other user's profile
+//               await fetchUserProfile(otherParticipantId);
+//             }
+//           }
+//         }
+//       } catch (error) {
+//         console.error('Error fetching chat info:', error);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchChatInfo();
+//   }, [id, user, profileId]);
+
+//   // Fetch user profile from Users collection
+//   const fetchUserProfile = async (userId) => {
+//     try {
+//       const profileRef = doc(db, 'Users', userId);
+//       const profileSnap = await getDoc(profileRef);
+      
+//       if (profileSnap.exists()) {
+//         const profileData = profileSnap.data();
+//         setOtherUserProfile({
+//           id: userId,
+//           name: `${profileData.firstName || ''} ${profileData.lastName || ''}`.trim() || 'User',
+//           photo: profileData.profilePhoto || 'https://via.placeholder.com/150?text=User',
+//           age: profileData.age,
+//           city: profileData.city
+//         });
+//         return;
+//       }
+      
+//       // Fallback if no profile found
+//       setOtherUserProfile({
+//         id: userId,
+//         name: name || 'User',
+//         photo: 'https://via.placeholder.com/150?text=User',
+//         age: null,
+//         city: null
+//       });
+//     } catch (error) {
+//       console.error('Error fetching user profile:', error);
+//       setOtherUserProfile({
+//         id: userId,
+//         name: name || 'User',
+//         photo: 'https://via.placeholder.com/150?text=User',
+//         age: null,
+//         city: null
+//       });
+//     }
+//   };
+
+//   // Listen for online users and typing status
+//   useEffect(() => {
+//     if (!user?.id || !otherUserProfile?.id) return;
+
+//     const onlineRef = doc(db, 'onlineUsers', otherUserProfile.id);
+    
+//     const unsubscribe = onSnapshot(onlineRef, (doc) => {
+//       if (doc.exists()) {
+//         const userData = doc.data();
+//         if (userData.lastSeen) {
+//           const lastSeenDate = userData.lastSeen.toDate ? userData.lastSeen.toDate() : new Date(userData.lastSeen);
+//           setLastSeen(lastSeenDate);
+//         }
+        
+//         // Check if user is typing
+//         if (userData.typing === true) {
+//           setUserTyping(true);
+          
+//           // Reset typing status after 3 seconds if no update
+//           if (typingTimeoutRef.current) {
+//             clearTimeout(typingTimeoutRef.current);
+//           }
+          
+//           typingTimeoutRef.current = setTimeout(() => {
+//             setUserTyping(false);
+//           }, 3000);
+//         } else {
+//           setUserTyping(false);
+//         }
+//       }
+//     });
+
+//     return () => {
+//       if (typingTimeoutRef.current) {
+//         clearTimeout(typingTimeoutRef.current);
+//       }
+//       unsubscribe();
+//     };
+//   }, [user, otherUserProfile]);
+
+//   // Update typing status in Firestore
+//   const updateTypingStatus = async (isTyping) => {
+//     if (!user?.id) return;
+    
+//     try {
+//       const userStatusRef = doc(db, 'onlineUsers', user.id);
+//       await setDoc(userStatusRef, {
+//         isOnline: true,
+//         lastSeen: serverTimestamp(),
+//         userId: user.id,
+//         userName: user.displayName || 'User',
+//         typing: isTyping
+//       }, { merge: true });
+//     } catch (error) {
+//       console.error('Error updating typing status:', error);
+//     }
+//   };
+
+//   // Handle text input changes
+//   const handleTextChange = (text) => {
+//     setNewMessage(text);
+    
+//     // Update typing status
+//     if (text.length > 0) {
+//       updateTypingStatus(true);
+      
+//       // Clear previous timeout
+//       if (typingTimeoutRef.current) {
+//         clearTimeout(typingTimeoutRef.current);
+//       }
+      
+//       // Set new timeout to reset typing status
+//       typingTimeoutRef.current = setTimeout(() => {
+//         updateTypingStatus(false);
+//       }, 1000);
+//     } else {
+//       updateTypingStatus(false);
+//     }
+//   };
+
+//   // Listen for messages in real-time
+//   useEffect(() => {
+//     if (!id) return;
+
+//     const messagesRef = collection(db, 'chats', id, 'messages');
+//     const q = query(messagesRef, orderBy('timestamp', 'asc'));
+    
+//     const unsubscribe = onSnapshot(q, (querySnapshot) => {
+//       const messagesData = [];
+//       querySnapshot.forEach((doc) => {
+//         const data = doc.data();
+//         messagesData.push({
+//           id: doc.id,
+//           ...data,
+//           // Ensure timestamp is a Date object
+//           timestamp: data.timestamp ? data.timestamp.toDate() : new Date()
+//         });
+//       });
+//       setMessages(messagesData);
+      
+//       // Scroll to bottom when new messages arrive
+//       setTimeout(() => {
+//         flatListRef.current?.scrollToEnd({ animated: true });
+//       }, 100);
+//     });
+
+//     return () => unsubscribe();
+//   }, [id]);
+
+//   // Check if other user is online
+//   const isOtherUserOnline = () => {
+//     if (!lastSeen || !otherUserProfile?.id) return false;
+    
+//     const now = new Date();
+//     const lastSeenDate = new Date(lastSeen);
+//     const diff = Math.floor((now - lastSeenDate) / 1000); // difference in seconds
+    
+//     // Consider user online if they were active in the last 2 minutes
+//     return diff < 120;
+//   };
+
+//   // Format last seen time in a detailed way
+//   const formatLastSeen = (date) => {
+//     if (!date) return 'recently';
+    
+//     const now = new Date();
+//     const lastSeenDate = new Date(date);
+//     const diff = Math.floor((now - lastSeenDate) / 1000); // difference in seconds
+    
+//     if (diff < 60) {
+//       return 'just now';
+//     } else if (diff < 3600) {
+//       const minutes = Math.floor(diff / 60);
+//       return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+//     } else if (diff < 86400) {
+//       const hours = Math.floor(diff / 3600);
+//       return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+//     } else if (diff < 604800) {
+//       const days = Math.floor(diff / 86400);
+//       return `${days} day${days !== 1 ? 's' : ''} ago`;
+//     } else {
+//       return lastSeenDate.toLocaleDateString();
+//     }
+//   };
+
+//   // Send a new message
+//   const sendMessage = async () => {
+//     if (!newMessage.trim() || !user || !user.id || !id) {
+//       Alert.alert('Error', 'Cannot send empty message');
+//       return;
+//     }
+
+//     try {
+//       // Reset typing status
+//       updateTypingStatus(false);
+      
+//       const messagesRef = collection(db, 'chats', id, 'messages');
+      
+//       // Create message data with validated fields
+//       const messageData = {
+//         text: newMessage.trim(),
+//         senderId: user.id,
+//         senderName: user.displayName || `${user.firstName} ${user.lastName}`.trim() || 'User',
+//         timestamp: serverTimestamp(),
+//         type: 'text',
+//         edited: false
+//       };
+
+//       await addDoc(messagesRef, messageData);
+      
+//       // Update the chat's last message and timestamp
+//       const chatRef = doc(db, 'chats', id);
+//       await updateDoc(chatRef, {
+//         lastMessage: newMessage.trim(),
+//         lastMessageTime: serverTimestamp()
+//       });
+      
+//       setNewMessage('');
+//     } catch (error) {
+//       console.error('Error sending message:', error);
+//       Alert.alert('Error', 'Failed to send message. Please try again.');
+//     }
+//   };
+
+//   // Edit a message
+//   const editMessage = async (messageId, newText) => {
+//     if (!newText.trim()) return;
+    
+//     try {
+//       const messageRef = doc(db, 'chats', id, 'messages', messageId);
+//       await updateDoc(messageRef, {
+//         text: newText.trim(),
+//         edited: true,
+//         editedAt: serverTimestamp()
+//       });
+      
+//       setEditingMessage(null);
+//       Alert.alert('Success', 'Message updated successfully');
+//     } catch (error) {
+//       console.error('Error editing message:', error);
+//       Alert.alert('Error', 'Failed to edit message. Please try again.');
+//     }
+//   };
+
+//   // Delete a message
+//   const deleteMessage = async (messageId) => {
+//     try {
+//       const messageRef = doc(db, 'chats', id, 'messages', messageId);
+//       await deleteDoc(messageRef);
+//       Alert.alert('Success', 'Message deleted successfully');
+//     } catch (error) {
+//       console.error('Error deleting message:', error);
+//       Alert.alert('Error', 'Failed to delete message. Please try again.');
+//     }
+//   };
+
+//   // Add emoji to message
+//   const addEmoji = (emoji) => {
+//     setNewMessage(prevMessage => prevMessage + emoji);
+//     setShowEmojiPicker(false);
+//   };
+
+//   const renderMessage = useCallback(({ item }) => {
+//     const isMyMessage = item.senderId === user?.id;
+//     const isEditing = editingMessage?.id === item.id;
+    
+//     return (
+//       <View style={[
+//         styles.messageContainer,
+//         isMyMessage ? styles.myMessageContainer : styles.theirMessageContainer,
+//         isEditing && styles.editingMessage
+//       ]}>
+//         {!isMyMessage && (
+//           <Image
+//             source={{ uri: otherUserProfile?.photo || 'https://via.placeholder.com/150?text=User' }}
+//             style={styles.messageAvatar}
+//           />
+//         )}
+        
+//         <View style={[
+//           styles.messageBubble,
+//           isMyMessage ? styles.myMessage : styles.theirMessage
+//         ]}>
+//           {isEditing ? (
+//             <View style={styles.editContainer}>
+//               <TextInput
+//                 style={styles.editInput}
+//                 defaultValue={item.text}
+//                 onSubmitEditing={(e) => editMessage(item.id, e.nativeEvent.text)}
+//                 autoFocus
+//                 multiline
+//               />
+//               <View style={styles.editActions}>
+//                 <TouchableOpacity
+//                   style={styles.editActionButton}
+//                   onPress={() => setEditingMessage(null)}
+//                 >
+//                   <Text style={styles.editActionText}>Cancel</Text>
+//                 </TouchableOpacity>
+//                 <TouchableOpacity
+//                   style={[styles.editActionButton, styles.saveButton]}
+//                   onPress={() => editMessage(item.id, item.text)}
+//                 >
+//                   <Text style={styles.editActionText}>Save</Text>
+//                 </TouchableOpacity>
+//               </View>
+//             </View>
+//           ) : (
+//             <>
+//               <Text style={[
+//                 styles.messageText,
+//                 isMyMessage ? styles.myMessageText : styles.theirMessageText
+//               ]}>
+//                 {item.text}
+//               </Text>
+              
+//               <View style={styles.messageFooter}>
+//                 <Text style={[
+//                   styles.messageTime,
+//                   isMyMessage ? styles.myMessageTime : styles.theirMessageTime
+//                 ]}>
+//                   {item.timestamp ? formatTime(item.timestamp) : 'Just now'}
+//                   {item.edited && ' (edited)'}
+//                 </Text>
+                
+//                 {isMyMessage && (
+//                   <View style={styles.messageActions}>
+//                     <TouchableOpacity
+//                       style={styles.messageAction}
+//                       onPress={() => setEditingMessage(item)}
+//                     >
+//                       <Ionicons name="create-outline" size={14} color="#666" />
+//                     </TouchableOpacity>
+//                     <TouchableOpacity
+//                       style={styles.messageAction}
+//                       onPress={() => deleteMessage(item.id)}
+//                     >
+//                       <Ionicons name="trash-outline" size={14} color="#FF6B6B" />
+//                     </TouchableOpacity>
+//                   </View>
+//                 )}
+//               </View>
+//             </>
+//           )}
+//         </View>
+        
+//         {isMyMessage && (
+//           <Image
+//             source={{ uri: user.profilePhoto || 'https://via.placeholder.com/150?text=You' }}
+//             style={styles.messageAvatar}
+//           />
+//         )}
+//       </View>
+//     );
+//   }, [user, otherUserProfile, editingMessage]);
+
+//   const formatTime = (date) => {
+//     if (!date) return '';
+//     const now = new Date();
+//     const messageDate = new Date(date);
+    
+//     // If message is from today, show time only
+//     if (messageDate.toDateString() === now.toDateString()) {
+//       return messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+//     }
+//     // If message is from yesterday, show "Yesterday"
+//     else if (messageDate.toDateString() === new Date(now.setDate(now.getDate() - 1)).toDateString()) {
+//       return 'Yesterday ' + messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+//     }
+//     // Otherwise show date and time
+//     else {
+//       return messageDate.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' +
+//              messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+//     }
+//   };
+
+//   // Enhanced emoji picker component with all emojis
+//   const EmojiPicker = () => {
+//     return (
+//       <Modal
+//         transparent={true}
+//         visible={showEmojiPicker}
+//         animationType="slide"
+//         onRequestClose={() => setShowEmojiPicker(false)}
+//       >
+//         <View style={styles.emojiPickerContainer}>
+//           <View style={styles.emojiPicker}>
+//             <View style={styles.emojiPickerHeader}>
+//               <Text style={styles.emojiPickerTitle}>Select Emoji</Text>
+//               <TouchableOpacity
+//                 onPress={() => setShowEmojiPicker(false)}
+//                 style={styles.closeButton}
+//               >
+//                 <Ionicons name="close" size={24} color="#333" />
+//               </TouchableOpacity>
+//             </View>
+            
+//             {/* All Emojis Grid */}
+//             <View style={styles.emojiGridContainer}>
+//               <ScrollView>
+//                 <View style={styles.emojiGrid}>
+//                   {allEmojis.map((emoji, index) => (
+//                     <TouchableOpacity
+//                       key={index}
+//                       style={styles.emojiItem}
+//                       onPress={() => addEmoji(emoji)}
+//                     >
+//                       <Text style={[styles.emoji, { fontSize: emojiSize * 0.6 }]}>
+//                         {emoji}
+//                       </Text>
+//                     </TouchableOpacity>
+//                   ))}
+//                 </View>
+//               </ScrollView>
+//             </View>
+//           </View>
+//         </View>
+//       </Modal>
+//     );
+//   };
+
+//   if (loading) {
+//     return (
+//       <SafeAreaView style={styles.safeArea}>
+//         <View style={styles.loadingContainer}>
+//           <ActivityIndicator size="large" color="#FF6B6B" />
+//           <Text style={styles.loadingText}>Loading chat...</Text>
+//         </View>
+//       </SafeAreaView>
+//     );
+//   }
+
+//   return (
+//     <SafeAreaView style={styles.safeArea}>
+//       {/* Header with Profile Photo and Online Status */}
+//       <View style={styles.header}>
+//         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+//           <Ionicons name="arrow-back" size={24} color="#333" />
+//         </TouchableOpacity>
+        
+//         <View style={styles.headerProfile}>
+//           <View style={styles.avatarContainer}>
+//             <Image
+//               source={{ uri: otherUserProfile?.photo || 'https://via.placeholder.com/150?text=User' }}
+//               style={styles.headerAvatar}
+//             />
+//             {isOtherUserOnline() && <View style={styles.onlineBadge} />}
+//           </View>
+//           <View style={styles.headerInfo}>
+//             <Text style={styles.headerName}>{otherUserProfile?.name || name || 'User'}</Text>
+//             <View style={styles.statusContainer}>
+//               {isOtherUserOnline() ? (
+//                 userTyping ? (
+//                   <View style={styles.typingContainer}>
+//                     <Text style={styles.typingText}>typing</Text>
+//                     <View style={styles.typingDots}>
+//                       <View style={[styles.typingDot, styles.typingDot1]} />
+//                       <View style={[styles.typingDot, styles.typingDot2]} />
+//                       <View style={[styles.typingDot, styles.typingDot3]} />
+//                     </View>
+//                   </View>
+//                 ) : (
+//                   <>
+//                     <View style={styles.onlineDot} />
+//                     <Text style={styles.onlineText}>online</Text>
+//                   </>
+//                 )
+//               ) : lastSeen ? (
+//                 <Text style={styles.offlineText}>
+//                   last seen {formatLastSeen(lastSeen)}
+//                 </Text>
+//               ) : (
+//                 <Text style={styles.offlineText}>offline</Text>
+//               )}
+//             </View>
+//           </View>
+//         </View>
+//       </View>
+
+//       {/* Messages List */}
+//       <FlatList
+//         ref={flatListRef}
+//         data={messages}
+//         renderItem={renderMessage}
+//         keyExtractor={item => item.id}
+//         contentContainerStyle={styles.messagesList}
+//         showsVerticalScrollIndicator={false}
+//         onContentSizeChange={() => {
+//           flatListRef.current?.scrollToEnd({ animated: true });
+//         }}
+//         onLayout={() => {
+//           flatListRef.current?.scrollToEnd({ animated: true });
+//         }}
+//       />
+
+//       {/* Emoji Picker */}
+//       <EmojiPicker />
+
+//       {/* Message Input */}
+//       <KeyboardAvoidingView
+//         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+//         keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+//         style={styles.inputContainer}
+//       >
+//         <TouchableOpacity
+//           style={styles.emojiButton}
+//           onPress={() => setShowEmojiPicker(true)}
+//         >
+//           <Ionicons name="happy-outline" size={28} color="#666" />
+//         </TouchableOpacity>
+        
+//         <TextInput
+//           ref={textInputRef}
+//           style={styles.textInput}
+//           value={newMessage}
+//           onChangeText={handleTextChange}
+//           placeholder="Type a message..."
+//           multiline
+//           maxLength={500}
+//           placeholderTextColor="#999"
+//         />
+        
+//         {newMessage.trim() ? (
+//           <TouchableOpacity
+//             style={styles.sendButton}
+//             onPress={sendMessage}
+//           >
+//             <Ionicons name="send" size={22} color="#fff" />
+//           </TouchableOpacity>
+//         ) : (
+//           <TouchableOpacity style={styles.emojiButton}>
+//             <Ionicons name="heart-outline" size={28} color="#666" />
+//           </TouchableOpacity>
+//         )}
+//       </KeyboardAvoidingView>
+//     </SafeAreaView>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   safeArea: {
+//     flex: 1,
+//     backgroundColor: '#f8f9fa',
+//   },
+//   loadingContainer: {
+//     flex: 1,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//   },
+//   loadingText: {
+//     marginTop: 10,
+//     color: '#666',
+//   },
+//   header: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     padding: 16,
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#e9ecef',
+//     backgroundColor: '#fff',
+//   },
+//   backButton: {
+//     marginRight: 12,
+//     padding: 4,
+//   },
+//   headerProfile: {
+//     flex: 1,
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//   },
+//   avatarContainer: {
+//     position: 'relative',
+//     marginRight: 12,
+//   },
+//   headerAvatar: {
+//     width: 45,
+//     height: 45,
+//     borderRadius: 22.5,
+//     borderWidth: 2,
+//     borderColor: '#FF6B6B',
+//   },
+//   onlineBadge: {
+//     position: 'absolute',
+//     bottom: 0,
+//     right: 0,
+//     width: 14,
+//     height: 14,
+//     borderRadius: 7,
+//     backgroundColor: '#4CAF50',
+//     borderWidth: 2,
+//     borderColor: '#fff',
+//   },
+//   headerInfo: {
+//     flex: 1,
+//   },
+//   headerName: {
+//     fontSize: 18,
+//     fontWeight: '600',
+//     color: '#212529',
+//     marginBottom: 2,
+//   },
+//   statusContainer: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//   },
+//   onlineDot: {
+//     width: 8,
+//     height: 8,
+//     borderRadius: 4,
+//     backgroundColor: '#4CAF50',
+//     marginRight: 6,
+//   },
+//   onlineText: {
+//     fontSize: 12,
+//     color: '#4CAF50',
+//     fontWeight: '500',
+//     textTransform: 'lowercase',
+//   },
+//   offlineText: {
+//     fontSize: 12,
+//     color: '#6c757d',
+//     textTransform: 'lowercase',
+//   },
+//   typingContainer: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//   },
+//   typingText: {
+//     fontSize: 12,
+//     color: '#4CAF50',
+//     fontStyle: 'italic',
+//     marginRight: 4,
+//   },
+//   typingDots: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//   },
+//   typingDot: {
+//     width: 4,
+//     height: 4,
+//     borderRadius: 2,
+//     backgroundColor: '#4CAF50',
+//     marginHorizontal: 1,
+//   },
+//   typingDot1: {
+//     opacity: 0.4,
+//   },
+//   typingDot2: {
+//     opacity: 0.6,
+//   },
+//   typingDot3: {
+//     opacity: 0.8,
+//   },
+//   messagesList: {
+//     padding: 16,
+//     flexGrow: 1,
+//     paddingBottom: 80,
+//   },
+//   messageContainer: {
+//     flexDirection: 'row',
+//     alignItems: 'flex-end',
+//     marginBottom: 16,
+//     maxWidth: '100%',
+//   },
+//   myMessageContainer: {
+//     justifyContent: 'flex-end',
+//   },
+//   theirMessageContainer: {
+//     justifyContent: 'flex-start',
+//   },
+//   editingMessage: {
+//     backgroundColor: '#fff8e1',
+//     borderRadius: 8,
+//     padding: 4,
+//   },
+//   messageAvatar: {
+//     width: 36,
+//     height: 36,
+//     borderRadius: 18,
+//     marginHorizontal: 8,
+//   },
+//   messageBubble: {
+//     maxWidth: '70%',
+//     padding: 12,
+//     borderRadius: 18,
+//     marginHorizontal: 8,
+//   },
+//   myMessage: {
+//     backgroundColor: '#FF6B6B',
+//     borderBottomRightRadius: 4,
+//   },
+//   theirMessage: {
+//     backgroundColor: '#fff',
+//     borderBottomLeftRadius: 4,
+//     borderWidth: 1,
+//     borderColor: '#e9ecef',
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 1 },
+//     shadowOpacity: 0.1,
+//     shadowRadius: 2,
+//     elevation: 2,
+//   },
+//   messageText: {
+//     fontSize: 16,
+//     lineHeight: 22,
+//     marginBottom: 4,
+//   },
+//   myMessageText: {
+//     color: '#fff',
+//   },
+//   theirMessageText: {
+//     color: '#212529',
+//   },
+//   messageFooter: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//   },
+//   messageTime: {
+//     fontSize: 11,
+//     opacity: 0.7,
+//   },
+//   myMessageTime: {
+//     color: 'rgba(255, 255, 255, 0.8)',
+//   },
+//   theirMessageTime: {
+//     color: '#6c757d',
+//   },
+//   messageActions: {
+//     flexDirection: 'row',
+//     marginLeft: 8,
+//   },
+//   messageAction: {
+//     padding: 4,
+//     marginLeft: 4,
+//   },
+//   editContainer: {
+//     flex: 1,
+//   },
+//   editInput: {
+//     backgroundColor: '#fff',
+//     borderRadius: 8,
+//     padding: 8,
+//     marginBottom: 8,
+//     fontSize: 16,
+//     minHeight: 40,
+//   },
+//   editActions: {
+//     flexDirection: 'row',
+//     justifyContent: 'flex-end',
+//   },
+//   editActionButton: {
+//     paddingHorizontal: 12,
+//     paddingVertical: 6,
+//     borderRadius: 4,
+//     marginLeft: 8,
+//     backgroundColor: '#f0f0f0',
+//   },
+//   saveButton: {
+//     backgroundColor: '#FF6B6B',
+//   },
+//   editActionText: {
+//     fontSize: 12,
+//     fontWeight: '500',
+//   },
+//   inputContainer: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     padding: 12,
+//     borderTopWidth: 1,
+//     borderTopColor: '#e9ecef',
+//     backgroundColor: '#fff',
+//   },
+//   emojiButton: {
+//     padding: 8,
+//     marginRight: 8,
+//   },
+//   textInput: {
+//     flex: 1,
+//     borderWidth: 1,
+//     borderColor: '#e9ecef',
+//     borderRadius: 24,
+//     paddingHorizontal: 16,
+//     paddingVertical: 10,
+//     maxHeight: 100,
+//     fontSize: 16,
+//     backgroundColor: '#f8f9fa',
+//   },
+//   sendButton: {
+//     padding: 12,
+//     marginLeft: 8,
+//     backgroundColor: '#FF6B6B',
+//     borderRadius: 24,
+//     width: 48,
+//     height: 48,
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//   },
+//   emojiPickerContainer: {
+//     flex: 1,
+//     justifyContent: 'flex-end',
+//     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+//   },
+//   emojiPicker: {
+//     backgroundColor: '#fff',
+//     borderTopLeftRadius: 16,
+//     borderTopRightRadius: 16,
+//     padding: 16,
+//     maxHeight: '50%',
+//   },
+//   emojiPickerHeader: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     marginBottom: 16,
+//     paddingBottom: 12,
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#e9ecef',
+//   },
+//   emojiPickerTitle: {
+//     fontSize: 18,
+//     fontWeight: '600',
+//     color: '#212529',
+//   },
+//   closeButton: {
+//     padding: 4,
+//   },
+//   emojiGridContainer: {
+//     height: 200,
+//   },
+//   emojiGrid: {
+//     flexDirection: 'row',
+//     flexWrap: 'wrap',
+//     justifyContent: 'flex-start',
+//   },
+//   emojiItem: {
+//     width: '10%',
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//     padding: 8,
+//   },
+//   emoji: {
+//     textAlign: 'center',
+//   },
+// });
+
+
+
+
+
+
+//18/10/2025
+//app/chat/[id].js
+// import {
+//   View,
+//   Text,
+//   StyleSheet,
+//   TextInput,
+//   TouchableOpacity,
+//   FlatList,
+//   KeyboardAvoidingView,
+//   Platform,
+//   Image,
+//   Alert,
+//   Modal,
+//   ScrollView,
+//   ActivityIndicator,
+//   Dimensions
+// } from 'react-native';
+// import React, { useState, useEffect, useRef, useCallback } from 'react';
+// import { SafeAreaView } from 'react-native-safe-area-context';
+// import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+// import {
+//   collection,
+//   doc,
+//   addDoc,
+//   onSnapshot,
+//   orderBy,
+//   query,
+//   updateDoc,
+//   serverTimestamp,
+//   getDoc,
+//   deleteDoc,
+//   setDoc,
+//   where
+// } from 'firebase/firestore';
+// import { db } from '../../config/firebase';
+// import { useAuth } from '../context/AuthContext';
+// import { useLocalSearchParams, useRouter } from 'expo-router';
+
+// const { width, height } = Dimensions.get('window');
+
+// // All emojis in one flat list
+// const allEmojis = [
+//   '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇',
+//   '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚',
+//   '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩',
+//   '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣',
+//   '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬',
+//   '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🫣',
+//   '🤗', '🫡', '🤔', '🫢', '🤭', '🤫', '🤥', '😶', '🫠', '😐',
+//   '🫤', '😑', '😬', '🙄', '😯', '😦', '😧', '😮', '😲', '🥱',
+//   '😴', '🤤', '😪', '😵', '🫥', '🤐', '🥴', '🤢', '🤮', '🤧',
+//   '😷', '🤒', '🤕', '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻',
+//   '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐽', '🐸', '🐵', '🙈',
+//   '🙉', '🙊', '🐒', '🐔', '🐧', '🐦', '🐤', '🦆', '🦅', '🦉',
+//   '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞',
+//   '🐜', '🦟', '🦗', '🕷️', '🦂', '🐢', '🐍', '🦎', '🦖', '🦕',
+//   '🐙', '🦑', '🦐', '🦞', '🦀', '🐡', '🐠', '🐟', '🐬', '🐳',
+//   '🐋', '🦈', '🐊', '🐅', '🐆', '🦓', '🦍', '🦧', '🦣', '🐘',
+//   '🦛', '🦏', '🐪', '🐫', '🦒', '🦘', '🦬', '🐃', '🐂', '🐄',
+//   '🐎', '🐖', '🐏', '🐑', '🦙', '🐐', '🦌', '🐕', '🐩', '🦮',
+//   '🐕‍🦺', '🐈', '🐈‍⬛', '🍏', '🍎', '🍐', '🍊', '🍋', '🍌', '🍉',
+//   '🍇', '🍓', '🫐', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝',
+//   '🍅', '🍆', '🥑', '🥦', '🥬', '🥒', '🌶️', '🫑', '🌽', '🥕',
+//   '🫒', '🧄', '🧅', '🥔', '🍠', '🥐', '🥯', '🍞', '🥖', '🥨',
+//   '🧀', '🥚', '🍳', '🧈', '🥞', '🧇', '🥓', '🥩', '🍗', '🍖',
+//   '🌭', '🍔', '🍟', '🍕', '🫓', '🥪', '🥙', '🧆', '🌮', '🌯',
+//   '🫔', '🥗', '🥘', '🫕', '🥫', '🍝', '🍜', '🍲', '🍛', '🍣',
+//   '🍱', '🥟', '🦪', '🍤', '🍙', '🍚', '🍘', '🍥', '🥠', '🥮',
+//   '🍢', '🍡', '🍧', '🍨', '🍦', '🥧', '🧁', '🍰', '🎂', '🍮',
+//   '🍭', '🍬', '🍫', '🍿', '🍩', '🍪', '🌰', '🥜', '🍯', '🥛',
+//   '🍼', '🫖', '☕️', '⌚️', '📱', '📲', '💻', '⌨️', '🖥️', '🖨️',
+//   '🖱️', '🖲️', '🕹️', '📷', '📸', '📹', '🎥', '📽️', '🎞️', '📞',
+//   '☎️', '📟', '📠', '📺', '📻', '🎙️', '🎚️', '🎛️', '🧭', '⏱️',
+//   '⏲️', '⏰', '🕰️', '⌛️', '⏳', '📡', '🔋', '🔌', '💡', '🔦',
+//   '🕯️', '🪔', '🧯', '💰', '💳', '💎', '⚖️', '🪜', '🧰', '🪛',
+//   '🔧', '🔨', '⚒️', '🛠️', '⛏️', '🔩', '⚙️', '🔗', '📎', '🖇️',
+//   '📐', '📏', '🧮', '📌', '📍', '✂️', '🖊️', '🖋️', '✒️', '🖌️',
+//   '🖍️', '📝', '✏️', '🔍', '🔎', '🔏', '🔐', '🔒', '🔓', '❤️',
+//   '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❤️‍🔥',
+//   '❤️‍🩹', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '☮️',
+//   '✝️', '☪️', '🕉️', '☸️', '✡️', '🔯', '🕎', '☯️', '☦️', '🛐',
+//   '⛎', '♈️', '♉️', '♊️', '♋️', '♌️', '♍️', '♎️', '♏️', '♐️',
+//   '♑️', '♒️', '♓️', '🆔', '⚛️', '🉑', '☢️', '☣️', '📴', '📳',
+//   '🈶', '🈚️', '🈸', '🈺', '🈷️', '✴️', '🆚', '💮', '🉐', '㊙️',
+//   '㊗️', '🈴', '🈵', '🈹', '🈲', '🅰️', '🅱️', '🆎', '🆑', '🅾️',
+//   '🆘', '❌', '⭕️', '🛑', '⛔️', '📛', '🚫', '💯', '💢', '♨️',
+//   '🚷', '🚯', '🚳', '🚱', '🔞', '📵', '🚭', '❗️', '❕', '❓',
+//   '❔', '‼️', '⁉️', '🔅', '🔆', '〽️', '⚠️', '🚸', '🔱', '⚜️',
+//   '🔰', '♻️', '✅', '🈯️', '💹', '❇️', '✳️', '❎', '🌐', '💠',
+//   'Ⓜ️', '🌀', '💤', '🏧', '🚾', '♿️', '🅿️', '🛗', '🈳'
+// ];
+
+// export default function ChatScreen() {
+//   const [messages, setMessages] = useState([]);
+//   const [newMessage, setNewMessage] = useState('');
+//   const [otherUserProfile, setOtherUserProfile] = useState(null);
+//   const [onlineUsers, setOnlineUsers] = useState([]);
+//   const [userTyping, setUserTyping] = useState(false);
+//   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+//   const [loading, setLoading] = useState(true);
+//   const [lastSeen, setLastSeen] = useState(null);
+//   const { user } = useAuth();
+//   const { id, name, profileId } = useLocalSearchParams();
+//   const router = useRouter();
+//   const flatListRef = useRef(null);
+//   const textInputRef = useRef(null);
+//   const typingTimeoutRef = useRef(null);
+
+//   // Calculate emoji size based on screen width
+//   const emojiSize = Math.floor(width / 10);
+
+//   // Get the other participant's ID and fetch their profile
+//   useEffect(() => {
+//     const fetchChatInfo = async () => {
+//       if (!id || !user?.id) return;
+
+//       try {
+//         setLoading(true);
+        
+//         // If we have profileId from params, use it directly
+//         if (profileId) {
+//           await fetchUserProfile(profileId);
+//         } else {
+//           // Get chat document to find other participant
+//           const chatRef = doc(db, 'chats', id);
+//           const chatSnap = await getDoc(chatRef);
+          
+//           if (chatSnap.exists()) {
+//             const chatData = chatSnap.data();
+//             const otherParticipantId = chatData.participantIds.find(pid => pid !== user.id);
+            
+//             if (otherParticipantId) {
+//               // Fetch other user's profile
+//               await fetchUserProfile(otherParticipantId);
+//             }
+//           }
+//         }
+//       } catch (error) {
+//         console.error('Error fetching chat info:', error);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchChatInfo();
+//   }, [id, user, profileId]);
+
+//   // Fetch user profile from Users collection
+//   const fetchUserProfile = async (userId) => {
+//     try {
+//       const profileRef = doc(db, 'Users', userId);
+//       const profileSnap = await getDoc(profileRef);
+      
+//       if (profileSnap.exists()) {
+//         const profileData = profileSnap.data();
+        
+//         // Use profile photo from Users collection, not Gmail
+//         const profilePhoto = profileData.profilePhoto || 
+//                            'https://via.placeholder.com/150?text=User';
+        
+//         setOtherUserProfile({
+//           id: userId,
+//           name: `${profileData.firstName || ''} ${profileData.lastName || ''}`.trim() || 'User',
+//           photo: profilePhoto,
+//           age: profileData.age,
+//           city: profileData.city
+//         });
+//         return;
+//       }
+      
+//       // Fallback if no profile found
+//       setOtherUserProfile({
+//         id: userId,
+//         name: name || 'User',
+//         photo: 'https://via.placeholder.com/150?text=User',
+//         age: null,
+//         city: null
+//       });
+//     } catch (error) {
+//       console.error('Error fetching user profile:', error);
+//       setOtherUserProfile({
+//         id: userId,
+//         name: name || 'User',
+//         photo: 'https://via.placeholder.com/150?text=User',
+//         age: null,
+//         city: null
+//       });
+//     }
+//   };
+
+//   // Listen for online users and typing status
+//   useEffect(() => {
+//     if (!user?.id || !otherUserProfile?.id) return;
+
+//     const onlineRef = doc(db, 'onlineUsers', otherUserProfile.id);
+    
+//     const unsubscribe = onSnapshot(onlineRef, (doc) => {
+//       if (doc.exists()) {
+//         const userData = doc.data();
+//         if (userData.lastSeen) {
+//           const lastSeenDate = userData.lastSeen.toDate ? userData.lastSeen.toDate() : new Date(userData.lastSeen);
+//           setLastSeen(lastSeenDate);
+//         }
+        
+//         // Check if user is typing
+//         if (userData.typing === true) {
+//           setUserTyping(true);
+          
+//           // Reset typing status after 3 seconds if no update
+//           if (typingTimeoutRef.current) {
+//             clearTimeout(typingTimeoutRef.current);
+//           }
+          
+//           typingTimeoutRef.current = setTimeout(() => {
+//             setUserTyping(false);
+//           }, 3000);
+//         } else {
+//           setUserTyping(false);
+//         }
+//       }
+//     });
+
+//     return () => {
+//       if (typingTimeoutRef.current) {
+//         clearTimeout(typingTimeoutRef.current);
+//       }
+//       unsubscribe();
+//     };
+//   }, [user, otherUserProfile]);
+
+//   // Update typing status in Firestore
+//   const updateTypingStatus = async (isTyping) => {
+//     if (!user?.id) return;
+    
+//     try {
+//       const userStatusRef = doc(db, 'onlineUsers', user.id);
+//       await setDoc(userStatusRef, {
+//         isOnline: true,
+//         lastSeen: serverTimestamp(),
+//         userId: user.id,
+//         userName: user.displayName || 'User',
+//         typing: isTyping
+//       }, { merge: true });
+//     } catch (error) {
+//       console.error('Error updating typing status:', error);
+//     }
+//   };
+
+//   // Handle text input changes
+//   const handleTextChange = (text) => {
+//     setNewMessage(text);
+    
+//     // Update typing status
+//     if (text.length > 0) {
+//       updateTypingStatus(true);
+      
+//       // Clear previous timeout
+//       if (typingTimeoutRef.current) {
+//         clearTimeout(typingTimeoutRef.current);
+//       }
+      
+//       // Set new timeout to reset typing status
+//       typingTimeoutRef.current = setTimeout(() => {
+//         updateTypingStatus(false);
+//       }, 1000);
+//     } else {
+//       updateTypingStatus(false);
+//     }
+//   };
+
+//   // Listen for messages in real-time
+//   useEffect(() => {
+//     if (!id) return;
+
+//     const messagesRef = collection(db, 'chats', id, 'messages');
+//     const q = query(messagesRef, orderBy('timestamp', 'asc'));
+    
+//     const unsubscribe = onSnapshot(q, (querySnapshot) => {
+//       const messagesData = [];
+//       querySnapshot.forEach((doc) => {
+//         const data = doc.data();
+//         messagesData.push({
+//           id: doc.id,
+//           ...data,
+//           // Ensure timestamp is a Date object
+//           timestamp: data.timestamp ? data.timestamp.toDate() : new Date()
+//         });
+//       });
+//       setMessages(messagesData);
+      
+//       // Scroll to bottom when new messages arrive
+//       setTimeout(() => {
+//         flatListRef.current?.scrollToEnd({ animated: true });
+//       }, 100);
+//     });
+
+//     return () => unsubscribe();
+//   }, [id]);
+
+//   // Check if other user is online
+//   const isOtherUserOnline = () => {
+//     if (!lastSeen || !otherUserProfile?.id) return false;
+    
+//     const now = new Date();
+//     const lastSeenDate = new Date(lastSeen);
+//     const diff = Math.floor((now - lastSeenDate) / 1000); // difference in seconds
+    
+//     // Consider user online if they were active in the last 2 minutes
+//     return diff < 120;
+//   };
+
+//   // Format last seen time in a detailed way
+//   const formatLastSeen = (date) => {
+//     if (!date) return 'recently';
+    
+//     const now = new Date();
+//     const lastSeenDate = new Date(date);
+//     const diff = Math.floor((now - lastSeenDate) / 1000); // difference in seconds
+    
+//     if (diff < 60) {
+//       return 'just now';
+//     } else if (diff < 3600) {
+//       const minutes = Math.floor(diff / 60);
+//       return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+//     } else if (diff < 86400) {
+//       const hours = Math.floor(diff / 3600);
+//       return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+//     } else if (diff < 604800) {
+//       const days = Math.floor(diff / 86400);
+//       return `${days} day${days !== 1 ? 's' : ''} ago`;
+//     } else {
+//       return lastSeenDate.toLocaleDateString();
+//     }
+//   };
+
+//   // Send a new message
+//   const sendMessage = async () => {
+//     if (!newMessage.trim() || !user || !user.id || !id) {
+//       Alert.alert('Error', 'Cannot send empty message');
+//       return;
+//     }
+
+//     try {
+//       // Reset typing status
+//       updateTypingStatus(false);
+      
+//       const messagesRef = collection(db, 'chats', id, 'messages');
+      
+//       // Create message data with validated fields
+//       const messageData = {
+//         text: newMessage.trim(),
+//         senderId: user.id,
+//         senderName: user.displayName || `${user.firstName} ${user.lastName}`.trim() || 'User',
+//         timestamp: serverTimestamp(),
+//         type: 'text',
+//         edited: false
+//       };
+
+//       await addDoc(messagesRef, messageData);
+      
+//       // Update the chat's last message and timestamp
+//       const chatRef = doc(db, 'chats', id);
+//       await updateDoc(chatRef, {
+//         lastMessage: newMessage.trim(),
+//         lastMessageTime: serverTimestamp()
+//       });
+      
+//       setNewMessage('');
+//     } catch (error) {
+//       console.error('Error sending message:', error);
+//       Alert.alert('Error', 'Failed to send message. Please try again.');
+//     }
+//   };
+
+//   // Delete a message
+//   const deleteMessage = async (messageId) => {
+//     Alert.alert(
+//       "Delete Message",
+//       "Are you sure you want to delete this message?",
+//       [
+//         {
+//           text: "Cancel",
+//           style: "cancel"
+//         },
+//         {
+//           text: "Delete",
+//           style: "destructive",
+//           onPress: async () => {
+//             try {
+//               const messageRef = doc(db, 'chats', id, 'messages', messageId);
+//               await deleteDoc(messageRef);
+//             } catch (error) {
+//               console.error('Error deleting message:', error);
+//               Alert.alert('Error', 'Failed to delete message. Please try again.');
+//             }
+//           }
+//         }
+//       ]
+//     );
+//   };
+
+//   // Add emoji to message
+//   const addEmoji = (emoji) => {
+//     setNewMessage(prevMessage => prevMessage + emoji);
+//     setShowEmojiPicker(false);
+//   };
+
+//   const renderMessage = useCallback(({ item }) => {
+//     const isMyMessage = item.senderId === user?.id;
+    
+//     return (
+//       <View style={[
+//         styles.messageContainer,
+//         isMyMessage ? styles.myMessageContainer : styles.theirMessageContainer
+//       ]}>
+//         {!isMyMessage && (
+//           <Image
+//             source={{ 
+//               uri: otherUserProfile?.photo || 'https://via.placeholder.com/150?text=User'
+//             }}
+//             style={styles.messageAvatar}
+//             defaultSource={{ uri: 'https://via.placeholder.com/150?text=User' }}
+//           />
+//         )}
+        
+//         <View style={[
+//           styles.messageBubble,
+//           isMyMessage ? styles.myMessage : styles.theirMessage
+//         ]}>
+//           <Text style={[
+//             styles.messageText,
+//             isMyMessage ? styles.myMessageText : styles.theirMessageText
+//           ]}>
+//             {item.text}
+//           </Text>
+          
+//           <View style={styles.messageFooter}>
+//             <Text style={[
+//               styles.messageTime,
+//               isMyMessage ? styles.myMessageTime : styles.theirMessageTime
+//             ]}>
+//               {item.timestamp ? formatTime(item.timestamp) : 'Just now'}
+//               {item.edited && ' (edited)'}
+//             </Text>
+            
+//             {isMyMessage && (
+//               <TouchableOpacity
+//                 style={styles.messageAction}
+//                 onPress={() => deleteMessage(item.id)}
+//               >
+//                 <Ionicons name="trash-outline" size={14} color="#FF6B6B" />
+//               </TouchableOpacity>
+//             )}
+//           </View>
+//         </View>
+        
+//         {isMyMessage && (
+//           <Image
+//             source={{ 
+//               uri: user.profilePhoto || 'https://via.placeholder.com/150?text=You'
+//             }}
+//             style={styles.messageAvatar}
+//             defaultSource={{ uri: 'https://via.placeholder.com/150?text=You' }}
+//           />
+//         )}
+//       </View>
+//     );
+//   }, [user, otherUserProfile]);
+
+//   const formatTime = (date) => {
+//     if (!date) return '';
+//     const now = new Date();
+//     const messageDate = new Date(date);
+    
+//     // If message is from today, show time only
+//     if (messageDate.toDateString() === now.toDateString()) {
+//       return messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+//     }
+//     // If message is from yesterday, show "Yesterday"
+//     else if (messageDate.toDateString() === new Date(now.setDate(now.getDate() - 1)).toDateString()) {
+//       return 'Yesterday ' + messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+//     }
+//     // Otherwise show date and time
+//     else {
+//       return messageDate.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' +
+//              messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+//     }
+//   };
+
+//   // Enhanced emoji picker component with all emojis
+//   const EmojiPicker = () => {
+//     return (
+//       <Modal
+//         transparent={true}
+//         visible={showEmojiPicker}
+//         animationType="slide"
+//         onRequestClose={() => setShowEmojiPicker(false)}
+//       >
+//         <View style={styles.emojiPickerContainer}>
+//           <View style={styles.emojiPicker}>
+//             <View style={styles.emojiPickerHeader}>
+//               <Text style={styles.emojiPickerTitle}>Select Emoji</Text>
+//               <TouchableOpacity
+//                 onPress={() => setShowEmojiPicker(false)}
+//                 style={styles.closeButton}
+//               >
+//                 <Ionicons name="close" size={24} color="#333" />
+//               </TouchableOpacity>
+//             </View>
+            
+//             {/* All Emojis Grid */}
+//             <View style={styles.emojiGridContainer}>
+//               <ScrollView>
+//                 <View style={styles.emojiGrid}>
+//                   {allEmojis.map((emoji, index) => (
+//                     <TouchableOpacity
+//                       key={index}
+//                       style={styles.emojiItem}
+//                       onPress={() => addEmoji(emoji)}
+//                     >
+//                       <Text style={[styles.emoji, { fontSize: emojiSize * 0.6 }]}>
+//                         {emoji}
+//                       </Text>
+//                     </TouchableOpacity>
+//                   ))}
+//                 </View>
+//               </ScrollView>
+//             </View>
+//           </View>
+//         </View>
+//       </Modal>
+//     );
+//   };
+
+//   if (loading) {
+//     return (
+//       <SafeAreaView style={styles.safeArea}>
+//         <View style={styles.loadingContainer}>
+//           <ActivityIndicator size="large" color="#FF6B6B" />
+//           <Text style={styles.loadingText}>Loading chat...</Text>
+//         </View>
+//       </SafeAreaView>
+//     );
+//   }
+
+//   return (
+//     <SafeAreaView style={styles.safeArea}>
+//       {/* Header with Profile Photo and Online Status */}
+//       <View style={styles.header}>
+//         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+//           <Ionicons name="arrow-back" size={24} color="#333" />
+//         </TouchableOpacity>
+        
+//         <View style={styles.headerProfile}>
+//           <View style={styles.avatarContainer}>
+//             <Image
+//               source={{ 
+//                 uri: otherUserProfile?.photo || 'https://via.placeholder.com/150?text=User'
+//               }}
+//               style={styles.headerAvatar}
+//               defaultSource={{ uri: 'https://via.placeholder.com/150?text=User' }}
+//             />
+//             {isOtherUserOnline() && <View style={styles.onlineBadge} />}
+//           </View>
+//           <View style={styles.headerInfo}>
+//             <Text style={styles.headerName}>{otherUserProfile?.name || name || 'User'}</Text>
+//             <View style={styles.statusContainer}>
+//               {isOtherUserOnline() ? (
+//                 userTyping ? (
+//                   <View style={styles.typingContainer}>
+//                     <Text style={styles.typingText}>typing</Text>
+//                     <View style={styles.typingDots}>
+//                       <View style={[styles.typingDot, styles.typingDot1]} />
+//                       <View style={[styles.typingDot, styles.typingDot2]} />
+//                       <View style={[styles.typingDot, styles.typingDot3]} />
+//                     </View>
+//                   </View>
+//                 ) : (
+//                   <>
+//                     <View style={styles.onlineDot} />
+//                     <Text style={styles.onlineText}>online</Text>
+//                   </>
+//                 )
+//               ) : lastSeen ? (
+//                 <Text style={styles.offlineText}>
+//                   last seen {formatLastSeen(lastSeen)}
+//                 </Text>
+//               ) : (
+//                 <Text style={styles.offlineText}>offline</Text>
+//               )}
+//             </View>
+//           </View>
+//         </View>
+//       </View>
+
+//       {/* Messages List */}
+//       <KeyboardAvoidingView
+//         style={styles.keyboardAvoidingView}
+//         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+//         keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+//       >
+//         <FlatList
+//           ref={flatListRef}
+//           data={messages}
+//           renderItem={renderMessage}
+//           keyExtractor={item => item.id}
+//           contentContainerStyle={styles.messagesList}
+//           showsVerticalScrollIndicator={false}
+//           onContentSizeChange={() => {
+//             flatListRef.current?.scrollToEnd({ animated: true });
+//           }}
+//           onLayout={() => {
+//             flatListRef.current?.scrollToEnd({ animated: true });
+//           }}
+//         />
+
+//         {/* Emoji Picker */}
+//         <EmojiPicker />
+
+//         {/* Message Input */}
+//         <View style={styles.inputContainer}>
+//           <TouchableOpacity
+//             style={styles.emojiButton}
+//             onPress={() => setShowEmojiPicker(true)}
+//           >
+//             <Ionicons name="happy-outline" size={28} color="#666" />
+//           </TouchableOpacity>
+          
+//           <TextInput
+//             ref={textInputRef}
+//             style={styles.textInput}
+//             value={newMessage}
+//             onChangeText={handleTextChange}
+//             placeholder="Type a message..."
+//             multiline
+//             maxLength={500}
+//             placeholderTextColor="#999"
+//           />
+          
+//           {newMessage.trim() ? (
+//             <TouchableOpacity
+//               style={styles.sendButton}
+//               onPress={sendMessage}
+//             >
+//               <Ionicons name="send" size={22} color="#fff" />
+//             </TouchableOpacity>
+//           ) : (
+//             <TouchableOpacity style={styles.emojiButton}>
+//               <Ionicons name="heart-outline" size={28} color="#666" />
+//             </TouchableOpacity>
+//           )}
+//         </View>
+//       </KeyboardAvoidingView>
+//     </SafeAreaView>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   safeArea: {
+//     flex: 1,
+//     backgroundColor: '#f8f9fa',
+//   },
+//   keyboardAvoidingView: {
+//     flex: 1,
+//   },
+//   loadingContainer: {
+//     flex: 1,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//   },
+//   loadingText: {
+//     marginTop: 10,
+//     color: '#666',
+//   },
+//   header: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     padding: 16,
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#e9ecef',
+//     backgroundColor: '#fff',
+//   },
+//   backButton: {
+//     marginRight: 12,
+//     padding: 4,
+//   },
+//   headerProfile: {
+//     flex: 1,
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//   },
+//   avatarContainer: {
+//     position: 'relative',
+//     marginRight: 12,
+//   },
+//   headerAvatar: {
+//     width: 45,
+//     height: 45,
+//     borderRadius: 22.5,
+//     borderWidth: 2,
+//     borderColor: '#FF6B6B',
+//   },
+//   onlineBadge: {
+//     position: 'absolute',
+//     bottom: 0,
+//     right: 0,
+//     width: 14,
+//     height: 14,
+//     borderRadius: 7,
+//     backgroundColor: '#4CAF50',
+//     borderWidth: 2,
+//     borderColor: '#fff',
+//   },
+//   headerInfo: {
+//     flex: 1,
+//   },
+//   headerName: {
+//     fontSize: 18,
+//     fontWeight: '600',
+//     color: '#212529',
+//     marginBottom: 2,
+//   },
+//   statusContainer: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//   },
+//   onlineDot: {
+//     width: 8,
+//     height: 8,
+//     borderRadius: 4,
+//     backgroundColor: '#4CAF50',
+//     marginRight: 6,
+//   },
+//   onlineText: {
+//     fontSize: 12,
+//     color: '#4CAF50',
+//     fontWeight: '500',
+//     textTransform: 'lowercase',
+//   },
+//   offlineText: {
+//     fontSize: 12,
+//     color: '#6c757d',
+//     textTransform: 'lowercase',
+//   },
+//   typingContainer: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//   },
+//   typingText: {
+//     fontSize: 12,
+//     color: '#4CAF50',
+//     fontStyle: 'italic',
+//     marginRight: 4,
+//   },
+//   typingDots: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//   },
+//   typingDot: {
+//     width: 4,
+//     height: 4,
+//     borderRadius: 2,
+//     backgroundColor: '#4CAF50',
+//     marginHorizontal: 1,
+//   },
+//   typingDot1: {
+//     opacity: 0.4,
+//   },
+//   typingDot2: {
+//     opacity: 0.6,
+//   },
+//   typingDot3: {
+//     opacity: 0.8,
+//   },
+//   messagesList: {
+//     padding: 16,
+//     flexGrow: 1,
+//     paddingBottom: 20,
+//   },
+//   messageContainer: {
+//     flexDirection: 'row',
+//     alignItems: 'flex-end',
+//     marginBottom: 16,
+//     maxWidth: '100%',
+//   },
+//   myMessageContainer: {
+//     justifyContent: 'flex-end',
+//   },
+//   theirMessageContainer: {
+//     justifyContent: 'flex-start',
+//   },
+//   messageAvatar: {
+//     width: 36,
+//     height: 36,
+//     borderRadius: 18,
+//     marginHorizontal: 8,
+//   },
+//   messageBubble: {
+//     maxWidth: '70%',
+//     padding: 12,
+//     borderRadius: 18,
+//     marginHorizontal: 8,
+//   },
+//   myMessage: {
+//     backgroundColor: '#FF6B6B',
+//     borderBottomRightRadius: 4,
+//   },
+//   theirMessage: {
+//     backgroundColor: '#fff',
+//     borderBottomLeftRadius: 4,
+//     borderWidth: 1,
+//     borderColor: '#e9ecef',
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 1 },
+//     shadowOpacity: 0.1,
+//     shadowRadius: 2,
+//     elevation: 2,
+//   },
+//   messageText: {
+//     fontSize: 16,
+//     lineHeight: 22,
+//     marginBottom: 4,
+//   },
+//   myMessageText: {
+//     color: '#fff',
+//   },
+//   theirMessageText: {
+//     color: '#212529',
+//   },
+//   messageFooter: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//   },
+//   messageTime: {
+//     fontSize: 11,
+//     opacity: 0.7,
+//   },
+//   myMessageTime: {
+//     color: 'rgba(255, 255, 255, 0.8)',
+//   },
+//   theirMessageTime: {
+//     color: '#6c757d',
+//   },
+//   messageAction: {
+//     padding: 4,
+//     marginLeft: 8,
+//   },
+//   inputContainer: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     padding: 12,
+//     borderTopWidth: 1,
+//     borderTopColor: '#e9ecef',
+//     backgroundColor: '#fff',
+//     paddingBottom: Platform.OS === 'ios' ? 25 : 12, // Extra padding for iOS
+//   },
+//   emojiButton: {
+//     padding: 8,
+//     marginRight: 8,
+//   },
+//   textInput: {
+//     flex: 1,
+//     borderWidth: 1,
+//     borderColor: '#e9ecef',
+//     borderRadius: 24,
+//     paddingHorizontal: 16,
+//     paddingVertical: Platform.OS === 'ios' ? 12 : 8,
+//     maxHeight: 100,
+//     fontSize: 16,
+//     backgroundColor: '#f8f9fa',
+//   },
+//   sendButton: {
+//     padding: 12,
+//     marginLeft: 8,
+//     backgroundColor: '#FF6B6B',
+//     borderRadius: 24,
+//     width: 48,
+//     height: 48,
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//   },
+//   emojiPickerContainer: {
+//     flex: 1,
+//     justifyContent: 'flex-end',
+//     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+//   },
+//   emojiPicker: {
+//     backgroundColor: '#fff',
+//     borderTopLeftRadius: 16,
+//     borderTopRightRadius: 16,
+//     padding: 16,
+//     maxHeight: '50%',
+//   },
+//   emojiPickerHeader: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     marginBottom: 16,
+//     paddingBottom: 12,
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#e9ecef',
+//   },
+//   emojiPickerTitle: {
+//     fontSize: 18,
+//     fontWeight: '600',
+//     color: '#212529',
+//   },
+//   closeButton: {
+//     padding: 4,
+//   },
+//   emojiGridContainer: {
+//     height: 200,
+//   },
+//   emojiGrid: {
+//     flexDirection: 'row',
+//     flexWrap: 'wrap',
+//     justifyContent: 'flex-start',
+//   },
+//   emojiItem: {
+//     width: '10%',
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//     padding: 8,
+//   },
+//   emoji: {
+//     textAlign: 'center',
+//   },
+// });
+
+
+
+
+
+// trail2
+//app/chat/[id].js
 import {
   View,
   Text,
@@ -8191,7 +10124,7 @@ import { db } from '../../config/firebase';
 import { useAuth } from '../context/AuthContext';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 // All emojis in one flat list
 const allEmojis = [
@@ -8249,10 +10182,10 @@ export default function ChatScreen() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [otherUserProfile, setOtherUserProfile] = useState(null);
+  const [currentUserProfile, setCurrentUserProfile] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [userTyping, setUserTyping] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [editingMessage, setEditingMessage] = useState(null);
   const [loading, setLoading] = useState(true);
   const [lastSeen, setLastSeen] = useState(null);
   const { user } = useAuth();
@@ -8273,9 +10206,12 @@ export default function ChatScreen() {
       try {
         setLoading(true);
         
+        // Fetch current user's profile first
+        await fetchCurrentUserProfile(user.id);
+        
         // If we have profileId from params, use it directly
         if (profileId) {
-          await fetchUserProfile(profileId);
+          await fetchOtherUserProfile(profileId);
         } else {
           // Get chat document to find other participant
           const chatRef = doc(db, 'chats', id);
@@ -8287,7 +10223,7 @@ export default function ChatScreen() {
             
             if (otherParticipantId) {
               // Fetch other user's profile
-              await fetchUserProfile(otherParticipantId);
+              await fetchOtherUserProfile(otherParticipantId);
             }
           }
         }
@@ -8301,18 +10237,66 @@ export default function ChatScreen() {
     fetchChatInfo();
   }, [id, user, profileId]);
 
-  // Fetch user profile from Users collection
-  const fetchUserProfile = async (userId) => {
+  // Fetch current user's profile from Users collection
+  const fetchCurrentUserProfile = async (userId) => {
     try {
       const profileRef = doc(db, 'Users', userId);
       const profileSnap = await getDoc(profileRef);
       
       if (profileSnap.exists()) {
         const profileData = profileSnap.data();
+        
+        // Use profile photo from Users collection
+        const profilePhoto = profileData.profilePhoto || 
+                           'https://via.placeholder.com/150?text=You';
+        
+        setCurrentUserProfile({
+          id: userId,
+          name: `${profileData.firstName || ''} ${profileData.lastName || ''}`.trim() || 'You',
+          photo: profilePhoto,
+          age: profileData.age,
+          city: profileData.city
+        });
+        return;
+      }
+      
+      // Fallback if no profile found
+      setCurrentUserProfile({
+        id: userId,
+        name: 'You',
+        photo: 'https://via.placeholder.com/150?text=You',
+        age: null,
+        city: null
+      });
+    } catch (error) {
+      console.error('Error fetching current user profile:', error);
+      setCurrentUserProfile({
+        id: userId,
+        name: 'You',
+        photo: 'https://via.placeholder.com/150?text=You',
+        age: null,
+        city: null
+      });
+    }
+  };
+
+  // Fetch other user's profile from Users collection
+  const fetchOtherUserProfile = async (userId) => {
+    try {
+      const profileRef = doc(db, 'Users', userId);
+      const profileSnap = await getDoc(profileRef);
+      
+      if (profileSnap.exists()) {
+        const profileData = profileSnap.data();
+        
+        // Use profile photo from Users collection
+        const profilePhoto = profileData.profilePhoto || 
+                           'https://via.placeholder.com/150?text=User';
+        
         setOtherUserProfile({
           id: userId,
           name: `${profileData.firstName || ''} ${profileData.lastName || ''}`.trim() || 'User',
-          photo: profileData.profilePhoto || 'https://via.placeholder.com/150?text=User',
+          photo: profilePhoto,
           age: profileData.age,
           city: profileData.city
         });
@@ -8328,7 +10312,7 @@ export default function ChatScreen() {
         city: null
       });
     } catch (error) {
-      console.error('Error fetching user profile:', error);
+      console.error('Error fetching other user profile:', error);
       setOtherUserProfile({
         id: userId,
         name: name || 'User',
@@ -8501,7 +10485,7 @@ export default function ChatScreen() {
       const messageData = {
         text: newMessage.trim(),
         senderId: user.id,
-        senderName: user.displayName || `${user.firstName} ${user.lastName}`.trim() || 'User',
+        senderName: currentUserProfile?.name || 'You',
         timestamp: serverTimestamp(),
         type: 'text',
         edited: false
@@ -8523,36 +10507,31 @@ export default function ChatScreen() {
     }
   };
 
-  // Edit a message
-  const editMessage = async (messageId, newText) => {
-    if (!newText.trim()) return;
-    
-    try {
-      const messageRef = doc(db, 'chats', id, 'messages', messageId);
-      await updateDoc(messageRef, {
-        text: newText.trim(),
-        edited: true,
-        editedAt: serverTimestamp()
-      });
-      
-      setEditingMessage(null);
-      Alert.alert('Success', 'Message updated successfully');
-    } catch (error) {
-      console.error('Error editing message:', error);
-      Alert.alert('Error', 'Failed to edit message. Please try again.');
-    }
-  };
-
   // Delete a message
   const deleteMessage = async (messageId) => {
-    try {
-      const messageRef = doc(db, 'chats', id, 'messages', messageId);
-      await deleteDoc(messageRef);
-      Alert.alert('Success', 'Message deleted successfully');
-    } catch (error) {
-      console.error('Error deleting message:', error);
-      Alert.alert('Error', 'Failed to delete message. Please try again.');
-    }
+    Alert.alert(
+      "Delete Message",
+      "Are you sure you want to delete this message?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const messageRef = doc(db, 'chats', id, 'messages', messageId);
+              await deleteDoc(messageRef);
+            } catch (error) {
+              console.error('Error deleting message:', error);
+              Alert.alert('Error', 'Failed to delete message. Please try again.');
+            }
+          }
+        }
+      ]
+    );
   };
 
   // Add emoji to message
@@ -8563,18 +10542,22 @@ export default function ChatScreen() {
 
   const renderMessage = useCallback(({ item }) => {
     const isMyMessage = item.senderId === user?.id;
-    const isEditing = editingMessage?.id === item.id;
     
     return (
       <View style={[
         styles.messageContainer,
-        isMyMessage ? styles.myMessageContainer : styles.theirMessageContainer,
-        isEditing && styles.editingMessage
+        isMyMessage ? styles.myMessageContainer : styles.theirMessageContainer
       ]}>
         {!isMyMessage && (
           <Image
-            source={{ uri: otherUserProfile?.photo || 'https://via.placeholder.com/150?text=User' }}
+            source={{ 
+              uri: otherUserProfile?.photo || 'https://via.placeholder.com/150?text=User'
+            }}
             style={styles.messageAvatar}
+            defaultSource={{ uri: 'https://via.placeholder.com/150?text=User' }}
+            onError={(e) => {
+              console.log('Error loading other user profile image:', e.nativeEvent.error);
+            }}
           />
         )}
         
@@ -8582,78 +10565,48 @@ export default function ChatScreen() {
           styles.messageBubble,
           isMyMessage ? styles.myMessage : styles.theirMessage
         ]}>
-          {isEditing ? (
-            <View style={styles.editContainer}>
-              <TextInput
-                style={styles.editInput}
-                defaultValue={item.text}
-                onSubmitEditing={(e) => editMessage(item.id, e.nativeEvent.text)}
-                autoFocus
-                multiline
-              />
-              <View style={styles.editActions}>
-                <TouchableOpacity
-                  style={styles.editActionButton}
-                  onPress={() => setEditingMessage(null)}
-                >
-                  <Text style={styles.editActionText}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.editActionButton, styles.saveButton]}
-                  onPress={() => editMessage(item.id, item.text)}
-                >
-                  <Text style={styles.editActionText}>Save</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          ) : (
-            <>
-              <Text style={[
-                styles.messageText,
-                isMyMessage ? styles.myMessageText : styles.theirMessageText
-              ]}>
-                {item.text}
-              </Text>
-              
-              <View style={styles.messageFooter}>
-                <Text style={[
-                  styles.messageTime,
-                  isMyMessage ? styles.myMessageTime : styles.theirMessageTime
-                ]}>
-                  {item.timestamp ? formatTime(item.timestamp) : 'Just now'}
-                  {item.edited && ' (edited)'}
-                </Text>
-                
-                {isMyMessage && (
-                  <View style={styles.messageActions}>
-                    <TouchableOpacity
-                      style={styles.messageAction}
-                      onPress={() => setEditingMessage(item)}
-                    >
-                      <Ionicons name="create-outline" size={14} color="#666" />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.messageAction}
-                      onPress={() => deleteMessage(item.id)}
-                    >
-                      <Ionicons name="trash-outline" size={14} color="#FF6B6B" />
-                    </TouchableOpacity>
-                  </View>
-                )}
-              </View>
-            </>
-          )}
+          <Text style={[
+            styles.messageText,
+            isMyMessage ? styles.myMessageText : styles.theirMessageText
+          ]}>
+            {item.text}
+          </Text>
+          
+          <View style={styles.messageFooter}>
+            <Text style={[
+              styles.messageTime,
+              isMyMessage ? styles.myMessageTime : styles.theirMessageTime
+            ]}>
+              {item.timestamp ? formatTime(item.timestamp) : 'Just now'}
+              {item.edited && ' (edited)'}
+            </Text>
+            
+            {isMyMessage && (
+              <TouchableOpacity
+                style={styles.messageAction}
+                onPress={() => deleteMessage(item.id)}
+              >
+                <Ionicons name="trash-outline" size={14} color="#FF6B6B" />
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
         
         {isMyMessage && (
           <Image
-            source={{ uri: user.profilePhoto || 'https://via.placeholder.com/150?text=You' }}
+            source={{ 
+              uri: currentUserProfile?.photo || 'https://via.placeholder.com/150?text=You'
+            }}
             style={styles.messageAvatar}
+            defaultSource={{ uri: 'https://via.placeholder.com/150?text=You' }}
+            onError={(e) => {
+              console.log('Error loading current user profile image:', e.nativeEvent.error);
+            }}
           />
         )}
       </View>
     );
-  }, [user, otherUserProfile, editingMessage]);
+  }, [user, otherUserProfile, currentUserProfile]);
 
   const formatTime = (date) => {
     if (!date) return '';
@@ -8742,8 +10695,14 @@ export default function ChatScreen() {
         <View style={styles.headerProfile}>
           <View style={styles.avatarContainer}>
             <Image
-              source={{ uri: otherUserProfile?.photo || 'https://via.placeholder.com/150?text=User' }}
+              source={{ 
+                uri: otherUserProfile?.photo || 'https://via.placeholder.com/150?text=User'
+              }}
               style={styles.headerAvatar}
+              defaultSource={{ uri: 'https://via.placeholder.com/150?text=User' }}
+              onError={(e) => {
+                console.log('Error loading header profile image:', e.nativeEvent.error);
+              }}
             />
             {isOtherUserOnline() && <View style={styles.onlineBadge} />}
           </View>
@@ -8779,60 +10738,62 @@ export default function ChatScreen() {
       </View>
 
       {/* Messages List */}
-      <FlatList
-        ref={flatListRef}
-        data={messages}
-        renderItem={renderMessage}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.messagesList}
-        showsVerticalScrollIndicator={false}
-        onContentSizeChange={() => {
-          flatListRef.current?.scrollToEnd({ animated: true });
-        }}
-        onLayout={() => {
-          flatListRef.current?.scrollToEnd({ animated: true });
-        }}
-      />
-
-      {/* Emoji Picker */}
-      <EmojiPicker />
-
-      {/* Message Input */}
       <KeyboardAvoidingView
+        style={styles.keyboardAvoidingView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-        style={styles.inputContainer}
       >
-        <TouchableOpacity
-          style={styles.emojiButton}
-          onPress={() => setShowEmojiPicker(true)}
-        >
-          <Ionicons name="happy-outline" size={28} color="#666" />
-        </TouchableOpacity>
-        
-        <TextInput
-          ref={textInputRef}
-          style={styles.textInput}
-          value={newMessage}
-          onChangeText={handleTextChange}
-          placeholder="Type a message..."
-          multiline
-          maxLength={500}
-          placeholderTextColor="#999"
+        <FlatList
+          ref={flatListRef}
+          data={messages}
+          renderItem={renderMessage}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.messagesList}
+          showsVerticalScrollIndicator={false}
+          onContentSizeChange={() => {
+            flatListRef.current?.scrollToEnd({ animated: true });
+          }}
+          onLayout={() => {
+            flatListRef.current?.scrollToEnd({ animated: true });
+          }}
         />
-        
-        {newMessage.trim() ? (
+
+        {/* Emoji Picker */}
+        <EmojiPicker />
+
+        {/* Message Input */}
+        <View style={styles.inputContainer}>
           <TouchableOpacity
-            style={styles.sendButton}
-            onPress={sendMessage}
+            style={styles.emojiButton}
+            onPress={() => setShowEmojiPicker(true)}
           >
-            <Ionicons name="send" size={22} color="#fff" />
+            <Ionicons name="happy-outline" size={28} color="#666" />
           </TouchableOpacity>
-        ) : (
-          <TouchableOpacity style={styles.emojiButton}>
-            <Ionicons name="heart-outline" size={28} color="#666" />
-          </TouchableOpacity>
-        )}
+          
+          <TextInput
+            ref={textInputRef}
+            style={styles.textInput}
+            value={newMessage}
+            onChangeText={handleTextChange}
+            placeholder="Type a message..."
+            multiline
+            maxLength={500}
+            placeholderTextColor="#999"
+          />
+          
+          {newMessage.trim() ? (
+            <TouchableOpacity
+              style={styles.sendButton}
+              onPress={sendMessage}
+            >
+              <Ionicons name="send" size={22} color="#fff" />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity style={styles.emojiButton}>
+              <Ionicons name="heart-outline" size={28} color="#666" />
+            </TouchableOpacity>
+          )}
+        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -8842,6 +10803,9 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#f8f9fa',
+  },
+  keyboardAvoidingView: {
+    flex: 1,
   },
   loadingContainer: {
     flex: 1,
@@ -8955,7 +10919,7 @@ const styles = StyleSheet.create({
   messagesList: {
     padding: 16,
     flexGrow: 1,
-    paddingBottom: 80,
+    paddingBottom: 20,
   },
   messageContainer: {
     flexDirection: 'row',
@@ -8968,11 +10932,6 @@ const styles = StyleSheet.create({
   },
   theirMessageContainer: {
     justifyContent: 'flex-start',
-  },
-  editingMessage: {
-    backgroundColor: '#fff8e1',
-    borderRadius: 8,
-    padding: 4,
   },
   messageAvatar: {
     width: 36,
@@ -9027,42 +10986,9 @@ const styles = StyleSheet.create({
   theirMessageTime: {
     color: '#6c757d',
   },
-  messageActions: {
-    flexDirection: 'row',
-    marginLeft: 8,
-  },
   messageAction: {
     padding: 4,
-    marginLeft: 4,
-  },
-  editContainer: {
-    flex: 1,
-  },
-  editInput: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 8,
-    marginBottom: 8,
-    fontSize: 16,
-    minHeight: 40,
-  },
-  editActions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-  },
-  editActionButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 4,
     marginLeft: 8,
-    backgroundColor: '#f0f0f0',
-  },
-  saveButton: {
-    backgroundColor: '#FF6B6B',
-  },
-  editActionText: {
-    fontSize: 12,
-    fontWeight: '500',
   },
   inputContainer: {
     flexDirection: 'row',
@@ -9071,6 +10997,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#e9ecef',
     backgroundColor: '#fff',
+    paddingBottom: Platform.OS === 'ios' ? 25 : 12,
   },
   emojiButton: {
     padding: 8,
@@ -9082,7 +11009,7 @@ const styles = StyleSheet.create({
     borderColor: '#e9ecef',
     borderRadius: 24,
     paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingVertical: Platform.OS === 'ios' ? 12 : 8,
     maxHeight: 100,
     fontSize: 16,
     backgroundColor: '#f8f9fa',

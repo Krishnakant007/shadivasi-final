@@ -11526,9 +11526,9 @@
 //   const loadCachedData = async () => {
 //     try {
 //       const [
-//         cachedChats, 
-//         cachedReceivedInterests, 
-//         cachedSentInterests, 
+//         cachedChats,
+//         cachedReceivedInterests,
+//         cachedSentInterests,
 //         cachedUserProfiles,
 //         cachedLastUpdate
 //       ] = await Promise.all([
@@ -11867,7 +11867,7 @@
 //           // Update the specific chat in our state
 //           const updatedChat = change.doc.data();
 //           setChats(prevChats => {
-//             const updatedChats = prevChats.map(chat => 
+//             const updatedChats = prevChats.map(chat =>
 //               chat.id === change.doc.id ? { ...chat, ...updatedChat } : chat
 //             );
             
@@ -11913,8 +11913,8 @@
 //       }
 
 //       // Update local state
-//       setReceivedInterests(prev => 
-//         prev.map(item => 
+//       setReceivedInterests(prev =>
+//         prev.map(item =>
 //           item.id === interestId ? { ...item, status: response } : item
 //         )
 //       );
@@ -12597,17 +12597,2364 @@
 
 //25/09/2025
 // app/(tabs)/Messages.jsx
+// import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Image, TextInput, FlatList, Alert, AppState, RefreshControl, ActivityIndicator } from 'react-native';
+// import React, { useState, useEffect, useRef, useCallback } from 'react';
+// import { Ionicons, Feather, MaterialIcons, FontAwesome } from '@expo/vector-icons';
+// import { SafeAreaView } from 'react-native-safe-area-context';
+// import { collection, query, where, onSnapshot, orderBy, doc, getDoc, updateDoc, addDoc, serverTimestamp, getDocs, setDoc } from 'firebase/firestore';
+// import { db } from '../../config/firebase';
+// import { useAuth } from '../context/AuthContext';
+// import { useRouter } from 'expo-router';
+// import { useLanguage } from '../context/LanguageContext';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+// import { useFirestore } from '../hooks/useFirebase';
+
+// export default function Messages() {
+//   const [activeTab, setActiveTab] = useState('Chats');
+//   const [searchQuery, setSearchQuery] = useState('');
+//   const [chats, setChats] = useState([]);
+//   const [receivedInterests, setReceivedInterests] = useState([]);
+//   const [sentInterests, setSentInterests] = useState([]);
+//   const [onlineUsers, setOnlineUsers] = useState([]);
+//   const [userProfiles, setUserProfiles] = useState({});
+//   const [refreshing, setRefreshing] = useState(false);
+//   const [lastUpdateTime, setLastUpdateTime] = useState(null);
+//   const [loading, setLoading] = useState(true);
+//   const { user } = useAuth();
+//   const router = useRouter();
+//   const { language } = useLanguage();
+//   const appState = useRef(AppState.currentState);
+//   const { fetchProfiles } = useFirestore();
+
+//   // Cache expiration time (5 minutes)
+//   const CACHE_EXPIRY = 5 * 60 * 1000;
+
+//   // Get cached data with expiration check
+//   const getCachedData = async (key) => {
+//     try {
+//       const cached = await AsyncStorage.getItem(key);
+//       if (!cached) return null;
+      
+//       const { data, timestamp } = JSON.parse(cached);
+//       if (Date.now() - timestamp > CACHE_EXPIRY) {
+//         await AsyncStorage.removeItem(key);
+//         return null;
+//       }
+      
+//       return data;
+//     } catch (error) {
+//       console.error('Error getting cached data:', error);
+//       return null;
+//     }
+//   };
+
+//   // Set data to cache with timestamp
+//   const setCachedData = async (key, data) => {
+//     try {
+//       const cacheData = {
+//         data,
+//         timestamp: Date.now()
+//       };
+//       await AsyncStorage.setItem(key, JSON.stringify(cacheData));
+//     } catch (error) {
+//       console.error('Error setting cached data:', error);
+//     }
+//   };
+
+//   // Translations
+//   const translations = {
+//     messages: { ENG: "Messages", HI: "संदेश" },
+//     incomingMessages: { ENG: "Incoming messages", HI: "आने वाले संदेश" },
+//     awaitingResponse: { ENG: "Awaiting your response", HI: "आपकी प्रतिक्रिया का इंतजार" },
+//     searchMessages: { ENG: "Search messages", HI: "संदेश खोजें" },
+//     noMessages: { ENG: "No messages yet", HI: "अभी तक कोई संदेश नहीं" },
+//     startConversation: { ENG: "Start a conversation with someone you're interested in", HI: "किसी ऐसे व्यक्ति से बातचीत शुरू करें जिसमें आपकी रुचि हो" },
+//     noInterests: { ENG: "No interests found", HI: "कोई रुचि नहीं मिली" },
+//     interestsReceived: { ENG: "Interests received", HI: "प्राप्त रुचियाँ" },
+//     interestsSent: { ENG: "Interests sent", HI: "भेजी गई रुचियाँ" },
+//     accept: { ENG: "Accept", HI: "स्वीकार करें" },
+//     decline: { ENG: "Decline", HI: "अस्वीकार करें" },
+//     pending: { ENG: "Pending", HI: "लंबित" },
+//     accepted: { ENG: "Accepted", HI: "स्वीकृत" },
+//     declined: { ENG: "Declined", HI: "अस्वीकृत" },
+//     viewProfile: { ENG: "View Profile", HI: "प्रोफाइल देखें" },
+//     startChat: { ENG: "Start Chat", HI: "चैट शुरू करें" },
+//     online: { ENG: "Online", HI: "ऑनलाइन" },
+//     offline: { ENG: "Offline", HI: "ऑफलाइन" },
+//     lastSeen: { ENG: "Last seen", HI: "अंतिम बार देखा गया" },
+//     pullToRefresh: { ENG: "Pull to refresh", HI: "ताज़ा करने के लिए खींचें" },
+//     loading: { ENG: "Loading...", HI: "लोड हो रहा है..." }
+//   };
+
+//   // Load cached data from AsyncStorage on component mount
+//   useEffect(() => {
+//     loadCachedData();
+//   }, []);
+
+//   // Load all cached data from AsyncStorage
+//   const loadCachedData = async () => {
+//     try {
+//       const [
+//         cachedChats,
+//         cachedReceivedInterests,
+//         cachedSentInterests,
+//         cachedUserProfiles,
+//         cachedLastUpdate
+//       ] = await Promise.all([
+//         getCachedData(`chats_${user.id}`),
+//         getCachedData(`receivedInterests_${user.id}`),
+//         getCachedData(`sentInterests_${user.id}`),
+//         getCachedData(`userProfiles`),
+//         getCachedData(`lastUpdateTime_${user.id}`)
+//       ]);
+
+//       if (cachedChats) setChats(cachedChats);
+//       if (cachedReceivedInterests) setReceivedInterests(cachedReceivedInterests);
+//       if (cachedSentInterests) setSentInterests(cachedSentInterests);
+//       if (cachedUserProfiles) setUserProfiles(cachedUserProfiles);
+//       if (cachedLastUpdate) setLastUpdateTime(cachedLastUpdate);
+      
+//       // After loading cache, refresh data if needed
+//       refreshDataIfNeeded();
+//     } catch (error) {
+//       console.error('Error loading cached data:', error);
+//     }
+//   };
+
+//   // Check if we need to refresh data based on last update time
+//   const refreshDataIfNeeded = useCallback(async () => {
+//     if (!user?.id) return;
+    
+//     const now = Date.now();
+//     const fiveMinutesAgo = now - (5 * 60 * 1000); // 5 minutes in milliseconds
+    
+//     // If data is older than 5 minutes or doesn't exist, refresh it
+//     if (!lastUpdateTime || lastUpdateTime < fiveMinutesAgo) {
+//       await refreshData();
+//     } else {
+//       setLoading(false); // Data is fresh, hide loader
+//     }
+//   }, [user, lastUpdateTime]);
+
+//   // Refresh all data manually
+//   const onRefresh = useCallback(async () => {
+//     setRefreshing(true);
+//     await refreshData();
+//     setRefreshing(false);
+//   }, [user]);
+
+//   // Refresh data from Firestore
+//   const refreshData = async () => {
+//     if (!user?.id) return;
+    
+//     try {
+//       await Promise.all([
+//         loadChats(),
+//         loadReceivedInterests(),
+//         loadSentInterests(),
+//         loadOnlineUsers()
+//       ]);
+      
+//       // Update last refresh time
+//       const now = Date.now();
+//       setLastUpdateTime(now);
+//       await setCachedData(`lastUpdateTime_${user.id}`, now);
+      
+//       // Hide loader after data is loaded
+//       setLoading(false);
+//     } catch (error) {
+//       console.error('Error refreshing data:', error);
+//       setLoading(false); // Hide loader even if there's an error
+//     }
+//   };
+
+//   // Load chats with caching
+//   const loadChats = async () => {
+//     if (!user?.id) return;
+
+//     try {
+//       const cacheKey = `chats_${user.id}`;
+//       const cachedChats = await getCachedData(cacheKey);
+      
+//       if (cachedChats) {
+//         setChats(cachedChats);
+//         return;
+//       }
+      
+//       const chatsRef = collection(db, 'chats');
+//       const q = query(
+//         chatsRef,
+//         where('participantIds', 'array-contains', user.id),
+//         orderBy('lastMessageTime', 'desc')
+//       );
+      
+//       const querySnapshot = await getDocs(q);
+//       const chatsData = [];
+      
+//       for (const doc of querySnapshot.docs) {
+//         const chatData = doc.data();
+//         const otherParticipantId = chatData.participantIds.find(id => id !== user.id);
+        
+//         if (otherParticipantId) {
+//           // Get or fetch user profile
+//           let userProfile = userProfiles[otherParticipantId];
+//           if (!userProfile) {
+//             userProfile = await fetchUserProfile(otherParticipantId);
+//           }
+          
+//           chatsData.push({
+//             id: doc.id,
+//             ...chatData,
+//             otherParticipantId,
+//             otherParticipantName: userProfile?.name || 'User',
+//             otherParticipantPhoto: userProfile?.photo || 'https://via.placeholder.com/150?text=User'
+//           });
+//         }
+//       }
+      
+//       setChats(chatsData);
+//       await setCachedData(cacheKey, chatsData);
+//     } catch (error) {
+//       console.error('Error loading chats:', error);
+//       // If online loading fails, use cached data
+//       const cachedChats = await getCachedData(`chats_${user.id}`);
+//       if (cachedChats) setChats(cachedChats);
+//     }
+//   };
+
+//   // Load received interests with caching - FIXED to prevent duplicates
+//   const loadReceivedInterests = async () => {
+//     if (!user?.id) return;
+
+//     try {
+//       const cacheKey = `receivedInterests_${user.id}`;
+//       const cachedInterests = await getCachedData(cacheKey);
+      
+//       if (cachedInterests) {
+//         setReceivedInterests(cachedInterests);
+//         return;
+//       }
+      
+//       const interestsRef = collection(db, 'Users', user.id, 'receivedInterests');
+//       const q = query(interestsRef, orderBy('timestamp', 'desc'));
+      
+//       const querySnapshot = await getDocs(q);
+//       const interestsData = [];
+//       const seenUsers = new Set(); // Track seen users to prevent duplicates
+      
+//       for (const doc of querySnapshot.docs) {
+//         const interestData = doc.data();
+        
+//         if (interestData.fromUserId && !seenUsers.has(interestData.fromUserId)) {
+//           seenUsers.add(interestData.fromUserId); // Mark user as seen
+          
+//           // Get or fetch user profile
+//           let userProfile = userProfiles[interestData.fromUserId];
+//           if (!userProfile) {
+//             userProfile = await fetchUserProfile(interestData.fromUserId);
+//           }
+          
+//           interestsData.push({
+//             id: doc.id,
+//             ...interestData,
+//             fromUserPhoto: userProfile?.photo || 'https://via.placeholder.com/150?text=User',
+//             fromUserName: userProfile?.name || interestData.fromUserName || 'User'
+//           });
+//         }
+//       }
+      
+//       setReceivedInterests(interestsData);
+//       await setCachedData(cacheKey, interestsData);
+//     } catch (error) {
+//       console.error('Error loading received interests:', error);
+//       // If online loading fails, use cached data
+//       const cachedInterests = await getCachedData(`receivedInterests_${user.id}`);
+//       if (cachedInterests) setReceivedInterests(cachedInterests);
+//     }
+//   };
+
+//   // Load sent interests with caching - FIXED to prevent duplicates
+//   const loadSentInterests = async () => {
+//     if (!user?.id) return;
+
+//     try {
+//       const cacheKey = `sentInterests_${user.id}`;
+//       const cachedInterests = await getCachedData(cacheKey);
+      
+//       if (cachedInterests) {
+//         setSentInterests(cachedInterests);
+//         return;
+//       }
+      
+//       const interestsRef = collection(db, 'Users', user.id, 'sentInterests');
+//       const q = query(interestsRef, orderBy('timestamp', 'desc'));
+      
+//       const querySnapshot = await getDocs(q);
+//       const interestsData = [];
+//       const seenUsers = new Set(); // Track seen users to prevent duplicates
+      
+//       for (const doc of querySnapshot.docs) {
+//         const interestData = doc.data();
+        
+//         if (interestData.toUserId && !seenUsers.has(interestData.toUserId)) {
+//           seenUsers.add(interestData.toUserId); // Mark user as seen
+          
+//           // Get or fetch user profile
+//           let userProfile = userProfiles[interestData.toUserId];
+//           if (!userProfile) {
+//             userProfile = await fetchUserProfile(interestData.toUserId);
+//           }
+          
+//           interestsData.push({
+//             id: doc.id,
+//             ...interestData,
+//             toUserPhoto: userProfile?.photo || 'https://via.placeholder.com/150?text=User',
+//             toUserName: userProfile?.name || interestData.toUserName || 'User'
+//           });
+//         }
+//       }
+      
+//       setSentInterests(interestsData);
+//       await setCachedData(cacheKey, interestsData);
+//     } catch (error) {
+//       console.error('Error loading sent interests:', error);
+//       // If online loading fails, use cached data
+//       const cachedInterests = await getCachedData(`sentInterests_${user.id}`);
+//       if (cachedInterests) setSentInterests(cachedInterests);
+//     }
+//   };
+
+//   // Load online users
+//   const loadOnlineUsers = async () => {
+//     if (!user?.id) return;
+
+//     try {
+//       const onlineRef = collection(db, 'onlineUsers');
+//       const querySnapshot = await getDocs(onlineRef);
+      
+//       const onlineUsersData = [];
+//       const onlineUsersWithTime = {};
+      
+//       querySnapshot.forEach((doc) => {
+//         const userData = doc.data();
+//         if (doc.id !== user.id && userData.lastSeen) {
+//           const lastSeen = userData.lastSeen.toDate ? userData.lastSeen.toDate() : new Date(userData.lastSeen);
+//           onlineUsersWithTime[doc.id] = {
+//             isOnline: userData.isOnline,
+//             lastSeen: lastSeen
+//           };
+          
+//           const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+//           // Consider user online if they were active in the last 5 minutes
+//           if (lastSeen > fiveMinutesAgo && userData.isOnline !== false) {
+//             onlineUsersData.push(doc.id);
+//           }
+//         }
+//       });
+      
+//       setOnlineUsers(onlineUsersData);
+//     } catch (error) {
+//       console.error('Error loading online users:', error);
+//     }
+//   };
+
+//   // Fetch user profile data with caching - FIXED VERSION
+//   const fetchUserProfile = async (userId) => {
+//     // Check if profile is already in state
+//     if (userProfiles[userId]) return userProfiles[userId];
+    
+//     // Check if profile is in cache
+//     try {
+//       const cachedProfiles = await getCachedData('userProfiles');
+//       if (cachedProfiles && cachedProfiles[userId]) {
+//         return cachedProfiles[userId];
+//       }
+//     } catch (error) {
+//       console.error('Error checking stored profiles:', error);
+//     }
+    
+//     try {
+//       // Get user profile directly from Users collection
+//       const userRef = doc(db, 'Users', userId);
+//       const userSnap = await getDoc(userRef);
+      
+//       if (userSnap.exists()) {
+//         const userData = userSnap.data();
+//         const userProfile = {
+//           id: userId,
+//           name: `${userData.firstName || ''} ${userData.lastName || ''}`.trim() || 'User',
+//           photo: userData.profilePhoto || 'https://via.placeholder.com/150?text=User',
+//           age: userData.age,
+//           city: userData.city,
+//           verificationStatus: userData.verificationStatus
+//         };
+        
+//         // Update state and storage
+//         const updatedProfiles = { ...userProfiles, [userId]: userProfile };
+//         setUserProfiles(updatedProfiles);
+//         await setCachedData('userProfiles', updatedProfiles);
+        
+//         return userProfile;
+//       }
+      
+//       // Fallback if no profile found
+//       const fallbackProfile = {
+//         id: userId,
+//         name: 'User',
+//         photo: 'https://via.placeholder.com/150?text=User',
+//         age: null,
+//         city: null,
+//         verificationStatus: null
+//       };
+      
+//       const updatedProfiles = { ...userProfiles, [userId]: fallbackProfile };
+//       setUserProfiles(updatedProfiles);
+//       await setCachedData('userProfiles', updatedProfiles);
+      
+//       return fallbackProfile;
+//     } catch (error) {
+//       console.error('Error fetching user profile:', error);
+//       return null;
+//     }
+//   };
+
+//   // Set up real-time listeners only for message updates
+//   useEffect(() => {
+//     if (!user?.id) return;
+
+//     // Set up real-time listener for new messages
+//     const chatsRef = collection(db, 'chats');
+//     const q = query(
+//       chatsRef,
+//       where('participantIds', 'array-contains', user.id)
+//     );
+    
+//     const unsubscribe = onSnapshot(q, (querySnapshot) => {
+//       // Only update if there are actual changes
+//       querySnapshot.docChanges().forEach((change) => {
+//         if (change.type === 'modified') {
+//           // Update the specific chat in our state
+//           const updatedChat = change.doc.data();
+//           setChats(prevChats => {
+//             const updatedChats = prevChats.map(chat =>
+//               chat.id === change.doc.id ? { ...chat, ...updatedChat } : chat
+//             );
+            
+//             // Also update cache
+//             setCachedData(`chats_${user.id}`, updatedChats);
+//             return updatedChats;
+//           });
+//         }
+//       });
+//     });
+
+//     return () => unsubscribe();
+//   }, [user]);
+
+//   // Respond to an interest (accept/decline) - FIXED error handling
+//   const respondToInterest = async (interestId, response) => {
+//     try {
+//       if (!user?.id) throw new Error('User not available');
+
+//       // Update the received interest
+//       const receivedInterestRef = doc(db, 'Users', user.id, 'receivedInterests', interestId);
+//       await updateDoc(receivedInterestRef, {
+//         status: response,
+//         respondedAt: serverTimestamp()
+//       });
+
+//       // Find the original sent interest to update
+//       const interest = receivedInterests.find(i => i.id === interestId);
+//       if (interest && interest.fromUserId) {
+//         // Find the sent interest document ID by querying
+//         const sentInterestsRef = collection(db, 'Users', interest.fromUserId, 'sentInterests');
+//         const q = query(sentInterestsRef, where('toUserId', '==', user.id));
+//         const querySnapshot = await getDocs(q);
+        
+//         if (!querySnapshot.empty) {
+//           const sentInterestDoc = querySnapshot.docs[0];
+//           const sentInterestRef = doc(db, 'Users', interest.fromUserId, 'sentInterests', sentInterestDoc.id);
+//           await updateDoc(sentInterestRef, {
+//             status: response,
+//             respondedAt: serverTimestamp()
+//           });
+//         }
+//       }
+
+//       // Update local state
+//       setReceivedInterests(prev =>
+//         prev.map(item =>
+//           item.id === interestId ? { ...item, status: response } : item
+//         )
+//       );
+      
+//       // Update cache
+//       await setCachedData(`receivedInterests_${user.id}`, receivedInterests);
+
+//       if (response === 'accepted') {
+//         Alert.alert('Success', 'Interest accepted! You can now chat with this user.');
+//       } else {
+//         Alert.alert('Interest declined');
+//       }
+//     } catch (error) {
+//       console.error('Error responding to interest:', error);
+//       Alert.alert('Error', 'Failed to respond to interest. Please try again.');
+//     }
+//   };
+
+//   // Start a chat from an interest
+//   const startChatFromInterest = async (interest) => {
+//     try {
+//       if (!user?.id) throw new Error('User not available');
+
+//       // Check if chat already exists
+//       const chatsRef = collection(db, 'chats');
+//       const q = query(
+//         chatsRef,
+//         where('participantIds', 'array-contains', user.id)
+//       );
+      
+//       const querySnapshot = await getDocs(q);
+//       let existingChat = null;
+      
+//       querySnapshot.forEach((doc) => {
+//         const chatData = doc.data();
+//         if (chatData.participantIds && chatData.participantIds.includes(interest.fromUserId)) {
+//           existingChat = { id: doc.id, ...chatData };
+//         }
+//       });
+      
+//       if (existingChat) {
+//         router.push(`/chat/${existingChat.id}?name=${encodeURIComponent(interest.fromUserName)}&profileId=${interest.fromUserId}`);
+//       } else {
+//         // Create new chat
+//         const chatData = {
+//           participants: [
+//             user.displayName || `${user.firstName} ${user.lastName}`.trim() || 'You',
+//             interest.fromUserName
+//           ],
+//           participantIds: [user.id, interest.fromUserId],
+//           lastMessage: '',
+//           lastMessageTime: serverTimestamp(),
+//           createdAt: serverTimestamp()
+//         };
+        
+//         const chatRef = await addDoc(collection(db, 'chats'), chatData);
+        
+//         // Create participants subcollection
+//         await Promise.all([
+//           addDoc(collection(chatRef, 'participants'), {
+//             userId: user.id,
+//             userName: user.displayName || `${user.firstName} ${user.lastName}`.trim() || 'You',
+//             joinedAt: serverTimestamp()
+//           }),
+//           addDoc(collection(chatRef, 'participants'), {
+//             userId: interest.fromUserId,
+//             userName: interest.fromUserName,
+//             joinedAt: serverTimestamp()
+//           })
+//         ]);
+        
+//         router.push(`/chat/${chatRef.id}?name=${encodeURIComponent(interest.fromUserName)}&profileId=${interest.fromUserId}`);
+//       }
+//     } catch (error) {
+//       console.error('Error starting chat:', error);
+//       Alert.alert('Error', 'Failed to start chat. Please try again.');
+//     }
+//   };
+
+//   const formatTime = (date) => {
+//     if (!date) return '';
+    
+//     const now = new Date();
+//     const messageDate = date.toDate ? date.toDate() : new Date(date);
+//     const diff = now - messageDate;
+//     const minutes = Math.floor(diff / 60000);
+//     const hours = Math.floor(diff / 3600000);
+//     const days = Math.floor(diff / 86400000);
+    
+//     if (minutes < 60) return `${minutes}m ago`;
+//     if (hours < 24) return `${hours}h ago`;
+//     if (days < 7) return `${days}d ago`;
+//     return messageDate.toLocaleDateString();
+//   };
+
+//   const formatLastSeen = (date) => {
+//     if (!date) return '';
+    
+//     const now = new Date();
+//     const lastSeenDate = date.toDate ? date.toDate() : new Date(date);
+//     const diff = now - lastSeenDate;
+//     const minutes = Math.floor(diff / 60000);
+//     const hours = Math.floor(diff / 3600000);
+//     const days = Math.floor(diff / 86400000);
+    
+//     if (minutes < 1) return 'just now';
+//     if (minutes < 60) return `${minutes} minutes ago`;
+//     if (hours < 24) return `${hours} hours ago`;
+//     if (days < 7) return `${days} days ago`;
+//     return lastSeenDate.toLocaleDateString();
+//   };
+
+//   const renderMessageItem = ({ item }) => {
+//     const isOnline = onlineUsers.includes(item.otherParticipantId);
+    
+//     return (
+//       <TouchableOpacity
+//         style={styles.messageItem}
+//         onPress={() => router.push(`/chat/${item.id}?name=${encodeURIComponent(item.otherParticipantName)}&profileId=${item.otherParticipantId}`)}
+//       >
+//         <View style={styles.avatarContainer}>
+//           <Image
+//             source={{ uri: item.otherParticipantPhoto || 'https://via.placeholder.com/150?text=User' }}
+//             style={styles.avatar}
+//           />
+//           {isOnline && <View style={styles.onlineBadge} />}
+//         </View>
+//         <View style={styles.messageContent}>
+//           <View style={styles.messageHeader}>
+//             <Text style={styles.messageName}>{item.otherParticipantName}</Text>
+//             <Text style={styles.messageTime}>
+//               {formatTime(item.lastMessageTime)}
+//             </Text>
+//           </View>
+//           <Text
+//             style={[
+//               styles.messageText,
+//               item.unread && styles.unreadMessage
+//             ]}
+//             numberOfLines={1}
+//           >
+//             {item.lastMessage || 'Start a conversation...'}
+//           </Text>
+//           {isOnline ? (
+//             <View style={styles.onlineStatus}>
+//               <View style={styles.onlineDot} />
+//               <Text style={styles.onlineText}>{translations.online[language]}</Text>
+//             </View>
+//           ) : (
+//             <Text style={styles.offlineText}>
+//               {translations.lastSeen[language]} {formatLastSeen(item.lastMessageTime)}
+//             </Text>
+//           )}
+//         </View>
+//         {item.unread && <View style={styles.unreadBadge} />}
+//       </TouchableOpacity>
+//     );
+//   };
+
+//   const renderInterestItem = ({ item }) => {
+//     const isReceived = activeTab === 'Interests Received';
+//     const interest = isReceived ? item : item;
+//     const status = interest.status || 'pending';
+//     const userPhoto = isReceived ? interest.fromUserPhoto : interest.toUserPhoto;
+//     const userName = isReceived ? interest.fromUserName : interest.toUserName;
+//     const userId = isReceived ? interest.fromUserId : interest.toUserId;
+    
+//     return (
+//       <View style={styles.interestItem}>
+//         <View style={styles.avatarContainer}>
+//           <Image
+//             source={{ uri: userPhoto || 'https://via.placeholder.com/150?text=User' }}
+//             style={styles.interestAvatar}
+//           />
+//           {onlineUsers.includes(userId) && (
+//             <View style={styles.onlineBadge} />
+//           )}
+//         </View>
+//         <View style={styles.interestContent}>
+//           <View style={styles.interestHeader}>
+//             <Text style={styles.interestName}>{userName}</Text>
+//             <Text style={styles.interestTime}>
+//               {formatTime(interest.timestamp)}
+//             </Text>
+//           </View>
+//           <View style={styles.interestActions}>
+//             <View style={[
+//               styles.statusBadge,
+//               status === 'accepted' && styles.acceptedBadge,
+//               status === 'declined' && styles.declinedBadge
+//             ]}>
+//               <Text style={[
+//                 styles.statusText,
+//                 status === 'accepted' && styles.acceptedText,
+//                 status === 'declined' && styles.declinedText
+//               ]}>
+//                 {translations[status]?.[language] || status}
+//               </Text>
+//             </View>
+            
+//             {isReceived && status === 'pending' ? (
+//               <View style={styles.actionButtons}>
+//                 <TouchableOpacity
+//                   style={[styles.actionButton, styles.acceptButton]}
+//                   onPress={() => respondToInterest(item.id, 'accepted')}
+//                 >
+//                   <Text style={styles.acceptButtonText}>{translations.accept[language]}</Text>
+//                 </TouchableOpacity>
+//                 <TouchableOpacity
+//                   style={[styles.actionButton, styles.declineButton]}
+//                   onPress={() => respondToInterest(item.id, 'declined')}
+//                 >
+//                   <Text style={styles.declineButtonText}>{translations.decline[language]}</Text>
+//                 </TouchableOpacity>
+//               </View>
+//             ) : status === 'accepted' ? (
+//               <TouchableOpacity
+//                 style={[styles.actionButton, styles.chatButton]}
+//                 onPress={() => startChatFromInterest(item)}
+//               >
+//                 <Text style={styles.chatButtonText}>{translations.startChat[language]}</Text>
+//               </TouchableOpacity>
+//             ) : null}
+//           </View>
+//         </View>
+//       </View>
+//     );
+//   };
+
+//   const getFilteredData = () => {
+//     if (activeTab === 'Chats') {
+//       return chats.filter(chat =>
+//         chat.otherParticipantName.toLowerCase().includes(searchQuery.toLowerCase())
+//       );
+//     } else if (activeTab === 'Interests Received') {
+//       return receivedInterests.filter(interest =>
+//         interest.fromUserName.toLowerCase().includes(searchQuery.toLowerCase())
+//       );
+//     } else if (activeTab === 'Interests Sent') {
+//       return sentInterests.filter(interest =>
+//         interest.toUserName.toLowerCase().includes(searchQuery.toLowerCase())
+//       );
+//     }
+//     return [];
+//   };
+
+//   const renderEmptyState = () => {
+//     if (loading) {
+//       return null; // Don't show empty state while loading
+//     }
+    
+//     if (activeTab === 'Chats') {
+//       return (
+//         <View style={styles.emptyContainer}>
+//           <Feather name="message-square" size={48} color="#ddd" />
+//           <Text style={styles.emptyText}>{translations.noMessages[language]}</Text>
+//           <Text style={styles.emptySubtext}>{translations.startConversation[language]}</Text>
+//         </View>
+//       );
+//     } else {
+//       return (
+//         <View style={styles.emptyContainer}>
+//           <Ionicons name="heart" size={48} color="#ddd" />
+//           <Text style={styles.emptyText}>{translations.noInterests[language]}</Text>
+//         </View>
+//       );
+//     }
+//   };
+
+//   // Show loading indicator while data is being fetched
+//   if (loading) {
+//     return (
+//       <SafeAreaView style={styles.safeArea}>
+//         <View style={styles.container}>
+//           {/* Header */}
+//           <View style={styles.header}>
+//             <Text style={styles.headerTitle}>{translations.messages[language]}</Text>
+//             <TouchableOpacity style={styles.headerButton} onPress={onRefresh}>
+//               <Ionicons name="refresh" size={20} color="#333" />
+//             </TouchableOpacity>
+//           </View>
+
+//           {/* Loading indicator */}
+//           <View style={styles.loadingContainer}>
+//             <ActivityIndicator size="large" color="#FF6B6B" />
+//             <Text style={styles.loadingText}>{translations.loading[language]}</Text>
+//           </View>
+//         </View>
+//       </SafeAreaView>
+//     );
+//   }
+
+//   return (
+//     <SafeAreaView style={styles.safeArea}>
+//       <View style={styles.container}>
+//         {/* Header */}
+//         <View style={styles.header}>
+//           <Text style={styles.headerTitle}>{translations.messages[language]}</Text>
+//           <TouchableOpacity style={styles.headerButton} onPress={onRefresh}>
+//             <Ionicons name="refresh" size={20} color="#333" />
+//           </TouchableOpacity>
+//         </View>
+
+//         {/* Tabs */}
+//         <View style={styles.tabsContainer}>
+//           {['Chats', 'Interests Received', 'Interests Sent'].map((tab) => (
+//             <TouchableOpacity
+//               key={tab}
+//               style={[
+//                 styles.tabButton,
+//                 activeTab === tab && styles.activeTabButton
+//               ]}
+//               onPress={() => setActiveTab(tab)}
+//             >
+//               <Text style={[
+//                 styles.tabText,
+//                 activeTab === tab && styles.activeTabText
+//               ]}>
+//                 {tab === 'Interests Received' ? translations.interestsReceived[language] :
+//                  tab === 'Interests Sent' ? translations.interestsSent[language] : tab}
+//               </Text>
+//               {activeTab === tab && <View style={styles.activeTabIndicator} />}
+//             </TouchableOpacity>
+//           ))}
+//         </View>
+
+//         {/* Search and Filter */}
+//         <View style={styles.searchContainer}>
+//           <Text style={styles.searchTitle}>
+//             {activeTab === 'Chats'
+//               ? translations.incomingMessages[language]
+//               : activeTab === 'Interests Received'
+//                 ? translations.awaitingResponse[language]
+//                 : translations.interestsSent[language]}
+//           </Text>
+//           <View style={styles.searchBar}>
+//             <View style={styles.searchInputContainer}>
+//               <Feather name="search" size={16} color="#888" style={styles.searchIcon} />
+//               <TextInput
+//                 style={styles.searchInput}
+//                 placeholder={translations.searchMessages[language]}
+//                 value={searchQuery}
+//                 onChangeText={setSearchQuery}
+//               />
+//             </View>
+//             <TouchableOpacity style={styles.filterButton}>
+//               <Feather name="filter" size={18} color="#FF6B6B" />
+//             </TouchableOpacity>
+//           </View>
+//         </View>
+
+//         {/* Messages/Interests List */}
+//         <FlatList
+//           data={getFilteredData()}
+//           renderItem={activeTab === 'Chats' ? renderMessageItem : renderInterestItem}
+//           keyExtractor={item => item.id}
+//           contentContainerStyle={styles.listContainer}
+//           showsVerticalScrollIndicator={false}
+//           ListEmptyComponent={renderEmptyState}
+//           refreshControl={
+//             <RefreshControl
+//               refreshing={refreshing}
+//               onRefresh={onRefresh}
+//               title={translations.pullToRefresh[language]}
+//               tintColor="#FF6B6B"
+//               titleColor="#666"
+//             />
+//           }
+//         />
+        
+//         {/* Bottom padding to avoid tab bar overlap */}
+//         <View style={styles.bottomPadding} />
+//       </View>
+//     </SafeAreaView>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   safeArea: {
+//     flex: 1,
+//     backgroundColor: '#fff',
+//   },
+//   container: {
+//     flex: 1,
+//     paddingHorizontal: 16,
+//   },
+//   header: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     paddingVertical: 16,
+//     paddingHorizontal: 4,
+//   },
+//   headerTitle: {
+//     fontSize: 24,
+//     fontWeight: '700',
+//     color: '#212529',
+//   },
+//   headerButton: {
+//     padding: 4,
+//   },
+//   tabsContainer: {
+//     flexDirection: 'row',
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#e9ecef',
+//     marginBottom: 16,
+//   },
+//   tabButton: {
+//     flex: 1,
+//     paddingVertical: 12,
+//     alignItems: 'center',
+//     position: 'relative',
+//   },
+//   activeTabButton: {
+//     // No additional styling needed as we're using the indicator
+//   },
+//   tabText: {
+//     fontSize: 14,
+//     color: '#6c757d',
+//     fontWeight: '500',
+//   },
+//   activeTabText: {
+//     color: '#FF6B6B',
+//     fontWeight: '600',
+//   },
+//   activeTabIndicator: {
+//     position: 'absolute',
+//     bottom: -1,
+//     height: 2,
+//     width: '60%',
+//     backgroundColor: '#FF6B6B',
+//     borderRadius: 2,
+//   },
+//   searchContainer: {
+//     marginBottom: 16,
+//     paddingHorizontal: 4,
+//   },
+//   searchTitle: {
+//     fontSize: 14,
+//     color: '#6c757d',
+//     marginBottom: 10,
+//     fontWeight: '500',
+//   },
+//   searchBar: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//   },
+//   searchInputContainer: {
+//     flex: 1,
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     backgroundColor: '#f8f9fa',
+//     borderRadius: 20,
+//     paddingHorizontal: 16,
+//     height: 40,
+//     marginRight: 12,
+//   },
+//   searchIcon: {
+//     marginRight: 8,
+//   },
+//   searchInput: {
+//     flex: 1,
+//     fontSize: 14,
+//     color: '#495057',
+//     paddingVertical: 8,
+//   },
+//   filterButton: {
+//     padding: 8,
+//     backgroundColor: '#f8f9fa',
+//     borderRadius: 20,
+//   },
+//   listContainer: {
+//     paddingBottom: 20,
+//     flexGrow: 1,
+//   },
+//   messageItem: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     paddingVertical: 14,
+//     paddingHorizontal: 4,
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#f1f3f5',
+//   },
+//   avatarContainer: {
+//     position: 'relative',
+//     marginRight: 16,
+//   },
+//   avatar: {
+//     width: 52,
+//     height: 52,
+//     borderRadius: 26,
+//   },
+//   interestAvatar: {
+//     width: 52,
+//     height: 52,
+//     borderRadius: 26,
+//   },
+//   onlineBadge: {
+//     position: 'absolute',
+//     bottom: 2,
+//     right: 2,
+//     width: 12,
+//     height: 12,
+//     borderRadius: 6,
+//     backgroundColor: '#4CAF50',
+//     borderWidth: 2,
+//     borderColor: '#fff',
+//   },
+//   messageContent: {
+//     flex: 1,
+//   },
+//   messageHeader: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     marginBottom: 6,
+//   },
+//   messageName: {
+//     fontSize: 16,
+//     fontWeight: '600',
+//     color: '#212529',
+//   },
+//   messageTime: {
+//     fontSize: 12,
+//     color: '#adb5bd',
+//   },
+//   messageText: {
+//     fontSize: 14,
+//     color: '#6c757d',
+//     lineHeight: 20,
+//     marginBottom: 4,
+//   },
+//   onlineStatus: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//   },
+//   onlineDot: {
+//     width: 8,
+//     height: 8,
+//     borderRadius: 4,
+//     backgroundColor: '#4CAF50',
+//     marginRight: 4,
+//   },
+//   onlineText: {
+//     fontSize: 12,
+//     color: '#4CAF50',
+//     fontWeight: '500',
+//   },
+//   offlineText: {
+//     fontSize: 11,
+//     color: '#6c757d',
+//   },
+//   unreadMessage: {
+//     color: '#212529',
+//     fontWeight: '500',
+//   },
+//   unreadBadge: {
+//     width: 10,
+//     height: 10,
+//     borderRadius: 5,
+//     backgroundColor: '#FF6B6B',
+//     marginLeft: 8,
+//   },
+//   interestItem: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     paddingVertical: 14,
+//     paddingHorizontal: 4,
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#f1f3f5',
+//   },
+//   interestContent: {
+//     flex: 1,
+//   },
+//   interestHeader: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     marginBottom: 8,
+//   },
+//   interestName: {
+//     fontSize: 16,
+//     fontWeight: '600',
+//     color: '#212529',
+//   },
+//   interestTime: {
+//     fontSize: 12,
+//     color: '#adb5bd',
+//   },
+//   interestActions: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//   },
+//   statusBadge: {
+//     backgroundColor: '#FFF0F0',
+//     paddingHorizontal: 8,
+//     paddingVertical: 4,
+//     borderRadius: 10,
+//   },
+//   acceptedBadge: {
+//     backgroundColor: '#E8F5E9',
+//   },
+//   declinedBadge: {
+//     backgroundColor: '#FFEBEE',
+//   },
+//   statusText: {
+//     fontSize: 12,
+//     color: '#FF6B6B',
+//     fontWeight: '500',
+//   },
+//   acceptedText: {
+//     color: '#4CAF50',
+//   },
+//   declinedText: {
+//     color: '#F44336',
+//   },
+//   actionButtons: {
+//     flexDirection: 'row',
+//   },
+//   actionButton: {
+//     paddingHorizontal: 12,
+//     paddingVertical: 6,
+//     borderRadius: 15,
+//     marginLeft: 8,
+//   },
+//   acceptButton: {
+//     backgroundColor: '#E8F5E9',
+//   },
+//   declineButton: {
+//     backgroundColor: '#FFEBEE',
+//   },
+//   chatButton: {
+//     backgroundColor: '#FF6B6B',
+//   },
+//   acceptButtonText: {
+//     color: '#4CAF50',
+//     fontWeight: '500',
+//     fontSize: 12,
+//   },
+//   declineButtonText: {
+//     color: '#F44336',
+//     fontWeight: '500',
+//     fontSize: 12,
+//   },
+//   chatButtonText: {
+//     color: '#fff',
+//     fontWeight: '500',
+//     fontSize: 12,
+//   },
+//   emptyContainer: {
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//     paddingVertical: 60,
+//   },
+//   emptyText: {
+//     fontSize: 16,
+//     color: '#adb5bd',
+//     marginTop: 16,
+//     fontWeight: '500',
+//   },
+//   emptySubtext: {
+//     fontSize: 14,
+//     color: '#adb5bd',
+//     marginTop: 8,
+//     textAlign: 'center',
+//     paddingHorizontal: 20,
+//   },
+//   loadingContainer: {
+//     flex: 1,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//   },
+//   loadingText: {
+//     marginTop: 16,
+//     fontSize: 16,
+//     color: '#6c757d',
+//   },
+//   bottomPadding: {
+//     height: 30, // Added bottom padding for tab bar
+//   },
+// });
+
+
+
+
+
+//
+
+//17/10/2025
+
+//app/(tabs)/Messages.jsx
+// import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Image, TextInput, FlatList, Alert, AppState, RefreshControl, ActivityIndicator } from 'react-native';
+// import React, { useState, useEffect, useRef, useCallback } from 'react';
+// import { Ionicons, Feather, MaterialIcons, FontAwesome } from '@expo/vector-icons';
+// import { SafeAreaView } from 'react-native-safe-area-context';
+// import { collection, query, where, onSnapshot, orderBy, doc, getDoc, updateDoc, addDoc, serverTimestamp, getDocs, setDoc } from 'firebase/firestore';
+// import { db } from '../../config/firebase';
+// import { useAuth } from '../context/AuthContext';
+// import { useRouter } from 'expo-router';
+// import { useLanguage } from '../context/LanguageContext';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+// import { useFirestore } from '../hooks/useFirebase';
+
+// export default function Messages() {
+//   const [activeTab, setActiveTab] = useState('Chats');
+//   const [searchQuery, setSearchQuery] = useState('');
+//   const [chats, setChats] = useState([]);
+//   const [receivedInterests, setReceivedInterests] = useState([]);
+//   const [sentInterests, setSentInterests] = useState([]);
+//   const [onlineUsers, setOnlineUsers] = useState([]);
+//   const [userProfiles, setUserProfiles] = useState({});
+//   const [refreshing, setRefreshing] = useState(false);
+//   const [lastUpdateTime, setLastUpdateTime] = useState(null);
+//   const [loading, setLoading] = useState(true);
+//   const { user } = useAuth();
+//   const router = useRouter();
+//   const { language } = useLanguage();
+//   const appState = useRef(AppState.currentState);
+//   const { fetchProfiles } = useFirestore();
+
+//   // Cache expiration time (5 minutes)
+//   const CACHE_EXPIRY = 5 * 60 * 1000;
+
+//   // Get cached data with expiration check
+//   const getCachedData = async (key) => {
+//     try {
+//       const cached = await AsyncStorage.getItem(key);
+//       if (!cached) return null;
+      
+//       const { data, timestamp } = JSON.parse(cached);
+//       if (Date.now() - timestamp > CACHE_EXPIRY) {
+//         await AsyncStorage.removeItem(key);
+//         return null;
+//       }
+      
+//       return data;
+//     } catch (error) {
+//       console.error('Error getting cached data:', error);
+//       return null;
+//     }
+//   };
+
+//   // Set data to cache with timestamp
+//   const setCachedData = async (key, data) => {
+//     try {
+//       const cacheData = {
+//         data,
+//         timestamp: Date.now()
+//       };
+//       await AsyncStorage.setItem(key, JSON.stringify(cacheData));
+//     } catch (error) {
+//       console.error('Error setting cached data:', error);
+//     }
+//   };
+
+//   // Translations
+//   const translations = {
+//     messages: { ENG: "Messages", HI: "संदेश" },
+//     incomingMessages: { ENG: "Incoming messages", HI: "आने वाले संदेश" },
+//     awaitingResponse: { ENG: "Awaiting your response", HI: "आपकी प्रतिक्रिया का इंतजार" },
+//     searchMessages: { ENG: "Search messages", HI: "संदेश खोजें" },
+//     noMessages: { ENG: "No messages yet", HI: "अभी तक कोई संदेश नहीं" },
+//     startConversation: { ENG: "Start a conversation with someone you're interested in", HI: "किसी ऐसे व्यक्ति से बातचीत शुरू करें जिसमें आपकी रुचि हो" },
+//     noInterests: { ENG: "No interests found", HI: "कोई रुचि नहीं मिली" },
+//     interestsReceived: { ENG: "Interests received", HI: "प्राप्त रुचियाँ" },
+//     interestsSent: { ENG: "Interests sent", HI: "भेजी गई रुचियाँ" },
+//     accept: { ENG: "Accept", HI: "स्वीकार करें" },
+//     decline: { ENG: "Decline", HI: "अस्वीकार करें" },
+//     pending: { ENG: "Pending", HI: "लंबित" },
+//     accepted: { ENG: "Accepted", HI: "स्वीकृत" },
+//     declined: { ENG: "Declined", HI: "अस्वीकृत" },
+//     viewProfile: { ENG: "View Profile", HI: "प्रोफाइल देखें" },
+//     startChat: { ENG: "Start Chat", HI: "चैट शुरू करें" },
+//     online: { ENG: "Online", HI: "ऑनलाइन" },
+//     offline: { ENG: "Offline", HI: "ऑफलाइन" },
+//     lastSeen: { ENG: "Last seen", HI: "अंतिम बार देखा गया" },
+//     pullToRefresh: { ENG: "Pull to refresh", HI: "ताज़ा करने के लिए खींचें" },
+//     loading: { ENG: "Loading...", HI: "लोड हो रहा है..." }
+//   };
+
+//   // Load cached data from AsyncStorage on component mount
+//   useEffect(() => {
+//     loadCachedData();
+//   }, []);
+
+//   // Load all cached data from AsyncStorage
+//   const loadCachedData = async () => {
+//     try {
+//       const [
+//         cachedChats, 
+//         cachedReceivedInterests, 
+//         cachedSentInterests, 
+//         cachedUserProfiles,
+//         cachedLastUpdate
+//       ] = await Promise.all([
+//         getCachedData(`chats_${user.id}`),
+//         getCachedData(`receivedInterests_${user.id}`),
+//         getCachedData(`sentInterests_${user.id}`),
+//         getCachedData(`userProfiles`),
+//         getCachedData(`lastUpdateTime_${user.id}`)
+//       ]);
+
+//       if (cachedChats) setChats(cachedChats);
+//       if (cachedReceivedInterests) setReceivedInterests(cachedReceivedInterests);
+//       if (cachedSentInterests) setSentInterests(cachedSentInterests);
+//       if (cachedUserProfiles) setUserProfiles(cachedUserProfiles);
+//       if (cachedLastUpdate) setLastUpdateTime(cachedLastUpdate);
+      
+//       // After loading cache, refresh data if needed
+//       refreshDataIfNeeded();
+//     } catch (error) {
+//       console.error('Error loading cached data:', error);
+//     }
+//   };
+
+//   // Check if we need to refresh data based on last update time
+//   const refreshDataIfNeeded = useCallback(async () => {
+//     if (!user?.id) return;
+    
+//     const now = Date.now();
+//     const fiveMinutesAgo = now - (5 * 60 * 1000); // 5 minutes in milliseconds
+    
+//     // If data is older than 5 minutes or doesn't exist, refresh it
+//     if (!lastUpdateTime || lastUpdateTime < fiveMinutesAgo) {
+//       await refreshData();
+//     } else {
+//       setLoading(false); // Data is fresh, hide loader
+//     }
+//   }, [user, lastUpdateTime]);
+
+//   // Refresh all data manually
+//   const onRefresh = useCallback(async () => {
+//     setRefreshing(true);
+//     await refreshData();
+//     setRefreshing(false);
+//   }, [user]);
+
+//   // Refresh data from Firestore
+//   const refreshData = async () => {
+//     if (!user?.id) return;
+    
+//     try {
+//       await Promise.all([
+//         loadChats(),
+//         loadReceivedInterests(),
+//         loadSentInterests(),
+//         loadOnlineUsers()
+//       ]);
+      
+//       // Update last refresh time
+//       const now = Date.now();
+//       setLastUpdateTime(now);
+//       await setCachedData(`lastUpdateTime_${user.id}`, now);
+      
+//       // Hide loader after data is loaded
+//       setLoading(false);
+//     } catch (error) {
+//       console.error('Error refreshing data:', error);
+//       setLoading(false); // Hide loader even if there's an error
+//     }
+//   };
+
+//   // Load chats with caching
+//   const loadChats = async () => {
+//     if (!user?.id) return;
+
+//     try {
+//       const cacheKey = `chats_${user.id}`;
+//       const cachedChats = await getCachedData(cacheKey);
+      
+//       if (cachedChats) {
+//         setChats(cachedChats);
+//         return;
+//       }
+      
+//       const chatsRef = collection(db, 'chats');
+//       const q = query(
+//         chatsRef,
+//         where('participantIds', 'array-contains', user.id),
+//         orderBy('lastMessageTime', 'desc')
+//       );
+      
+//       const querySnapshot = await getDocs(q);
+//       const chatsData = [];
+      
+//       for (const doc of querySnapshot.docs) {
+//         const chatData = doc.data();
+//         const otherParticipantId = chatData.participantIds.find(id => id !== user.id);
+        
+//         if (otherParticipantId) {
+//           // Get or fetch user profile
+//           let userProfile = userProfiles[otherParticipantId];
+//           if (!userProfile) {
+//             userProfile = await fetchUserProfile(otherParticipantId);
+//           }
+          
+//           chatsData.push({
+//             id: doc.id,
+//             ...chatData,
+//             otherParticipantId,
+//             otherParticipantName: userProfile?.name || 'User',
+//             otherParticipantPhoto: userProfile?.photo || 'https://via.placeholder.com/150?text=User'
+//           });
+//         }
+//       }
+      
+//       setChats(chatsData);
+//       await setCachedData(cacheKey, chatsData);
+//     } catch (error) {
+//       console.error('Error loading chats:', error);
+//       // If online loading fails, use cached data
+//       const cachedChats = await getCachedData(`chats_${user.id}`);
+//       if (cachedChats) setChats(cachedChats);
+//     }
+//   };
+
+//   // Load received interests with caching - FIXED to prevent duplicates
+//   const loadReceivedInterests = async () => {
+//     if (!user?.id) return;
+
+//     try {
+//       const cacheKey = `receivedInterests_${user.id}`;
+//       const cachedInterests = await getCachedData(cacheKey);
+      
+//       if (cachedInterests) {
+//         setReceivedInterests(cachedInterests);
+//         return;
+//       }
+      
+//       const interestsRef = collection(db, 'Users', user.id, 'receivedInterests');
+//       const q = query(interestsRef, orderBy('timestamp', 'desc'));
+      
+//       const querySnapshot = await getDocs(q);
+//       const interestsData = [];
+//       const seenUsers = new Set(); // Track seen users to prevent duplicates
+      
+//       for (const doc of querySnapshot.docs) {
+//         const interestData = doc.data();
+        
+//         if (interestData.fromUserId && !seenUsers.has(interestData.fromUserId)) {
+//           seenUsers.add(interestData.fromUserId); // Mark user as seen
+          
+//           // Get or fetch user profile
+//           let userProfile = userProfiles[interestData.fromUserId];
+//           if (!userProfile) {
+//             userProfile = await fetchUserProfile(interestData.fromUserId);
+//           }
+          
+//           interestsData.push({
+//             id: doc.id,
+//             ...interestData,
+//             fromUserPhoto: userProfile?.photo || 'https://via.placeholder.com/150?text=User',
+//             fromUserName: userProfile?.name || interestData.fromUserName || 'User'
+//           });
+//         }
+//       }
+      
+//       setReceivedInterests(interestsData);
+//       await setCachedData(cacheKey, interestsData);
+//     } catch (error) {
+//       console.error('Error loading received interests:', error);
+//       // If online loading fails, use cached data
+//       const cachedInterests = await getCachedData(`receivedInterests_${user.id}`);
+//       if (cachedInterests) setReceivedInterests(cachedInterests);
+//     }
+//   };
+
+//   // Load sent interests with caching - FIXED to prevent duplicates
+//   const loadSentInterests = async () => {
+//     if (!user?.id) return;
+
+//     try {
+//       const cacheKey = `sentInterests_${user.id}`;
+//       const cachedInterests = await getCachedData(cacheKey);
+      
+//       if (cachedInterests) {
+//         setSentInterests(cachedInterests);
+//         return;
+//       }
+      
+//       const interestsRef = collection(db, 'Users', user.id, 'sentInterests');
+//       const q = query(interestsRef, orderBy('timestamp', 'desc'));
+      
+//       const querySnapshot = await getDocs(q);
+//       const interestsData = [];
+//       const seenUsers = new Set(); // Track seen users to prevent duplicates
+      
+//       for (const doc of querySnapshot.docs) {
+//         const interestData = doc.data();
+        
+//         if (interestData.toUserId && !seenUsers.has(interestData.toUserId)) {
+//           seenUsers.add(interestData.toUserId); // Mark user as seen
+          
+//           // Get or fetch user profile
+//           let userProfile = userProfiles[interestData.toUserId];
+//           if (!userProfile) {
+//             userProfile = await fetchUserProfile(interestData.toUserId);
+//           }
+          
+//           interestsData.push({
+//             id: doc.id,
+//             ...interestData,
+//             toUserPhoto: userProfile?.photo || 'https://via.placeholder.com/150?text=User',
+//             toUserName: userProfile?.name || interestData.toUserName || 'User'
+//           });
+//         }
+//       }
+      
+//       setSentInterests(interestsData);
+//       await setCachedData(cacheKey, interestsData);
+//     } catch (error) {
+//       console.error('Error loading sent interests:', error);
+//       // If online loading fails, use cached data
+//       const cachedInterests = await getCachedData(`sentInterests_${user.id}`);
+//       if (cachedInterests) setSentInterests(cachedInterests);
+//     }
+//   };
+
+//   // Load online users
+//   const loadOnlineUsers = async () => {
+//     if (!user?.id) return;
+
+//     try {
+//       const onlineRef = collection(db, 'onlineUsers');
+//       const querySnapshot = await getDocs(onlineRef);
+      
+//       const onlineUsersData = [];
+//       const onlineUsersWithTime = {};
+      
+//       querySnapshot.forEach((doc) => {
+//         const userData = doc.data();
+//         if (doc.id !== user.id && userData.lastSeen) {
+//           const lastSeen = userData.lastSeen.toDate ? userData.lastSeen.toDate() : new Date(userData.lastSeen);
+//           onlineUsersWithTime[doc.id] = {
+//             isOnline: userData.isOnline,
+//             lastSeen: lastSeen
+//           };
+          
+//           const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+//           // Consider user online if they were active in the last 5 minutes
+//           if (lastSeen > fiveMinutesAgo && userData.isOnline !== false) {
+//             onlineUsersData.push(doc.id);
+//           }
+//         }
+//       });
+      
+//       setOnlineUsers(onlineUsersData);
+//     } catch (error) {
+//       console.error('Error loading online users:', error);
+//     }
+//   };
+
+//   // Fetch user profile data with caching - FIXED VERSION
+//   const fetchUserProfile = async (userId) => {
+//     // Check if profile is already in state
+//     if (userProfiles[userId]) return userProfiles[userId];
+    
+//     // Check if profile is in cache
+//     try {
+//       const cachedProfiles = await getCachedData('userProfiles');
+//       if (cachedProfiles && cachedProfiles[userId]) {
+//         return cachedProfiles[userId];
+//       }
+//     } catch (error) {
+//       console.error('Error checking stored profiles:', error);
+//     }
+    
+//     try {
+//       // Get user profile directly from Users collection
+//       const userRef = doc(db, 'Users', userId);
+//       const userSnap = await getDoc(userRef);
+      
+//       if (userSnap.exists()) {
+//         const userData = userSnap.data();
+//         const userProfile = {
+//           id: userId,
+//           name: `${userData.firstName || ''} ${userData.lastName || ''}`.trim() || 'User',
+//           photo: userData.profilePhoto || 'https://via.placeholder.com/150?text=User',
+//           age: userData.age,
+//           city: userData.city,
+//           verificationStatus: userData.verificationStatus
+//         };
+        
+//         // Update state and storage
+//         const updatedProfiles = { ...userProfiles, [userId]: userProfile };
+//         setUserProfiles(updatedProfiles);
+//         await setCachedData('userProfiles', updatedProfiles);
+        
+//         return userProfile;
+//       }
+      
+//       // Fallback if no profile found
+//       const fallbackProfile = {
+//         id: userId,
+//         name: 'User',
+//         photo: 'https://via.placeholder.com/150?text=User',
+//         age: null,
+//         city: null,
+//         verificationStatus: null
+//       };
+      
+//       const updatedProfiles = { ...userProfiles, [userId]: fallbackProfile };
+//       setUserProfiles(updatedProfiles);
+//       await setCachedData('userProfiles', updatedProfiles);
+      
+//       return fallbackProfile;
+//     } catch (error) {
+//       console.error('Error fetching user profile:', error);
+//       return null;
+//     }
+//   };
+
+//   // Set up real-time listeners only for message updates
+//   useEffect(() => {
+//     if (!user?.id) return;
+
+//     // Set up real-time listener for new messages
+//     const chatsRef = collection(db, 'chats');
+//     const q = query(
+//       chatsRef,
+//       where('participantIds', 'array-contains', user.id)
+//     );
+    
+//     const unsubscribe = onSnapshot(q, (querySnapshot) => {
+//       // Only update if there are actual changes
+//       querySnapshot.docChanges().forEach((change) => {
+//         if (change.type === 'modified') {
+//           // Update the specific chat in our state
+//           const updatedChat = change.doc.data();
+//           setChats(prevChats => {
+//             const updatedChats = prevChats.map(chat => 
+//               chat.id === change.doc.id ? { ...chat, ...updatedChat } : chat
+//             );
+            
+//             // Also update cache
+//             setCachedData(`chats_${user.id}`, updatedChats);
+//             return updatedChats;
+//           });
+//         }
+//       });
+//     });
+
+//     return () => unsubscribe();
+//   }, [user]);
+
+//   // Respond to an interest (accept/decline) - FIXED error handling
+//   const respondToInterest = async (interestId, response) => {
+//     try {
+//       if (!user?.id) throw new Error('User not available');
+
+//       // Update the received interest
+//       const receivedInterestRef = doc(db, 'Users', user.id, 'receivedInterests', interestId);
+//       await updateDoc(receivedInterestRef, {
+//         status: response,
+//         respondedAt: serverTimestamp()
+//       });
+
+//       // Find the original sent interest to update
+//       const interest = receivedInterests.find(i => i.id === interestId);
+//       if (interest && interest.fromUserId) {
+//         // Find the sent interest document ID by querying
+//         const sentInterestsRef = collection(db, 'Users', interest.fromUserId, 'sentInterests');
+//         const q = query(sentInterestsRef, where('toUserId', '==', user.id));
+//         const querySnapshot = await getDocs(q);
+        
+//         if (!querySnapshot.empty) {
+//           const sentInterestDoc = querySnapshot.docs[0];
+//           const sentInterestRef = doc(db, 'Users', interest.fromUserId, 'sentInterests', sentInterestDoc.id);
+//           await updateDoc(sentInterestRef, {
+//             status: response,
+//             respondedAt: serverTimestamp()
+//           });
+//         }
+//       }
+
+//       // Update local state
+//       setReceivedInterests(prev => 
+//         prev.map(item => 
+//           item.id === interestId ? { ...item, status: response } : item
+//         )
+//       );
+      
+//       // Update cache
+//       await setCachedData(`receivedInterests_${user.id}`, receivedInterests);
+
+//       if (response === 'accepted') {
+//         Alert.alert('Success', 'Interest accepted! You can now chat with this user.');
+//       } else {
+//         Alert.alert('Interest declined');
+//       }
+//     } catch (error) {
+//       console.error('Error responding to interest:', error);
+//       Alert.alert('Error', 'Failed to respond to interest. Please try again.');
+//     }
+//   };
+
+//   // Start a chat from an interest
+//   const startChatFromInterest = async (interest) => {
+//     try {
+//       if (!user?.id) throw new Error('User not available');
+
+//       // Check if chat already exists
+//       const chatsRef = collection(db, 'chats');
+//       const q = query(
+//         chatsRef,
+//         where('participantIds', 'array-contains', user.id)
+//       );
+      
+//       const querySnapshot = await getDocs(q);
+//       let existingChat = null;
+      
+//       querySnapshot.forEach((doc) => {
+//         const chatData = doc.data();
+//         if (chatData.participantIds && chatData.participantIds.includes(interest.fromUserId)) {
+//           existingChat = { id: doc.id, ...chatData };
+//         }
+//       });
+      
+//       if (existingChat) {
+//         router.push(`/chat/${existingChat.id}?name=${encodeURIComponent(interest.fromUserName)}&profileId=${interest.fromUserId}`);
+//       } else {
+//         // Create new chat
+//         const chatData = {
+//           participants: [
+//             user.displayName || `${user.firstName} ${user.lastName}`.trim() || 'You',
+//             interest.fromUserName
+//           ],
+//           participantIds: [user.id, interest.fromUserId],
+//           lastMessage: '',
+//           lastMessageTime: serverTimestamp(),
+//           createdAt: serverTimestamp()
+//         };
+        
+//         const chatRef = await addDoc(collection(db, 'chats'), chatData);
+        
+//         // Create participants subcollection
+//         await Promise.all([
+//           addDoc(collection(chatRef, 'participants'), {
+//             userId: user.id,
+//             userName: user.displayName || `${user.firstName} ${user.lastName}`.trim() || 'You',
+//             joinedAt: serverTimestamp()
+//           }),
+//           addDoc(collection(chatRef, 'participants'), {
+//             userId: interest.fromUserId,
+//             userName: interest.fromUserName,
+//             joinedAt: serverTimestamp()
+//           })
+//         ]);
+        
+//         router.push(`/chat/${chatRef.id}?name=${encodeURIComponent(interest.fromUserName)}&profileId=${interest.fromUserId}`);
+//       }
+//     } catch (error) {
+//       console.error('Error starting chat:', error);
+//       Alert.alert('Error', 'Failed to start chat. Please try again.');
+//     }
+//   };
+
+//   const formatTime = (date) => {
+//     if (!date) return '';
+    
+//     const now = new Date();
+//     const messageDate = date.toDate ? date.toDate() : new Date(date);
+//     const diff = now - messageDate;
+//     const minutes = Math.floor(diff / 60000);
+//     const hours = Math.floor(diff / 3600000);
+//     const days = Math.floor(diff / 86400000);
+    
+//     if (minutes < 60) return `${minutes}m ago`;
+//     if (hours < 24) return `${hours}h ago`;
+//     if (days < 7) return `${days}d ago`;
+//     return messageDate.toLocaleDateString();
+//   };
+
+//   const formatLastSeen = (date) => {
+//     if (!date) return '';
+    
+//     const now = new Date();
+//     const lastSeenDate = date.toDate ? date.toDate() : new Date(date);
+//     const diff = now - lastSeenDate;
+//     const minutes = Math.floor(diff / 60000);
+//     const hours = Math.floor(diff / 3600000);
+//     const days = Math.floor(diff / 86400000);
+    
+//     if (minutes < 1) return 'just now';
+//     if (minutes < 60) return `${minutes} minutes ago`;
+//     if (hours < 24) return `${hours} hours ago`;
+//     if (days < 7) return `${days} days ago`;
+//     return lastSeenDate.toLocaleDateString();
+//   };
+
+//   const renderMessageItem = ({ item }) => {
+//     const isOnline = onlineUsers.includes(item.otherParticipantId);
+    
+//     return (
+//       <TouchableOpacity
+//         style={styles.messageItem}
+//         onPress={() => router.push(`/chat/${item.id}?name=${encodeURIComponent(item.otherParticipantName)}&profileId=${item.otherParticipantId}`)}
+//       >
+//         <View style={styles.avatarContainer}>
+//           <Image
+//             source={{ uri: item.otherParticipantPhoto || 'https://via.placeholder.com/150?text=User' }}
+//             style={styles.avatar}
+//           />
+//           {isOnline && <View style={styles.onlineBadge} />}
+//         </View>
+//         <View style={styles.messageContent}>
+//           <View style={styles.messageHeader}>
+//             <Text style={styles.messageName}>{item.otherParticipantName}</Text>
+//             <Text style={styles.messageTime}>
+//               {formatTime(item.lastMessageTime)}
+//             </Text>
+//           </View>
+//           <Text
+//             style={[
+//               styles.messageText,
+//               item.unread && styles.unreadMessage
+//             ]}
+//             numberOfLines={1}
+//           >
+//             {item.lastMessage || 'Start a conversation...'}
+//           </Text>
+//           {isOnline ? (
+//             <View style={styles.onlineStatus}>
+//               <View style={styles.onlineDot} />
+//               <Text style={styles.onlineText}>{translations.online[language]}</Text>
+//             </View>
+//           ) : (
+//             <Text style={styles.offlineText}>
+//               {translations.lastSeen[language]} {formatLastSeen(item.lastMessageTime)}
+//             </Text>
+//           )}
+//         </View>
+//         {item.unread && <View style={styles.unreadBadge} />}
+//       </TouchableOpacity>
+//     );
+//   };
+
+//   const renderInterestItem = ({ item }) => {
+//     const isReceived = activeTab === 'Interests Received';
+//     const interest = isReceived ? item : item;
+//     const status = interest.status || 'pending';
+//     const userPhoto = isReceived ? interest.fromUserPhoto : interest.toUserPhoto;
+//     const userName = isReceived ? interest.fromUserName : interest.toUserName;
+//     const userId = isReceived ? interest.fromUserId : interest.toUserId;
+    
+//     return (
+//       <View style={styles.interestItem}>
+//         <View style={styles.avatarContainer}>
+//           <Image
+//             source={{ uri: userPhoto || 'https://via.placeholder.com/150?text=User' }}
+//             style={styles.interestAvatar}
+//           />
+//           {onlineUsers.includes(userId) && (
+//             <View style={styles.onlineBadge} />
+//           )}
+//         </View>
+//         <View style={styles.interestContent}>
+//           <View style={styles.interestHeader}>
+//             <Text style={styles.interestName}>{userName}</Text>
+//             <Text style={styles.interestTime}>
+//               {formatTime(interest.timestamp)}
+//             </Text>
+//           </View>
+//           <View style={styles.interestActions}>
+//             <View style={[
+//               styles.statusBadge,
+//               status === 'accepted' && styles.acceptedBadge,
+//               status === 'declined' && styles.declinedBadge
+//             ]}>
+//               <Text style={[
+//                 styles.statusText,
+//                 status === 'accepted' && styles.acceptedText,
+//                 status === 'declined' && styles.declinedText
+//               ]}>
+//                 {translations[status]?.[language] || status}
+//               </Text>
+//             </View>
+            
+//             {isReceived && status === 'pending' ? (
+//               <View style={styles.actionButtons}>
+//                 <TouchableOpacity
+//                   style={[styles.actionButton, styles.acceptButton]}
+//                   onPress={() => respondToInterest(item.id, 'accepted')}
+//                 >
+//                   <Text style={styles.acceptButtonText}>{translations.accept[language]}</Text>
+//                 </TouchableOpacity>
+//                 <TouchableOpacity
+//                   style={[styles.actionButton, styles.declineButton]}
+//                   onPress={() => respondToInterest(item.id, 'declined')}
+//                 >
+//                   <Text style={styles.declineButtonText}>{translations.decline[language]}</Text>
+//                 </TouchableOpacity>
+//               </View>
+//             ) : status === 'accepted' ? (
+//               <TouchableOpacity
+//                 style={[styles.actionButton, styles.chatButton]}
+//                 onPress={() => startChatFromInterest(item)}
+//               >
+//                 <Text style={styles.chatButtonText}>{translations.startChat[language]}</Text>
+//               </TouchableOpacity>
+//             ) : null}
+//           </View>
+//         </View>
+//       </View>
+//     );
+//   };
+
+//   const getFilteredData = () => {
+//     if (activeTab === 'Chats') {
+//       return chats.filter(chat =>
+//         chat.otherParticipantName.toLowerCase().includes(searchQuery.toLowerCase())
+//       );
+//     } else if (activeTab === 'Interests Received') {
+//       return receivedInterests.filter(interest =>
+//         interest.fromUserName.toLowerCase().includes(searchQuery.toLowerCase())
+//       );
+//     } else if (activeTab === 'Interests Sent') {
+//       return sentInterests.filter(interest =>
+//         interest.toUserName.toLowerCase().includes(searchQuery.toLowerCase())
+//       );
+//     }
+//     return [];
+//   };
+
+//   const renderEmptyState = () => {
+//     if (loading) {
+//       return null; // Don't show empty state while loading
+//     }
+    
+//     if (activeTab === 'Chats') {
+//       return (
+//         <View style={styles.emptyContainer}>
+//           <Feather name="message-square" size={48} color="#ddd" />
+//           <Text style={styles.emptyText}>{translations.noMessages[language]}</Text>
+//           <Text style={styles.emptySubtext}>{translations.startConversation[language]}</Text>
+//         </View>
+//       );
+//     } else {
+//       return (
+//         <View style={styles.emptyContainer}>
+//           <Ionicons name="heart" size={48} color="#ddd" />
+//           <Text style={styles.emptyText}>{translations.noInterests[language]}</Text>
+//         </View>
+//       );
+//     }
+//   };
+
+//   // Show loading indicator while data is being fetched
+//   if (loading) {
+//     return (
+//       <SafeAreaView style={styles.safeArea} edges={['top']}>
+//         <View style={styles.container}>
+//           {/* Header */}
+//           <View style={styles.header}>
+//             <Text style={styles.headerTitle}>{translations.messages[language]}</Text>
+//             <TouchableOpacity style={styles.headerButton} onPress={onRefresh}>
+//               <Ionicons name="refresh" size={20} color="#333" />
+//             </TouchableOpacity>
+//           </View>
+
+//           {/* Loading indicator */}
+//           <View style={styles.loadingContainer}>
+//             <ActivityIndicator size="large" color="#FF6B6B" />
+//             <Text style={styles.loadingText}>{translations.loading[language]}</Text>
+//           </View>
+//         </View>
+//       </SafeAreaView>
+//     );
+//   }
+
+//   return (
+//     <SafeAreaView style={styles.safeArea} edges={['top']}>
+//       <View style={styles.container}>
+//         {/* Header */}
+//         <View style={styles.header}>
+//           <Text style={styles.headerTitle}>{translations.messages[language]}</Text>
+//           <TouchableOpacity style={styles.headerButton} onPress={onRefresh}>
+//             <Ionicons name="refresh" size={20} color="#333" />
+//           </TouchableOpacity>
+//         </View>
+
+//         {/* Tabs */}
+//         <View style={styles.tabsContainer}>
+//           {['Chats', 'Interests Received', 'Interests Sent'].map((tab) => (
+//             <TouchableOpacity
+//               key={tab}
+//               style={[
+//                 styles.tabButton,
+//                 activeTab === tab && styles.activeTabButton
+//               ]}
+//               onPress={() => setActiveTab(tab)}
+//             >
+//               <Text style={[
+//                 styles.tabText,
+//                 activeTab === tab && styles.activeTabText
+//               ]}>
+//                 {tab === 'Interests Received' ? translations.interestsReceived[language] :
+//                  tab === 'Interests Sent' ? translations.interestsSent[language] : tab}
+//               </Text>
+//               {activeTab === tab && <View style={styles.activeTabIndicator} />}
+//             </TouchableOpacity>
+//           ))}
+//         </View>
+
+//         {/* Search and Filter */}
+//         <View style={styles.searchContainer}>
+//           <Text style={styles.searchTitle}>
+//             {activeTab === 'Chats'
+//               ? translations.incomingMessages[language]
+//               : activeTab === 'Interests Received'
+//                 ? translations.awaitingResponse[language]
+//                 : translations.interestsSent[language]}
+//           </Text>
+//           <View style={styles.searchBar}>
+//             <View style={styles.searchInputContainer}>
+//               <Feather name="search" size={16} color="#888" style={styles.searchIcon} />
+//               <TextInput
+//                 style={styles.searchInput}
+//                 placeholder={translations.searchMessages[language]}
+//                 value={searchQuery}
+//                 onChangeText={setSearchQuery}
+//               />
+//             </View>
+//             <TouchableOpacity style={styles.filterButton}>
+//               <Feather name="filter" size={18} color="#FF6B6B" />
+//             </TouchableOpacity>
+//           </View>
+//         </View>
+
+//         {/* Messages/Interests List */}
+//         <FlatList
+//           data={getFilteredData()}
+//           renderItem={activeTab === 'Chats' ? renderMessageItem : renderInterestItem}
+//           keyExtractor={item => item.id}
+//           contentContainerStyle={styles.listContainer}
+//           showsVerticalScrollIndicator={false}
+//           ListEmptyComponent={renderEmptyState}
+//           refreshControl={
+//             <RefreshControl
+//               refreshing={refreshing}
+//               onRefresh={onRefresh}
+//               title={translations.pullToRefresh[language]}
+//               tintColor="#FF6B6B"
+//               titleColor="#666"
+//             />
+//           }
+//         />
+//       </View>
+//     </SafeAreaView>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   safeArea: {
+//     flex: 1,
+//     backgroundColor: '#fff',
+//   },
+//   container: {
+//     flex: 1,
+//     paddingHorizontal: 16,
+//   },
+//   header: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     paddingVertical: 16,
+//     paddingHorizontal: 4,
+//   },
+//   headerTitle: {
+//     fontSize: 24,
+//     fontWeight: '700',
+//     color: '#212529',
+//   },
+//   headerButton: {
+//     padding: 4,
+//   },
+//   tabsContainer: {
+//     flexDirection: 'row',
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#e9ecef',
+//     marginBottom: 16,
+//   },
+//   tabButton: {
+//     flex: 1,
+//     paddingVertical: 12,
+//     alignItems: 'center',
+//     position: 'relative',
+//   },
+//   activeTabButton: {
+//     // No additional styling needed as we're using the indicator
+//   },
+//   tabText: {
+//     fontSize: 14,
+//     color: '#6c757d',
+//     fontWeight: '500',
+//   },
+//   activeTabText: {
+//     color: '#FF6B6B',
+//     fontWeight: '600',
+//   },
+//   activeTabIndicator: {
+//     position: 'absolute',
+//     bottom: -1,
+//     height: 2,
+//     width: '60%',
+//     backgroundColor: '#FF6B6B',
+//     borderRadius: 2,
+//   },
+//   searchContainer: {
+//     marginBottom: 16,
+//     paddingHorizontal: 4,
+//   },
+//   searchTitle: {
+//     fontSize: 14,
+//     color: '#6c757d',
+//     marginBottom: 10,
+//     fontWeight: '500',
+//   },
+//   searchBar: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//   },
+//   searchInputContainer: {
+//     flex: 1,
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     backgroundColor: '#f8f9fa',
+//     borderRadius: 20,
+//     paddingHorizontal: 16,
+//     height: 40,
+//     marginRight: 12,
+//   },
+//   searchIcon: {
+//     marginRight: 8,
+//   },
+//   searchInput: {
+//     flex: 1,
+//     fontSize: 14,
+//     color: '#495057',
+//     paddingVertical: 8,
+//   },
+//   filterButton: {
+//     padding: 8,
+//     backgroundColor: '#f8f9fa',
+//     borderRadius: 20,
+//   },
+//   listContainer: {
+//     flexGrow: 1,
+//   },
+//   messageItem: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     paddingVertical: 14,
+//     paddingHorizontal: 4,
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#f1f3f5',
+//   },
+//   avatarContainer: {
+//     position: 'relative',
+//     marginRight: 16,
+//   },
+//   avatar: {
+//     width: 52,
+//     height: 52,
+//     borderRadius: 26,
+//   },
+//   interestAvatar: {
+//     width: 52,
+//     height: 52,
+//     borderRadius: 26,
+//   },
+//   onlineBadge: {
+//     position: 'absolute',
+//     bottom: 2,
+//     right: 2,
+//     width: 12,
+//     height: 12,
+//     borderRadius: 6,
+//     backgroundColor: '#4CAF50',
+//     borderWidth: 2,
+//     borderColor: '#fff',
+//   },
+//   messageContent: {
+//     flex: 1,
+//   },
+//   messageHeader: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     marginBottom: 6,
+//   },
+//   messageName: {
+//     fontSize: 16,
+//     fontWeight: '600',
+//     color: '#212529',
+//   },
+//   messageTime: {
+//     fontSize: 12,
+//     color: '#adb5bd',
+//   },
+//   messageText: {
+//     fontSize: 14,
+//     color: '#6c757d',
+//     lineHeight: 20,
+//     marginBottom: 4,
+//   },
+//   onlineStatus: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//   },
+//   onlineDot: {
+//     width: 8,
+//     height: 8,
+//     borderRadius: 4,
+//     backgroundColor: '#4CAF50',
+//     marginRight: 4,
+//   },
+//   onlineText: {
+//     fontSize: 12,
+//     color: '#4CAF50',
+//     fontWeight: '500',
+//   },
+//   offlineText: {
+//     fontSize: 11,
+//     color: '#6c757d',
+//   },
+//   unreadMessage: {
+//     color: '#212529',
+//     fontWeight: '500',
+//   },
+//   unreadBadge: {
+//     width: 10,
+//     height: 10,
+//     borderRadius: 5,
+//     backgroundColor: '#FF6B6B',
+//     marginLeft: 8,
+//   },
+//   interestItem: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     paddingVertical: 14,
+//     paddingHorizontal: 4,
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#f1f3f5',
+//   },
+//   interestContent: {
+//     flex: 1,
+//   },
+//   interestHeader: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     marginBottom: 8,
+//   },
+//   interestName: {
+//     fontSize: 16,
+//     fontWeight: '600',
+//     color: '#212529',
+//   },
+//   interestTime: {
+//     fontSize: 12,
+//     color: '#adb5bd',
+//   },
+//   interestActions: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//   },
+//   statusBadge: {
+//     backgroundColor: '#FFF0F0',
+//     paddingHorizontal: 8,
+//     paddingVertical: 4,
+//     borderRadius: 10,
+//   },
+//   acceptedBadge: {
+//     backgroundColor: '#E8F5E9',
+//   },
+//   declinedBadge: {
+//     backgroundColor: '#FFEBEE',
+//   },
+//   statusText: {
+//     fontSize: 12,
+//     color: '#FF6B6B',
+//     fontWeight: '500',
+//   },
+//   acceptedText: {
+//     color: '#4CAF50',
+//   },
+//   declinedText: {
+//     color: '#F44336',
+//   },
+//   actionButtons: {
+//     flexDirection: 'row',
+//   },
+//   actionButton: {
+//     paddingHorizontal: 12,
+//     paddingVertical: 6,
+//     borderRadius: 15,
+//     marginLeft: 8,
+//   },
+//   acceptButton: {
+//     backgroundColor: '#E8F5E9',
+//   },
+//   declineButton: {
+//     backgroundColor: '#FFEBEE',
+//   },
+//   chatButton: {
+//     backgroundColor: '#FF6B6B',
+//   },
+//   acceptButtonText: {
+//     color: '#4CAF50',
+//     fontWeight: '500',
+//     fontSize: 12,
+//   },
+//   declineButtonText: {
+//     color: '#F44336',
+//     fontWeight: '500',
+//     fontSize: 12,
+//   },
+//   chatButtonText: {
+//     color: '#fff',
+//     fontWeight: '500',
+//     fontSize: 12,
+//   },
+//   emptyContainer: {
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//     paddingVertical: 60,
+//   },
+//   emptyText: {
+//     fontSize: 16,
+//     color: '#adb5bd',
+//     marginTop: 16,
+//     fontWeight: '500',
+//   },
+//   emptySubtext: {
+//     fontSize: 14,
+//     color: '#adb5bd',
+//     marginTop: 8,
+//     textAlign: 'center',
+//     paddingHorizontal: 20,
+//   },
+//   loadingContainer: {
+//     flex: 1,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//   },
+//   loadingText: {
+//     marginTop: 16,
+//     fontSize: 16,
+//     color: '#6c757d',
+//   },
+// });
+
+
+
+
+
+//18/10/2025
+// app/(tabs)/Messages.jsx
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Image, TextInput, FlatList, Alert, AppState, RefreshControl, ActivityIndicator } from 'react-native';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Ionicons, Feather, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { collection, query, where, onSnapshot, orderBy, doc, getDoc, updateDoc, addDoc, serverTimestamp, getDocs, setDoc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, orderBy, doc, getDoc, updateDoc, addDoc, serverTimestamp, getDocs, setDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'expo-router';
 import { useLanguage } from '../context/LanguageContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFirestore } from '../hooks/useFirebase';
 
 export default function Messages() {
   const [activeTab, setActiveTab] = useState('Chats');
@@ -12618,48 +14965,19 @@ export default function Messages() {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [userProfiles, setUserProfiles] = useState({});
   const [refreshing, setRefreshing] = useState(false);
-  const [lastUpdateTime, setLastUpdateTime] = useState(null);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const router = useRouter();
   const { language } = useLanguage();
   const appState = useRef(AppState.currentState);
-  const { fetchProfiles } = useFirestore();
 
-  // Cache expiration time (5 minutes)
-  const CACHE_EXPIRY = 5 * 60 * 1000;
-
-  // Get cached data with expiration check
-  const getCachedData = async (key) => {
-    try {
-      const cached = await AsyncStorage.getItem(key);
-      if (!cached) return null;
-      
-      const { data, timestamp } = JSON.parse(cached);
-      if (Date.now() - timestamp > CACHE_EXPIRY) {
-        await AsyncStorage.removeItem(key);
-        return null;
-      }
-      
-      return data;
-    } catch (error) {
-      console.error('Error getting cached data:', error);
-      return null;
-    }
-  };
-
-  // Set data to cache with timestamp
-  const setCachedData = async (key, data) => {
-    try {
-      const cacheData = {
-        data,
-        timestamp: Date.now()
-      };
-      await AsyncStorage.setItem(key, JSON.stringify(cacheData));
-    } catch (error) {
-      console.error('Error setting cached data:', error);
-    }
-  };
+  // Real-time unsubscribe functions
+  const unsubscribeRefs = useRef({
+    chats: null,
+    receivedInterests: null,
+    sentInterests: null,
+    onlineUsers: null
+  });
 
   // Translations
   const translations = {
@@ -12686,295 +15004,183 @@ export default function Messages() {
     loading: { ENG: "Loading...", HI: "लोड हो रहा है..." }
   };
 
-  // Load cached data from AsyncStorage on component mount
-  useEffect(() => {
-    loadCachedData();
-  }, []);
-
-  // Load all cached data from AsyncStorage
-  const loadCachedData = async () => {
-    try {
-      const [
-        cachedChats, 
-        cachedReceivedInterests, 
-        cachedSentInterests, 
-        cachedUserProfiles,
-        cachedLastUpdate
-      ] = await Promise.all([
-        getCachedData(`chats_${user.id}`),
-        getCachedData(`receivedInterests_${user.id}`),
-        getCachedData(`sentInterests_${user.id}`),
-        getCachedData(`userProfiles`),
-        getCachedData(`lastUpdateTime_${user.id}`)
-      ]);
-
-      if (cachedChats) setChats(cachedChats);
-      if (cachedReceivedInterests) setReceivedInterests(cachedReceivedInterests);
-      if (cachedSentInterests) setSentInterests(cachedSentInterests);
-      if (cachedUserProfiles) setUserProfiles(cachedUserProfiles);
-      if (cachedLastUpdate) setLastUpdateTime(cachedLastUpdate);
-      
-      // After loading cache, refresh data if needed
-      refreshDataIfNeeded();
-    } catch (error) {
-      console.error('Error loading cached data:', error);
-    }
-  };
-
-  // Check if we need to refresh data based on last update time
-  const refreshDataIfNeeded = useCallback(async () => {
-    if (!user?.id) return;
-    
-    const now = Date.now();
-    const fiveMinutesAgo = now - (5 * 60 * 1000); // 5 minutes in milliseconds
-    
-    // If data is older than 5 minutes or doesn't exist, refresh it
-    if (!lastUpdateTime || lastUpdateTime < fiveMinutesAgo) {
-      await refreshData();
-    } else {
-      setLoading(false); // Data is fresh, hide loader
-    }
-  }, [user, lastUpdateTime]);
-
-  // Refresh all data manually
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await refreshData();
-    setRefreshing(false);
-  }, [user]);
-
-  // Refresh data from Firestore
-  const refreshData = async () => {
-    if (!user?.id) return;
-    
-    try {
-      await Promise.all([
-        loadChats(),
-        loadReceivedInterests(),
-        loadSentInterests(),
-        loadOnlineUsers()
-      ]);
-      
-      // Update last refresh time
-      const now = Date.now();
-      setLastUpdateTime(now);
-      await setCachedData(`lastUpdateTime_${user.id}`, now);
-      
-      // Hide loader after data is loaded
-      setLoading(false);
-    } catch (error) {
-      console.error('Error refreshing data:', error);
-      setLoading(false); // Hide loader even if there's an error
-    }
-  };
-
-  // Load chats with caching
-  const loadChats = async () => {
+  // Initialize all real-time listeners
+  const initializeRealTimeListeners = useCallback(async () => {
     if (!user?.id) return;
 
+    console.log('Initializing real-time listeners...');
+
+    // Clean up any existing listeners
+    cleanupListeners();
+
     try {
-      const cacheKey = `chats_${user.id}`;
-      const cachedChats = await getCachedData(cacheKey);
-      
-      if (cachedChats) {
-        setChats(cachedChats);
-        return;
-      }
-      
+      // Real-time listener for chats
       const chatsRef = collection(db, 'chats');
-      const q = query(
+      const chatsQuery = query(
         chatsRef,
         where('participantIds', 'array-contains', user.id),
         orderBy('lastMessageTime', 'desc')
       );
-      
-      const querySnapshot = await getDocs(q);
-      const chatsData = [];
-      
-      for (const doc of querySnapshot.docs) {
-        const chatData = doc.data();
-        const otherParticipantId = chatData.participantIds.find(id => id !== user.id);
-        
-        if (otherParticipantId) {
-          // Get or fetch user profile
-          let userProfile = userProfiles[otherParticipantId];
-          if (!userProfile) {
-            userProfile = await fetchUserProfile(otherParticipantId);
+
+      unsubscribeRefs.current.chats = onSnapshot(chatsQuery, 
+        async (snapshot) => {
+          console.log('Chats updated:', snapshot.size, 'chats');
+          const chatsData = [];
+          
+          for (const doc of snapshot.docs) {
+            const chatData = doc.data();
+            const otherParticipantId = chatData.participantIds.find(id => id !== user.id);
+            
+            if (otherParticipantId) {
+              let userProfile = userProfiles[otherParticipantId];
+              if (!userProfile) {
+                userProfile = await fetchUserProfile(otherParticipantId);
+              }
+              
+              chatsData.push({
+                id: doc.id,
+                ...chatData,
+                otherParticipantId,
+                otherParticipantName: userProfile?.name || 'User',
+                otherParticipantPhoto: userProfile?.photo || 'https://via.placeholder.com/150?text=User'
+              });
+            }
           }
           
-          chatsData.push({
-            id: doc.id,
-            ...chatData,
-            otherParticipantId,
-            otherParticipantName: userProfile?.name || 'User',
-            otherParticipantPhoto: userProfile?.photo || 'https://via.placeholder.com/150?text=User'
+          setChats(chatsData);
+          setLoading(false);
+        },
+        (error) => {
+          console.error('Error in chats listener:', error);
+          setLoading(false);
+        }
+      );
+
+      // Real-time listener for received interests
+      const receivedInterestsRef = collection(db, 'Users', user.id, 'receivedInterests');
+      const receivedQuery = query(receivedInterestsRef, orderBy('timestamp', 'desc'));
+      
+      unsubscribeRefs.current.receivedInterests = onSnapshot(receivedQuery, 
+        async (snapshot) => {
+          console.log('Received interests updated:', snapshot.size, 'interests');
+          const interestsData = [];
+          const seenUsers = new Set();
+          
+          for (const doc of snapshot.docs) {
+            const interestData = doc.data();
+            
+            if (interestData.fromUserId && !seenUsers.has(interestData.fromUserId)) {
+              seenUsers.add(interestData.fromUserId);
+              
+              let userProfile = userProfiles[interestData.fromUserId];
+              if (!userProfile) {
+                userProfile = await fetchUserProfile(interestData.fromUserId);
+              }
+              
+              interestsData.push({
+                id: doc.id,
+                ...interestData,
+                fromUserPhoto: userProfile?.photo || 'https://via.placeholder.com/150?text=User',
+                fromUserName: userProfile?.name || interestData.fromUserName || 'User'
+              });
+            }
+          }
+          
+          setReceivedInterests(interestsData);
+        },
+        (error) => {
+          console.error('Error in received interests listener:', error);
+        }
+      );
+
+      // Real-time listener for sent interests
+      const sentInterestsRef = collection(db, 'Users', user.id, 'sentInterests');
+      const sentQuery = query(sentInterestsRef, orderBy('timestamp', 'desc'));
+      
+      unsubscribeRefs.current.sentInterests = onSnapshot(sentQuery, 
+        async (snapshot) => {
+          console.log('Sent interests updated:', snapshot.size, 'interests');
+          const interestsData = [];
+          const seenUsers = new Set();
+          
+          for (const doc of snapshot.docs) {
+            const interestData = doc.data();
+            
+            if (interestData.toUserId && !seenUsers.has(interestData.toUserId)) {
+              seenUsers.add(interestData.toUserId);
+              
+              let userProfile = userProfiles[interestData.toUserId];
+              if (!userProfile) {
+                userProfile = await fetchUserProfile(interestData.toUserId);
+              }
+              
+              interestsData.push({
+                id: doc.id,
+                ...interestData,
+                toUserPhoto: userProfile?.photo || 'https://via.placeholder.com/150?text=User',
+                toUserName: userProfile?.name || interestData.toUserName || 'User'
+              });
+            }
+          }
+          
+          setSentInterests(interestsData);
+        },
+        (error) => {
+          console.error('Error in sent interests listener:', error);
+        }
+      );
+
+      // Real-time listener for online users
+      const onlineUsersRef = collection(db, 'onlineUsers');
+      unsubscribeRefs.current.onlineUsers = onSnapshot(onlineUsersRef, 
+        (snapshot) => {
+          const onlineUsersData = [];
+          
+          snapshot.forEach((doc) => {
+            const userData = doc.data();
+            if (doc.id !== user.id && userData.lastSeen) {
+              const lastSeen = userData.lastSeen.toDate ? userData.lastSeen.toDate() : new Date(userData.lastSeen);
+              const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+              
+              if (lastSeen > fiveMinutesAgo && userData.isOnline !== false) {
+                onlineUsersData.push(doc.id);
+              }
+            }
           });
+          
+          setOnlineUsers(onlineUsersData);
+        },
+        (error) => {
+          console.error('Error in online users listener:', error);
         }
-      }
-      
-      setChats(chatsData);
-      await setCachedData(cacheKey, chatsData);
+      );
+
     } catch (error) {
-      console.error('Error loading chats:', error);
-      // If online loading fails, use cached data
-      const cachedChats = await getCachedData(`chats_${user.id}`);
-      if (cachedChats) setChats(cachedChats);
+      console.error('Error initializing real-time listeners:', error);
+      setLoading(false);
     }
-  };
+  }, [user, userProfiles]);
 
-  // Load received interests with caching - FIXED to prevent duplicates
-  const loadReceivedInterests = async () => {
-    if (!user?.id) return;
-
-    try {
-      const cacheKey = `receivedInterests_${user.id}`;
-      const cachedInterests = await getCachedData(cacheKey);
-      
-      if (cachedInterests) {
-        setReceivedInterests(cachedInterests);
-        return;
+  // Clean up listeners
+  const cleanupListeners = useCallback(() => {
+    Object.values(unsubscribeRefs.current).forEach(unsubscribe => {
+      if (unsubscribe && typeof unsubscribe === 'function') {
+        unsubscribe();
       }
-      
-      const interestsRef = collection(db, 'Users', user.id, 'receivedInterests');
-      const q = query(interestsRef, orderBy('timestamp', 'desc'));
-      
-      const querySnapshot = await getDocs(q);
-      const interestsData = [];
-      const seenUsers = new Set(); // Track seen users to prevent duplicates
-      
-      for (const doc of querySnapshot.docs) {
-        const interestData = doc.data();
-        
-        if (interestData.fromUserId && !seenUsers.has(interestData.fromUserId)) {
-          seenUsers.add(interestData.fromUserId); // Mark user as seen
-          
-          // Get or fetch user profile
-          let userProfile = userProfiles[interestData.fromUserId];
-          if (!userProfile) {
-            userProfile = await fetchUserProfile(interestData.fromUserId);
-          }
-          
-          interestsData.push({
-            id: doc.id,
-            ...interestData,
-            fromUserPhoto: userProfile?.photo || 'https://via.placeholder.com/150?text=User',
-            fromUserName: userProfile?.name || interestData.fromUserName || 'User'
-          });
-        }
-      }
-      
-      setReceivedInterests(interestsData);
-      await setCachedData(cacheKey, interestsData);
-    } catch (error) {
-      console.error('Error loading received interests:', error);
-      // If online loading fails, use cached data
-      const cachedInterests = await getCachedData(`receivedInterests_${user.id}`);
-      if (cachedInterests) setReceivedInterests(cachedInterests);
-    }
-  };
+    });
+    unsubscribeRefs.current = {
+      chats: null,
+      receivedInterests: null,
+      sentInterests: null,
+      onlineUsers: null
+    };
+  }, []);
 
-  // Load sent interests with caching - FIXED to prevent duplicates
-  const loadSentInterests = async () => {
-    if (!user?.id) return;
-
-    try {
-      const cacheKey = `sentInterests_${user.id}`;
-      const cachedInterests = await getCachedData(cacheKey);
-      
-      if (cachedInterests) {
-        setSentInterests(cachedInterests);
-        return;
-      }
-      
-      const interestsRef = collection(db, 'Users', user.id, 'sentInterests');
-      const q = query(interestsRef, orderBy('timestamp', 'desc'));
-      
-      const querySnapshot = await getDocs(q);
-      const interestsData = [];
-      const seenUsers = new Set(); // Track seen users to prevent duplicates
-      
-      for (const doc of querySnapshot.docs) {
-        const interestData = doc.data();
-        
-        if (interestData.toUserId && !seenUsers.has(interestData.toUserId)) {
-          seenUsers.add(interestData.toUserId); // Mark user as seen
-          
-          // Get or fetch user profile
-          let userProfile = userProfiles[interestData.toUserId];
-          if (!userProfile) {
-            userProfile = await fetchUserProfile(interestData.toUserId);
-          }
-          
-          interestsData.push({
-            id: doc.id,
-            ...interestData,
-            toUserPhoto: userProfile?.photo || 'https://via.placeholder.com/150?text=User',
-            toUserName: userProfile?.name || interestData.toUserName || 'User'
-          });
-        }
-      }
-      
-      setSentInterests(interestsData);
-      await setCachedData(cacheKey, interestsData);
-    } catch (error) {
-      console.error('Error loading sent interests:', error);
-      // If online loading fails, use cached data
-      const cachedInterests = await getCachedData(`sentInterests_${user.id}`);
-      if (cachedInterests) setSentInterests(cachedInterests);
-    }
-  };
-
-  // Load online users
-  const loadOnlineUsers = async () => {
-    if (!user?.id) return;
-
-    try {
-      const onlineRef = collection(db, 'onlineUsers');
-      const querySnapshot = await getDocs(onlineRef);
-      
-      const onlineUsersData = [];
-      const onlineUsersWithTime = {};
-      
-      querySnapshot.forEach((doc) => {
-        const userData = doc.data();
-        if (doc.id !== user.id && userData.lastSeen) {
-          const lastSeen = userData.lastSeen.toDate ? userData.lastSeen.toDate() : new Date(userData.lastSeen);
-          onlineUsersWithTime[doc.id] = {
-            isOnline: userData.isOnline,
-            lastSeen: lastSeen
-          };
-          
-          const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-          // Consider user online if they were active in the last 5 minutes
-          if (lastSeen > fiveMinutesAgo && userData.isOnline !== false) {
-            onlineUsersData.push(doc.id);
-          }
-        }
-      });
-      
-      setOnlineUsers(onlineUsersData);
-    } catch (error) {
-      console.error('Error loading online users:', error);
-    }
-  };
-
-  // Fetch user profile data with caching - FIXED VERSION
+  // Fetch user profile with caching
   const fetchUserProfile = async (userId) => {
-    // Check if profile is already in state
     if (userProfiles[userId]) return userProfiles[userId];
     
-    // Check if profile is in cache
     try {
-      const cachedProfiles = await getCachedData('userProfiles');
-      if (cachedProfiles && cachedProfiles[userId]) {
-        return cachedProfiles[userId];
-      }
-    } catch (error) {
-      console.error('Error checking stored profiles:', error);
-    }
-    
-    try {
-      // Get user profile directly from Users collection
       const userRef = doc(db, 'Users', userId);
       const userSnap = await getDoc(userRef);
       
@@ -12989,15 +15195,10 @@ export default function Messages() {
           verificationStatus: userData.verificationStatus
         };
         
-        // Update state and storage
-        const updatedProfiles = { ...userProfiles, [userId]: userProfile };
-        setUserProfiles(updatedProfiles);
-        await setCachedData('userProfiles', updatedProfiles);
-        
+        setUserProfiles(prev => ({ ...prev, [userId]: userProfile }));
         return userProfile;
       }
       
-      // Fallback if no profile found
       const fallbackProfile = {
         id: userId,
         name: 'User',
@@ -13007,10 +15208,7 @@ export default function Messages() {
         verificationStatus: null
       };
       
-      const updatedProfiles = { ...userProfiles, [userId]: fallbackProfile };
-      setUserProfiles(updatedProfiles);
-      await setCachedData('userProfiles', updatedProfiles);
-      
+      setUserProfiles(prev => ({ ...prev, [userId]: fallbackProfile }));
       return fallbackProfile;
     } catch (error) {
       console.error('Error fetching user profile:', error);
@@ -13018,40 +15216,54 @@ export default function Messages() {
     }
   };
 
-  // Set up real-time listeners only for message updates
+  // Initialize on component mount
   useEffect(() => {
-    if (!user?.id) return;
+    if (user?.id) {
+      initializeRealTimeListeners();
+    }
 
-    // Set up real-time listener for new messages
-    const chatsRef = collection(db, 'chats');
-    const q = query(
-      chatsRef,
-      where('participantIds', 'array-contains', user.id)
-    );
-    
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      // Only update if there are actual changes
-      querySnapshot.docChanges().forEach((change) => {
-        if (change.type === 'modified') {
-          // Update the specific chat in our state
-          const updatedChat = change.doc.data();
-          setChats(prevChats => {
-            const updatedChats = prevChats.map(chat => 
-              chat.id === change.doc.id ? { ...chat, ...updatedChat } : chat
-            );
-            
-            // Also update cache
-            setCachedData(`chats_${user.id}`, updatedChats);
-            return updatedChats;
-          });
+    return () => {
+      cleanupListeners();
+    };
+  }, [user?.id, initializeRealTimeListeners, cleanupListeners]);
+
+  // Handle app state changes
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      if (
+        appState.current.match(/inactive|background/) &&
+        nextAppState === 'active'
+      ) {
+        // App came to foreground, reinitialize listeners
+        if (user?.id) {
+          initializeRealTimeListeners();
         }
-      });
+      } else if (nextAppState.match(/inactive|background/)) {
+        // App going to background, cleanup listeners
+        cleanupListeners();
+      }
+
+      appState.current = nextAppState;
     });
 
-    return () => unsubscribe();
-  }, [user]);
+    return () => {
+      subscription.remove();
+    };
+  }, [user?.id, initializeRealTimeListeners, cleanupListeners]);
 
-  // Respond to an interest (accept/decline) - FIXED error handling
+  // Manual refresh function
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    
+    // Force reload by reinitializing listeners
+    if (user?.id) {
+      await initializeRealTimeListeners();
+    }
+    
+    setRefreshing(false);
+  }, [user?.id, initializeRealTimeListeners]);
+
+  // Respond to an interest (accept/decline)
   const respondToInterest = async (interestId, response) => {
     try {
       if (!user?.id) throw new Error('User not available');
@@ -13066,7 +15278,7 @@ export default function Messages() {
       // Find the original sent interest to update
       const interest = receivedInterests.find(i => i.id === interestId);
       if (interest && interest.fromUserId) {
-        // Find the sent interest document ID by querying
+        // Update the sent interest in the other user's collection
         const sentInterestsRef = collection(db, 'Users', interest.fromUserId, 'sentInterests');
         const q = query(sentInterestsRef, where('toUserId', '==', user.id));
         const querySnapshot = await getDocs(q);
@@ -13080,16 +15292,6 @@ export default function Messages() {
           });
         }
       }
-
-      // Update local state
-      setReceivedInterests(prev => 
-        prev.map(item => 
-          item.id === interestId ? { ...item, status: response } : item
-        )
-      );
-      
-      // Update cache
-      await setCachedData(`receivedInterests_${user.id}`, receivedInterests);
 
       if (response === 'accepted') {
         Alert.alert('Success', 'Interest accepted! You can now chat with this user.');
@@ -13136,24 +15338,35 @@ export default function Messages() {
           participantIds: [user.id, interest.fromUserId],
           lastMessage: '',
           lastMessageTime: serverTimestamp(),
-          createdAt: serverTimestamp()
+          createdAt: serverTimestamp(),
+          lastMessageSender: '',
+          unreadCount: { [user.id]: 0, [interest.fromUserId]: 0 }
         };
         
         const chatRef = await addDoc(collection(db, 'chats'), chatData);
         
         // Create participants subcollection
         await Promise.all([
-          addDoc(collection(chatRef, 'participants'), {
+          setDoc(doc(chatRef, 'participants', user.id), {
             userId: user.id,
             userName: user.displayName || `${user.firstName} ${user.lastName}`.trim() || 'You',
             joinedAt: serverTimestamp()
           }),
-          addDoc(collection(chatRef, 'participants'), {
+          setDoc(doc(chatRef, 'participants', interest.fromUserId), {
             userId: interest.fromUserId,
             userName: interest.fromUserName,
             joinedAt: serverTimestamp()
           })
         ]);
+
+        // Create initial message
+        await addDoc(collection(chatRef, 'messages'), {
+          text: 'Chat started!',
+          senderId: user.id,
+          senderName: user.displayName || `${user.firstName} ${user.lastName}`.trim() || 'You',
+          timestamp: serverTimestamp(),
+          type: 'system'
+        });
         
         router.push(`/chat/${chatRef.id}?name=${encodeURIComponent(interest.fromUserName)}&profileId=${interest.fromUserId}`);
       }
@@ -13163,39 +15376,122 @@ export default function Messages() {
     }
   };
 
+  // Start a new chat directly
+  const startNewChat = async (userId, userName) => {
+    try {
+      if (!user?.id) throw new Error('User not available');
+
+      // Check if chat already exists
+      const chatsRef = collection(db, 'chats');
+      const q = query(
+        chatsRef,
+        where('participantIds', 'array-contains', user.id)
+      );
+      
+      const querySnapshot = await getDocs(q);
+      let existingChat = null;
+      
+      querySnapshot.forEach((doc) => {
+        const chatData = doc.data();
+        if (chatData.participantIds && chatData.participantIds.includes(userId)) {
+          existingChat = { id: doc.id, ...chatData };
+        }
+      });
+      
+      if (existingChat) {
+        router.push(`/chat/${existingChat.id}?name=${encodeURIComponent(userName)}&profileId=${userId}`);
+      } else {
+        // Create new chat
+        const chatData = {
+          participants: [
+            user.displayName || `${user.firstName} ${user.lastName}`.trim() || 'You',
+            userName
+          ],
+          participantIds: [user.id, userId],
+          lastMessage: '',
+          lastMessageTime: serverTimestamp(),
+          createdAt: serverTimestamp(),
+          lastMessageSender: '',
+          unreadCount: { [user.id]: 0, [userId]: 0 }
+        };
+        
+        const chatRef = await addDoc(collection(db, 'chats'), chatData);
+        
+        // Create participants subcollection
+        await Promise.all([
+          setDoc(doc(chatRef, 'participants', user.id), {
+            userId: user.id,
+            userName: user.displayName || `${user.firstName} ${user.lastName}`.trim() || 'You',
+            joinedAt: serverTimestamp()
+          }),
+          setDoc(doc(chatRef, 'participants', userId), {
+            userId: userId,
+            userName: userName,
+            joinedAt: serverTimestamp()
+          })
+        ]);
+
+        // Create initial message
+        await addDoc(collection(chatRef, 'messages'), {
+          text: 'Chat started!',
+          senderId: user.id,
+          senderName: user.displayName || `${user.firstName} ${user.lastName}`.trim() || 'You',
+          timestamp: serverTimestamp(),
+          type: 'system'
+        });
+        
+        router.push(`/chat/${chatRef.id}?name=${encodeURIComponent(userName)}&profileId=${userId}`);
+      }
+    } catch (error) {
+      console.error('Error starting new chat:', error);
+      Alert.alert('Error', 'Failed to start chat. Please try again.');
+    }
+  };
+
+  // Format time for display
   const formatTime = (date) => {
     if (!date) return '';
     
-    const now = new Date();
-    const messageDate = date.toDate ? date.toDate() : new Date(date);
-    const diff = now - messageDate;
-    const minutes = Math.floor(diff / 60000);
-    const hours = Math.floor(diff / 3600000);
-    const days = Math.floor(diff / 86400000);
-    
-    if (minutes < 60) return `${minutes}m ago`;
-    if (hours < 24) return `${hours}h ago`;
-    if (days < 7) return `${days}d ago`;
-    return messageDate.toLocaleDateString();
+    try {
+      const now = new Date();
+      const messageDate = date.toDate ? date.toDate() : new Date(date);
+      const diff = now - messageDate;
+      const minutes = Math.floor(diff / 60000);
+      const hours = Math.floor(diff / 3600000);
+      const days = Math.floor(diff / 86400000);
+      
+      if (minutes < 1) return 'just now';
+      if (minutes < 60) return `${minutes}m ago`;
+      if (hours < 24) return `${hours}h ago`;
+      if (days < 7) return `${days}d ago`;
+      return messageDate.toLocaleDateString();
+    } catch (error) {
+      return '';
+    }
   };
 
   const formatLastSeen = (date) => {
     if (!date) return '';
     
-    const now = new Date();
-    const lastSeenDate = date.toDate ? date.toDate() : new Date(date);
-    const diff = now - lastSeenDate;
-    const minutes = Math.floor(diff / 60000);
-    const hours = Math.floor(diff / 3600000);
-    const days = Math.floor(diff / 86400000);
-    
-    if (minutes < 1) return 'just now';
-    if (minutes < 60) return `${minutes} minutes ago`;
-    if (hours < 24) return `${hours} hours ago`;
-    if (days < 7) return `${days} days ago`;
-    return lastSeenDate.toLocaleDateString();
+    try {
+      const now = new Date();
+      const lastSeenDate = date.toDate ? date.toDate() : new Date(date);
+      const diff = now - lastSeenDate;
+      const minutes = Math.floor(diff / 60000);
+      const hours = Math.floor(diff / 3600000);
+      const days = Math.floor(diff / 86400000);
+      
+      if (minutes < 1) return 'just now';
+      if (minutes < 60) return `${minutes} minutes ago`;
+      if (hours < 24) return `${hours} hours ago`;
+      if (days < 7) return `${days} days ago`;
+      return lastSeenDate.toLocaleDateString();
+    } catch (error) {
+      return '';
+    }
   };
 
+  // Render chat item
   const renderMessageItem = ({ item }) => {
     const isOnline = onlineUsers.includes(item.otherParticipantId);
     
@@ -13221,7 +15517,7 @@ export default function Messages() {
           <Text
             style={[
               styles.messageText,
-              item.unread && styles.unreadMessage
+              item.unreadCount && item.unreadCount[user.id] > 0 && styles.unreadMessage
             ]}
             numberOfLines={1}
           >
@@ -13238,11 +15534,18 @@ export default function Messages() {
             </Text>
           )}
         </View>
-        {item.unread && <View style={styles.unreadBadge} />}
+        {item.unreadCount && item.unreadCount[user.id] > 0 && (
+          <View style={styles.unreadBadge}>
+            <Text style={styles.unreadBadgeText}>
+              {item.unreadCount[user.id]}
+            </Text>
+          </View>
+        )}
       </TouchableOpacity>
     );
   };
 
+  // Render interest item
   const renderInterestItem = ({ item }) => {
     const isReceived = activeTab === 'Interests Received';
     const interest = isReceived ? item : item;
@@ -13253,7 +15556,10 @@ export default function Messages() {
     
     return (
       <View style={styles.interestItem}>
-        <View style={styles.avatarContainer}>
+        <TouchableOpacity 
+          style={styles.avatarContainer}
+          onPress={() => router.push(`/profile/${userId}`)}
+        >
           <Image
             source={{ uri: userPhoto || 'https://via.placeholder.com/150?text=User' }}
             style={styles.interestAvatar}
@@ -13261,7 +15567,7 @@ export default function Messages() {
           {onlineUsers.includes(userId) && (
             <View style={styles.onlineBadge} />
           )}
-        </View>
+        </TouchableOpacity>
         <View style={styles.interestContent}>
           <View style={styles.interestHeader}>
             <Text style={styles.interestName}>{userName}</Text>
@@ -13313,6 +15619,7 @@ export default function Messages() {
     );
   };
 
+  // Filter data based on search query
   const getFilteredData = () => {
     if (activeTab === 'Chats') {
       return chats.filter(chat =>
@@ -13330,9 +15637,10 @@ export default function Messages() {
     return [];
   };
 
+  // Render empty state
   const renderEmptyState = () => {
     if (loading) {
-      return null; // Don't show empty state while loading
+      return null;
     }
     
     if (activeTab === 'Chats') {
@@ -13353,20 +15661,17 @@ export default function Messages() {
     }
   };
 
-  // Show loading indicator while data is being fetched
-  if (loading) {
+  // Show loading indicator while initializing
+  if (loading && chats.length === 0 && receivedInterests.length === 0 && sentInterests.length === 0) {
     return (
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
         <View style={styles.container}>
-          {/* Header */}
           <View style={styles.header}>
             <Text style={styles.headerTitle}>{translations.messages[language]}</Text>
             <TouchableOpacity style={styles.headerButton} onPress={onRefresh}>
               <Ionicons name="refresh" size={20} color="#333" />
             </TouchableOpacity>
           </View>
-
-          {/* Loading indicator */}
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#FF6B6B" />
             <Text style={styles.loadingText}>{translations.loading[language]}</Text>
@@ -13377,7 +15682,7 @@ export default function Messages() {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
@@ -13427,6 +15732,7 @@ export default function Messages() {
                 placeholder={translations.searchMessages[language]}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
+                placeholderTextColor="#888"
               />
             </View>
             <TouchableOpacity style={styles.filterButton}>
@@ -13452,10 +15758,10 @@ export default function Messages() {
               titleColor="#666"
             />
           }
+          initialNumToRender={10}
+          maxToRenderPerBatch={10}
+          windowSize={5}
         />
-        
-        {/* Bottom padding to avoid tab bar overlap */}
-        <View style={styles.bottomPadding} />
       </View>
     </SafeAreaView>
   );
@@ -13497,9 +15803,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     position: 'relative',
   },
-  activeTabButton: {
-    // No additional styling needed as we're using the indicator
-  },
+  activeTabButton: {},
   tabText: {
     fontSize: 14,
     color: '#6c757d',
@@ -13556,7 +15860,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   listContainer: {
-    paddingBottom: 20,
     flexGrow: 1,
   },
   messageItem: {
@@ -13641,11 +15944,18 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   unreadBadge: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
     backgroundColor: '#FF6B6B',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginLeft: 8,
+  },
+  unreadBadgeText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: 'bold',
   },
   interestItem: {
     flexDirection: 'row',
@@ -13761,8 +16071,5 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 16,
     color: '#6c757d',
-  },
-  bottomPadding: {
-    height: 30, // Added bottom padding for tab bar
   },
 });

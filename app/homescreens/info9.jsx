@@ -9755,6 +9755,882 @@
 
 //30/09/2025
 //app/homescreens/info9.jsx
+// import React, { useState, useEffect, useRef } from 'react';
+// import {
+//   View,
+//   Text,
+//   TextInput,
+//   TouchableOpacity,
+//   StyleSheet,
+//   Alert,
+//   KeyboardAvoidingView,
+//   Platform,
+//   ActivityIndicator,
+//   Image,
+//   Modal,
+//   Animated,
+//   ScrollView
+// } from 'react-native';
+// import { MaterialIcons, Ionicons } from '@expo/vector-icons';
+// import { useRouter } from 'expo-router';
+// import { useLanguage } from '../context/LanguageContext';
+// import { useProfile } from '../context/ProfileContext';
+// import { useFirestore } from '../hooks/useFirebase';
+// import { serverTimestamp } from 'firebase/firestore';
+// import { sendOtp, verifyOtp } from '../services/otpService';
+// import { useProfileNavigation } from '../utils/navigationHelper';
+
+// export default function Info9() {
+//   const router = useRouter();
+//   const { language, toggleLanguage } = useLanguage();
+//   const { profileFor, getPrefix } = useProfile();
+//   const { saveUserProfile, userData } = useFirestore();
+//   const { getNextScreen, getPreviousScreen } = useProfileNavigation();
+//   const [mobileNumber, setMobileNumber] = useState('');
+//   const [otp, setOtp] = useState(['', '', '', '', '', '']);
+//   const [isOtpSent, setIsOtpSent] = useState(false);
+//   const [countdown, setCountdown] = useState(30);
+//   const [isResendDisabled, setIsResendDisabled] = useState(true);
+//   const [isLoading, setIsLoading] = useState(false);
+//   const [sessionId, setSessionId] = useState('');
+//   const [showSuccessModal, setShowSuccessModal] = useState(false);
+//   const [showErrorModal, setShowErrorModal] = useState(false);
+//   const [modalMessage, setModalMessage] = useState('');
+//   const shakeAnimation = useRef(new Animated.Value(0)).current;
+
+//   // Load existing data
+//   useEffect(() => {
+//     if (userData && userData.mobileNumber) {
+//       const numberWithoutCountryCode = userData.mobileNumber.replace('+91', '');
+//       setMobileNumber(numberWithoutCountryCode);
+//     }
+//   }, [userData]);
+
+//   // Translations
+//   const translations = {
+//     title: {
+//       ENG: `${getPrefix()} Mobile Verification`,
+//       HI: profileFor === 'MySelf' ? "आपका मोबाइल सत्यापन" :
+//           profileFor === 'My Son' ? "आपके बेटे का मोबाइल सत्यापन" :
+//           profileFor === 'My Daughter' ? "आपकी बेटी का मोबाइल सत्यापन" :
+//           profileFor === 'My Sister' ? "आपकी बहन का मोबाइल सत्यापन" :
+//           profileFor === 'My Brother' ? "आपके भाई का मोबाइल सत्यापन" :
+//           profileFor === 'My Friend' ? "आपके दोस्त का मोबाइल सत्यापन" :
+//           profileFor === 'Cousin' ? "आपके चचेरे भाई का मोबाइल सत्यापन" :
+//           "आपके रिश्तेदार का मोबाइल सत्यापन"
+//     },
+//     subtitle: {
+//       ENG: "We'll send you a verification code",
+//       HI: profileFor === 'MySelf' ? "हम आपको एक सत्यापन कोड भेजेंगे" :
+//           profileFor === 'My Son' ? "हम आपको एक सत्यापन कोड भेजेंगे" :
+//           profileFor === 'My Daughter' ? "हम आपको एक सत्यापन कोड भेजेंगे" :
+//           profileFor === 'My Sister' ? "हम आपको एक सत्यापन कोड भेजेंगे" :
+//           profileFor === 'My Brother' ? "हम आपको एक सत्यापन कोड भेजेंगे" :
+//           profileFor === 'My Friend' ? "हम आपको एक सत्यापन कोड भेजेंगे" :
+//           profileFor === 'Cousin' ? "हम आपको एक सत्यापन कोड भेजेंगे" :
+//           "हम आपको एक सत्यापन कोड भेजेंगे"
+//     },
+//     enterMobile: {
+//       ENG: `Enter ${getPrefix().toLowerCase()} mobile number`,
+//       HI: profileFor === 'MySelf' ? "अपना मोबाइल नंबर दर्ज करें" :
+//           profileFor === 'My Son' ? "अपने बेटे का मोबाइल नंबर दर्ज करें" :
+//           profileFor === 'My Daughter' ? "अपनी बेटी का मोबाइल नंबर दर्ज करें" :
+//           profileFor === 'My Sister' ? "अपनी बहन का मोबाइल नंबर दर्ज करें" :
+//           profileFor === 'My Brother' ? "अपने भाई का मोबाइल नंबर दर्ज करें" :
+//           profileFor === 'My Friend' ? "अपने दोस्त का मोबाइल नंबर दर्ज करें" :
+//           profileFor === 'Cousin' ? "अपने चचेरे भाई का मोबाइल नंबर दर्ज करें" :
+//           "अपने रिश्तेदार का मोबाइल नंबर दर्ज करें"
+//     },
+//     sendOtp: {
+//       ENG: "Send OTP",
+//       HI: "OTP भेजें"
+//     },
+//     otpSent: {
+//       ENG: `Code sent to`,
+//       HI: profileFor === 'MySelf' ? "कोड आपके मोबाइल पर भेजा गया" :
+//           profileFor === 'My Son' ? "कोड आपके बेटे के मोबाइल पर भेजा गया" :
+//           profileFor === 'My Daughter' ? "कोड आपकी बेटी के मोबाइल पर भेजा गया" :
+//           profileFor === 'My Sister' ? "कोड आपकी बहन के मोबाइल पर भेजा गया" :
+//           profileFor === 'My Brother' ? "कोड आपके भाई के मोबाइल पर भेजा गया" :
+//           profileFor === 'My Friend' ? "कोड आपके दोस्त के मोबाइल पर भेजा गया" :
+//           profileFor === 'Cousin' ? "कोड आपके चचेरे भाई के मोबाइल पर भेजा गया" :
+//           "कोड आपके रिश्तेदार के मोबाइल पर भेजा गया"
+//     },
+//     enterOtp: {
+//       ENG: "Enter 6-digit code",
+//       HI: "6-अंकीय कोड दर्ज करें"
+//     },
+//     resendIn: {
+//       ENG: "Resend code in",
+//       HI: "कोड पुनः भेजें"
+//     },
+//     didntReceive: {
+//       ENG: "Didn't receive code?",
+//       HI: "कोड प्राप्त नहीं हुआ?"
+//     },
+//     resend: {
+//       ENG: "Resend",
+//       HI: "पुनः भेजें"
+//     },
+//     verify: {
+//       ENG: "Verify",
+//       HI: "सत्यापित करें"
+//     },
+//     verified: {
+//       ENG: `${getPrefix()} mobile number verified successfully!`,
+//       HI: profileFor === 'MySelf' ? "आपका मोबाइल नंबर सफलतापूर्वक सत्यापित!" :
+//           profileFor === 'My Son' ? "आपके बेटे का मोबाइल नंबर सफलतापूर्वक सत्यापित!" :
+//           profileFor === 'My Daughter' ? "आपकी बेटी का मोबाइल नंबर सफलतापूर्वक सत्यापित!" :
+//           profileFor === 'My Sister' ? "आपकी बहन का मोबाइल नंबर सफलतापूर्वक सत्यापित!" :
+//           profileFor === 'My Brother' ? "आपके भाई का मोबाइल नंबर सफलतापूर्वक सत्यापित!" :
+//           profileFor === 'My Friend' ? "आपके दोस्त का मोबाइल नंबर सफलतापूर्वक सत्यापित!" :
+//           profileFor === 'Cousin' ? "आपके चचेरे भाई का मोबाइल नंबर सफलतापूर्वक सत्यापित!" :
+//           "आपके रिश्तेदार का मोबाइल नंबर सफलतापूर्वक सत्यापित!"
+//     },
+//     validNumber: {
+//       ENG: `Please enter a valid 10-digit ${getPrefix().toLowerCase()} mobile number`,
+//       HI: profileFor === 'MySelf' ? "कृपया अपना वैध 10-अंकीय मोबाइल नंबर दर्ज करें" :
+//           profileFor === 'My Son' ? "कृपया अपने बेटे का वैध 10-अंकीय मोबाइल नंबर दर्ज करें" :
+//           profileFor === 'My Daughter' ? "कृपया अपनी बेटी का वैध 10-अंकीय मोबाइल नंबर दर्ज करें" :
+//           profileFor === 'My Sister' ? "कृपया अपनी बहन का वैध 10-अंकीय मोबाइल नंबर दर्ज करें" :
+//           profileFor === 'My Brother' ? "कृपया अपने भाई का वैध 10-अंकीय मोबाइल नंबर दर्ज करें" :
+//           profileFor === 'My Friend' ? "कृपया अपने दोस्त का वैध 10-अंकीय मोबाइल नंबर दर्ज करें" :
+//           profileFor === 'Cousin' ? "कृपया अपने चचेरे भाई का वैध 10-अंकीय मोबाइल नंबर दर्ज करें" :
+//           "कृपया अपने रिश्तेदार का वैध 10-अंकीय मोबाइल नंबर दर्ज करें"
+//     },
+//     wrongOtp: {
+//       ENG: "Wrong code entered. Please try again.",
+//       HI: "गलत कोड दर्ज किया गया। कृपया पुनः प्रयास करें।"
+//     },
+//     completeOtp: {
+//       ENG: "Please enter the complete 6-digit code",
+//       HI: "कृपया पूरा 6-अंकीय कोड दर्ज करें"
+//     },
+//     editNumber: {
+//       ENG: "Edit Number",
+//       HI: "नंबर संपादित करें"
+//     }
+//   };
+
+//   const otpInputRefs = useRef([]);
+//   const hiddenOtpInputRef = useRef(null);
+
+//   useEffect(() => {
+//     let timer;
+//     if (countdown > 0 && isOtpSent) {
+//       timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+//     } else if (countdown === 0 && isOtpSent) {
+//       setIsResendDisabled(false);
+//     }
+//     return () => clearTimeout(timer);
+//   }, [countdown, isOtpSent]);
+
+//   // Auto-submit OTP when all 6 digits are entered
+//   useEffect(() => {
+//     const enteredOtp = otp.join('');
+//     if (enteredOtp.length === 6 && isOtpSent) {
+//       handleVerifyOtp();
+//     }
+//   }, [otp]);
+
+//   const startShake = () => {
+//     Animated.sequence([
+//       Animated.timing(shakeAnimation, { toValue: 10, duration: 100, useNativeDriver: true }),
+//       Animated.timing(shakeAnimation, { toValue: -10, duration: 100, useNativeDriver: true }),
+//       Animated.timing(shakeAnimation, { toValue: 10, duration: 100, useNativeDriver: true }),
+//       Animated.timing(shakeAnimation, { toValue: 0, duration: 100, useNativeDriver: true })
+//     ]).start();
+//   };
+
+//   const showModalWithMessage = (message, isError = false) => {
+//     setModalMessage(message);
+    
+//     if (isError) {
+//       setShowErrorModal(true);
+//       setTimeout(() => {
+//         setShowErrorModal(false);
+//       }, 3000);
+//     } else {
+//       setShowSuccessModal(true);
+//       setTimeout(() => {
+//         setShowSuccessModal(false);
+//       }, 2000);
+//     }
+//   };
+
+//   const handleSendOtp = async () => {
+//     if (!mobileNumber || mobileNumber.length !== 10) {
+//       showModalWithMessage(translations.validNumber[language], true);
+//       return;
+//     }
+
+//     setIsLoading(true);
+//     try {
+//       const result = await sendOtp(`+91${mobileNumber}`);
+      
+//       if (result.success) {
+//         setSessionId(result.sessionId);
+//         setIsOtpSent(true);
+//         setIsResendDisabled(true);
+//         setCountdown(30);
+//         setOtp(['', '', '', '', '', '']);
+        
+//         // Focus on first OTP input
+//         setTimeout(() => {
+//           if (otpInputRefs.current[0]) {
+//             otpInputRefs.current[0].focus();
+//           }
+//         }, 500);
+//       } else {
+//         showModalWithMessage(result.message, true);
+//       }
+//     } catch (error) {
+//       showModalWithMessage("Failed to send code. Please try again.", true);
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   const handleResendOtp = async () => {
+//     if (!mobileNumber || mobileNumber.length !== 10) {
+//       showModalWithMessage(translations.validNumber[language], true);
+//       return;
+//     }
+
+//     setIsLoading(true);
+//     try {
+//       const result = await sendOtp(`+91${mobileNumber}`);
+      
+//       if (result.success) {
+//         setSessionId(result.sessionId);
+//         setIsResendDisabled(true);
+//         setCountdown(30);
+//         setOtp(['', '', '', '', '', '']);
+//         showModalWithMessage("Code has been resent successfully");
+//       } else {
+//         showModalWithMessage(result.message, true);
+//       }
+//     } catch (error) {
+//       showModalWithMessage("Failed to resend code. Please try again.", true);
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   const handleVerifyOtp = async () => {
+//     const enteredOtp = otp.join('');
+//     if (enteredOtp.length !== 6) {
+//       showModalWithMessage(translations.completeOtp[language], true);
+//       return;
+//     }
+
+//     setIsLoading(true);
+//     try {
+//       const result = await verifyOtp(sessionId, enteredOtp);
+      
+//       if (result.success) {
+//         const profileData = {
+//           ...userData,
+//           mobileNumber: `+91${mobileNumber}`,
+//           isMobileVerified: true,
+//           profileProgress: 90,
+//           updatedAt: serverTimestamp()
+//         };
+
+//         await saveUserProfile(profileData, 9);
+//         showModalWithMessage(translations.verified[language]);
+        
+//         setTimeout(() => {
+//           router.push(getNextScreen('homescreens/info9'));
+//         }, 2000);
+//       } else {
+//         startShake();
+//         showModalWithMessage(translations.wrongOtp[language], true);
+//         setOtp(['', '', '', '', '', '']);
+//         if (otpInputRefs.current[0]) {
+//           otpInputRefs.current[0].focus();
+//         }
+//       }
+//     } catch (error) {
+//       showModalWithMessage("Failed to verify code. Please try again.", true);
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   // Handle individual OTP input
+//   const handleOtpChange = (value, index) => {
+//     if (isNaN(value)) return;
+
+//     const newOtp = [...otp];
+//     newOtp[index] = value;
+//     setOtp(newOtp);
+
+//     // Auto-focus next input
+//     if (value && index < 5) {
+//       otpInputRefs.current[index + 1].focus();
+//     }
+//   };
+
+//   // Handle paste in OTP inputs
+//   const handleOtpPaste = (event) => {
+//     const pastedData = event.nativeEvent.text;
+//     const numbersOnly = pastedData.replace(/\D/g, '');
+    
+//     if (numbersOnly.length === 6) {
+//       const otpArray = numbersOnly.split('');
+//       setOtp(otpArray);
+      
+//       // Focus on last input after paste
+//       if (otpInputRefs.current[5]) {
+//         otpInputRefs.current[5].focus();
+//       }
+//     }
+//   };
+
+//   const handleKeyPress = (e, index) => {
+//     if (e.nativeEvent.key === 'Backspace' && !otp[index] && index > 0) {
+//       otpInputRefs.current[index - 1].focus();
+//     }
+//   };
+
+//   const handleEditNumber = () => {
+//     setIsOtpSent(false);
+//     setOtp(['', '', '', '', '', '']);
+//     setCountdown(30);
+//     setIsResendDisabled(true);
+//   };
+
+//   return (
+//     <View style={styles.container}>
+//       {/* Header with fixed buttons */}
+//       <View style={styles.header}>
+//         <TouchableOpacity 
+//           style={styles.backButton}
+//           onPress={() => router.push(getPreviousScreen('homescreens/info9'))}
+//         >
+//           <MaterialIcons name="arrow-back" size={24} color="#333" />
+//         </TouchableOpacity>
+
+//         <View style={styles.languageToggleContainer}>
+//           <Text style={styles.languageLabel}>ENG</Text>
+//           <TouchableOpacity 
+//             style={styles.toggleContainer}
+//             onPress={toggleLanguage}
+//             activeOpacity={0.8}
+//           >
+//             <View style={[
+//               styles.toggleButton,
+//               { 
+//                 transform: [{ translateX: language === 'ENG' ? 0 : 32 }],
+//                 backgroundColor: language === 'ENG' ? '#6C63FF' : '#FF6B6B'
+//               }
+//             ]}>
+//               <Image 
+//                 source={language === 'ENG' 
+//                   ? require('../../assets/uk-flag.png') 
+//                   : require('../../assets/india-flag.png')} 
+//                 style={styles.flag} 
+//               />
+//             </View>
+//           </TouchableOpacity>
+//           <Text style={styles.languageLabel}>हिंदी</Text>
+//         </View>
+//       </View>
+
+//       <KeyboardAvoidingView
+//         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+//         style={styles.contentContainer}
+//       >
+//         {isLoading && (
+//           <View style={styles.loaderContainer}>
+//             <ActivityIndicator size="large" color="#7e57c2" />
+//           </View>
+//         )}
+
+//         <ScrollView 
+//           contentContainerStyle={styles.scrollContent}
+//           showsVerticalScrollIndicator={false}
+//         >
+//           {/* Show Icon only when OTP is not sent */}
+//           {!isOtpSent && (
+//             <View style={styles.iconSection}>
+//               <View style={styles.iconCircle}>
+//                 <MaterialIcons name="verified-user" size={60} color="white" />
+//               </View>
+//             </View>
+//           )}
+
+//           {/* Header */}
+//           <View style={styles.headerSection}>
+//             <Text style={styles.title}>{translations.title[language]}</Text>
+//           </View>
+
+//           {!isOtpSent ? (
+//             <>
+//               {/* Mobile Number Input View */}
+//               <Text style={styles.subtitle}>{translations.subtitle[language]}</Text>
+              
+//               <View style={styles.inputContainer}>
+//                 <TextInput
+//                   style={styles.input}
+//                   placeholder={translations.enterMobile[language]}
+//                   placeholderTextColor="#999"
+//                   keyboardType="phone-pad"
+//                   maxLength={10}
+//                   value={mobileNumber}
+//                   onChangeText={setMobileNumber}
+//                 />
+//               </View>
+//               <TouchableOpacity
+//                 style={[styles.continueButton, isLoading && styles.disabledButton]}
+//                 onPress={handleSendOtp}
+//                 disabled={isLoading}
+//               >
+//                 <Text style={styles.continueButtonText}>{translations.sendOtp[language]}</Text>
+//               </TouchableOpacity>
+//             </>
+//           ) : (
+//             <>
+//               {/* OTP Input View - Clean UI without icon */}
+//               <View style={styles.otpHeader}>
+//                 <View style={styles.otpInfo}>
+//                   <Text style={styles.otpSentText}>
+//                     {translations.otpSent[language]}
+//                   </Text>
+//                   <Text style={styles.mobileNumberText}>
+//                     +91 {mobileNumber}
+//                   </Text>
+//                 </View>
+//                 <TouchableOpacity onPress={handleEditNumber} style={styles.editButton}>
+//                   <MaterialIcons name="edit" size={18} color="#7e57c2" />
+//                   <Text style={styles.editText}>{translations.editNumber[language]}</Text>
+//                 </TouchableOpacity>
+//               </View>
+              
+//               <Text style={styles.otpInstruction}>{translations.enterOtp[language]}</Text>
+              
+//               <Animated.View style={[styles.otpSection, { transform: [{ translateX: shakeAnimation }] }]}>
+//                 {/* Hidden input for better paste handling */}
+//                 <TextInput
+//                   ref={hiddenOtpInputRef}
+//                   style={styles.hiddenInput}
+//                   value={otp.join('')}
+//                   onChangeText={(text) => {
+//                     const numbersOnly = text.replace(/\D/g, '');
+//                     if (numbersOnly.length === 6) {
+//                       const otpArray = numbersOnly.split('');
+//                       setOtp(otpArray);
+//                     }
+//                   }}
+//                   keyboardType="number-pad"
+//                   maxLength={6}
+//                 />
+                
+//                 <View style={styles.otpContainer}>
+//                   {otp.map((digit, index) => (
+//                     <TextInput
+//                       ref={(ref) => (otpInputRefs.current[index] = ref)}
+//                       key={index}
+//                       style={[
+//                         styles.otpInput,
+//                         digit && styles.otpInputFilled
+//                       ]}
+//                       keyboardType="number-pad"
+//                       maxLength={1}
+//                       value={digit}
+//                       onChangeText={(value) => handleOtpChange(value, index)}
+//                       onKeyPress={(e) => handleKeyPress(e, index)}
+//                       onPaste={handleOtpPaste}
+//                       contextMenuHidden={false}
+//                       showSoftInputOnFocus={true}
+//                       selectionColor="#7e57c2"
+//                     />
+//                   ))}
+//                 </View>
+//               </Animated.View>
+
+//               {/* Resend OTP Section */}
+//               <View style={styles.resendContainer}>
+//                 <Text style={styles.countdownText}>
+//                   {countdown > 0
+//                     ? `${translations.resendIn[language]} ${countdown}s`
+//                     : translations.didntReceive[language]}
+//                 </Text>
+//                 <TouchableOpacity
+//                   onPress={handleResendOtp}
+//                   disabled={isResendDisabled || isLoading}
+//                 >
+//                   <Text style={[
+//                     styles.resendText,
+//                     (isResendDisabled || isLoading) && styles.disabledResend
+//                   ]}>
+//                     {translations.resend[language]}
+//                   </Text>
+//                 </TouchableOpacity>
+//               </View>
+
+//               {/* Verify Button */}
+//               <TouchableOpacity
+//                 style={[
+//                   styles.continueButton,
+//                   (otp.join('').length !== 6 || isLoading) && styles.disabledButton
+//                 ]}
+//                 onPress={handleVerifyOtp}
+//                 disabled={otp.join('').length !== 6 || isLoading}
+//               >
+//                 <Text style={styles.continueButtonText}>{translations.verify[language]}</Text>
+//               </TouchableOpacity>
+//             </>
+//           )}
+//         </ScrollView>
+//       </KeyboardAvoidingView>
+
+//       {/* Success Modal */}
+//       <Modal
+//         visible={showSuccessModal}
+//         transparent={true}
+//         animationType="fade"
+//         onRequestClose={() => setShowSuccessModal(false)}
+//       >
+//         <View style={styles.modalOverlay}>
+//           <View style={styles.modalContent}>
+//             <Ionicons name="checkmark-circle" size={50} color="#4CAF50" />
+//             <Text style={styles.modalText}>{modalMessage}</Text>
+//           </View>
+//         </View>
+//       </Modal>
+
+//       {/* Error Modal */}
+//       <Modal
+//         visible={showErrorModal}
+//         transparent={true}
+//         animationType="fade"
+//         onRequestClose={() => setShowErrorModal(false)}
+//       >
+//         <View style={styles.modalOverlay}>
+//           <View style={[styles.modalContent, styles.errorModalContent]}>
+//             <Ionicons name="close-circle" size={50} color="#F44336" />
+//             <Text style={[styles.modalText, styles.errorModalText]}>{modalMessage}</Text>
+//           </View>
+//         </View>
+//       </Modal>
+//     </View>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: '#f8f9fa',
+//   },
+//   header: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     paddingHorizontal: 20,
+//     paddingTop: 50,
+//     paddingBottom: 15,
+//     backgroundColor: 'white',
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#E9ECEF',
+//   },
+//   backButton: {
+//     padding: 10,
+//     backgroundColor: 'white',
+//     borderRadius: 20,
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.1,
+//     shadowRadius: 3,
+//     elevation: 3,
+//   },
+//   languageToggleContainer: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     justifyContent: 'flex-end',
+//     gap: 6,
+//     backgroundColor: 'white',
+//     paddingHorizontal: 10,
+//     paddingVertical: 5,
+//     borderRadius: 20,
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.1,
+//     shadowRadius: 3,
+//     elevation: 3,
+//   },
+//   languageLabel: {
+//     fontWeight: '600',
+//     fontSize: 14,
+//     color: '#495057',
+//   },
+//   toggleContainer: {
+//     width: 60,
+//     height: 28,
+//     borderRadius: 14,
+//     backgroundColor: '#E9ECEF',
+//     justifyContent: 'center',
+//     paddingHorizontal: 2,
+//   },
+//   toggleButton: {
+//     width: 24,
+//     height: 24,
+//     borderRadius: 12,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.2,
+//     shadowRadius: 3,
+//     elevation: 3,
+//   },
+//   flag: {
+//     width: 18,
+//     height: 13,
+//     borderRadius: 2,
+//   },
+//   contentContainer: {
+//     flex: 1,
+//   },
+//   loaderContainer: {
+//     ...StyleSheet.absoluteFillObject,
+//     backgroundColor: 'rgba(255,255,255,0.8)',
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     zIndex: 1000,
+//   },
+//   scrollContent: {
+//     padding: 20,
+//     paddingBottom: 100,
+//     alignItems: 'center',
+//   },
+//   iconSection: {
+//     alignItems: 'center',
+//     marginBottom: 30,
+//     marginTop: 20,
+//   },
+//   iconCircle: {
+//     width: 100,
+//     height: 100,
+//     borderRadius: 50,
+//     backgroundColor: '#7e57c2',
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     shadowColor: '#7e57c2',
+//     shadowOffset: { width: 0, height: 6 },
+//     shadowOpacity: 0.4,
+//     shadowRadius: 8,
+//     elevation: 8,
+//   },
+//   headerSection: {
+//     alignItems: 'center',
+//     marginBottom: 15,
+//   },
+//   title: {
+//     fontSize: 28,
+//     fontWeight: 'bold',
+//     color: '#333',
+//     textAlign: 'center',
+//     marginBottom: 5,
+//   },
+//   subtitle: {
+//     fontSize: 16,
+//     color: '#666',
+//     marginBottom: 30,
+//     textAlign: 'center',
+//     lineHeight: 22,
+//   },
+//   inputContainer: {
+//     width: '100%',
+//     marginBottom: 25,
+//   },
+//   input: {
+//     backgroundColor: 'white',
+//     padding: 16,
+//     borderRadius: 12,
+//     fontSize: 16,
+//     borderWidth: 1,
+//     borderColor: '#ddd',
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.1,
+//     shadowRadius: 3,
+//     elevation: 2,
+//     textAlign: 'center',
+//   },
+//   continueButton: {
+//     backgroundColor: '#7e57c2',
+//     padding: 18,
+//     borderRadius: 30,
+//     width: '100%',
+//     alignItems: 'center',
+//     shadowColor: '#7e57c2',
+//     shadowOffset: { width: 0, height: 4 },
+//     shadowOpacity: 0.3,
+//     shadowRadius: 8,
+//     elevation: 5,
+//     marginTop: 10,
+//   },
+//   disabledButton: {
+//     backgroundColor: '#ADB5BD',
+//   },
+//   continueButtonText: {
+//     color: 'white',
+//     fontSize: 18,
+//     fontWeight: 'bold',
+//   },
+//   otpHeader: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'flex-start',
+//     width: '100%',
+//     marginBottom: 20,
+//     backgroundColor: 'white',
+//     padding: 15,
+//     borderRadius: 12,
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.1,
+//     shadowRadius: 3,
+//     elevation: 2,
+//   },
+//   otpInfo: {
+//     flex: 1,
+//   },
+//   otpSentText: {
+//     color: '#666',
+//     fontSize: 14,
+//     lineHeight: 20,
+//     marginBottom: 5,
+//   },
+//   mobileNumberText: {
+//     color: '#333',
+//     fontSize: 16,
+//     fontWeight: '600',
+//   },
+//   editButton: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     padding: 8,
+//     backgroundColor: '#f3e5f5',
+//     borderRadius: 8,
+//   },
+//   editText: {
+//     color: '#7e57c2',
+//     marginLeft: 5,
+//     fontSize: 14,
+//     fontWeight: '500',
+//   },
+//   otpInstruction: {
+//     fontSize: 16,
+//     color: '#666',
+//     marginBottom: 25,
+//     textAlign: 'center',
+//     width: '100%',
+//   },
+//   otpSection: {
+//     width: '100%',
+//     alignItems: 'center',
+//     marginBottom: 25,
+//   },
+//   hiddenInput: {
+//     position: 'absolute',
+//     width: 1,
+//     height: 1,
+//     opacity: 0,
+//   },
+//   otpContainer: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     width: '100%',
+//     maxWidth: 320,
+//     marginBottom: 15,
+//   },
+//   otpInput: {
+//     backgroundColor: 'white',
+//     width: 50,
+//     height: 55,
+//     borderRadius: 12,
+//     textAlign: 'center',
+//     fontSize: 20,
+//     fontWeight: 'bold',
+//     borderWidth: 2,
+//     borderColor: '#e0e0e0',
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.1,
+//     shadowRadius: 3,
+//     elevation: 2,
+//   },
+//   otpInputFilled: {
+//     borderColor: '#7e57c2',
+//     backgroundColor: '#f3e5f5',
+//   },
+//   resendContainer: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     marginBottom: 25,
+//     justifyContent: 'center',
+//     gap: 8,
+//   },
+//   countdownText: {
+//     color: '#666',
+//     fontSize: 14,
+//   },
+//   resendText: {
+//     color: '#7e57c2',
+//     fontWeight: 'bold',
+//     fontSize: 14,
+//   },
+//   disabledResend: {
+//     color: '#ADB5BD',
+//   },
+//   modalOverlay: {
+//     flex: 1,
+//     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//   },
+//   modalContent: {
+//     backgroundColor: 'white',
+//     padding: 25,
+//     borderRadius: 15,
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//     width: '80%',
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 4 },
+//     shadowOpacity: 0.3,
+//     shadowRadius: 5,
+//     elevation: 6,
+//   },
+//   errorModalContent: {
+//     borderLeftWidth: 6,
+//     borderLeftColor: '#F44336',
+//   },
+//   modalText: {
+//     fontSize: 16,
+//     textAlign: 'center',
+//     marginTop: 15,
+//     color: '#333',
+//     lineHeight: 22,
+//   },
+//   errorModalText: {
+//     color: '#F44336',
+//     fontWeight: '600',
+//   }, 
+// });
+
+
+
+
+
+
+
+
+// 08/10/2025
+// app/homescreens/info9.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
@@ -9762,7 +10638,6 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
@@ -9776,7 +10651,6 @@ import { useRouter } from 'expo-router';
 import { useLanguage } from '../context/LanguageContext';
 import { useProfile } from '../context/ProfileContext';
 import { useFirestore } from '../hooks/useFirebase';
-import { serverTimestamp } from 'firebase/firestore';
 import { sendOtp, verifyOtp } from '../services/otpService';
 import { useProfileNavigation } from '../utils/navigationHelper';
 
@@ -9786,6 +10660,7 @@ export default function Info9() {
   const { profileFor, getPrefix } = useProfile();
   const { saveUserProfile, userData } = useFirestore();
   const { getNextScreen, getPreviousScreen } = useProfileNavigation();
+  
   const [mobileNumber, setMobileNumber] = useState('');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [isOtpSent, setIsOtpSent] = useState(false);
@@ -9796,7 +10671,10 @@ export default function Info9() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
+  
   const shakeAnimation = useRef(new Animated.Value(0)).current;
+  const otpInputRefs = useRef([]);
+  const otpValues = useRef(['', '', '', '', '', '']); // Using ref to prevent re-renders
 
   // Load existing data
   useEffect(() => {
@@ -9805,6 +10683,238 @@ export default function Info9() {
       setMobileNumber(numberWithoutCountryCode);
     }
   }, [userData]);
+
+  // Countdown timer
+  useEffect(() => {
+    let timer;
+    if (countdown > 0 && isOtpSent) {
+      timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+    } else if (countdown === 0 && isOtpSent) {
+      setIsResendDisabled(false);
+    }
+    return () => clearTimeout(timer);
+  }, [countdown, isOtpSent]);
+
+  // Auto-submit OTP when all 6 digits are entered
+  useEffect(() => {
+    const enteredOtp = otp.join('');
+    if (enteredOtp.length === 6 && isOtpSent) {
+      // Auto verify after 1 second
+      const timer = setTimeout(() => {
+        handleVerifyOtp();
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [otp.join('')]);
+
+  const startShake = () => {
+    Animated.sequence([
+      Animated.timing(shakeAnimation, { toValue: 10, duration: 100, useNativeDriver: true }),
+      Animated.timing(shakeAnimation, { toValue: -10, duration: 100, useNativeDriver: true }),
+      Animated.timing(shakeAnimation, { toValue: 10, duration: 100, useNativeDriver: true }),
+      Animated.timing(shakeAnimation, { toValue: 0, duration: 100, useNativeDriver: true })
+    ]).start();
+  };
+
+  const showModalWithMessage = (message, isError = false) => {
+    setModalMessage(message);
+    
+    if (isError) {
+      setShowErrorModal(true);
+      setTimeout(() => {
+        setShowErrorModal(false);
+      }, 3000);
+    } else {
+      setShowSuccessModal(true);
+      setTimeout(() => {
+        setShowSuccessModal(false);
+      }, 2000);
+    }
+  };
+
+  const handleSendOtp = async () => {
+    if (!mobileNumber || mobileNumber.length !== 10) {
+      showModalWithMessage("Please enter a valid 10-digit mobile number", true);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const result = await sendOtp(`+91${mobileNumber}`);
+      
+      if (result.success) {
+        setSessionId(result.sessionId);
+        setIsOtpSent(true);
+        setIsResendDisabled(true);
+        setCountdown(30);
+        setOtp(['', '', '', '', '', '']);
+        otpValues.current = ['', '', '', '', '', ''];
+        
+        // Focus on first OTP input
+        setTimeout(() => {
+          if (otpInputRefs.current[0]) {
+            otpInputRefs.current[0].focus();
+          }
+        }, 500);
+      } else {
+        showModalWithMessage(result.message, true);
+      }
+    } catch (error) {
+      showModalWithMessage("Failed to send code. Please try again.", true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (!mobileNumber || mobileNumber.length !== 10) {
+      showModalWithMessage("Please enter a valid 10-digit mobile number", true);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const result = await sendOtp(`+91${mobileNumber}`);
+      
+      if (result.success) {
+        setSessionId(result.sessionId);
+        setIsResendDisabled(true);
+        setCountdown(30);
+        setOtp(['', '', '', '', '', '']);
+        otpValues.current = ['', '', '', '', '', ''];
+        showModalWithMessage("Code has been resent successfully");
+      } else {
+        showModalWithMessage(result.message, true);
+      }
+    } catch (error) {
+      showModalWithMessage("Failed to resend code. Please try again.", true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    const enteredOtp = otp.join('');
+    if (enteredOtp.length !== 6) {
+      showModalWithMessage("Please enter the complete 6-digit code", true);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const result = await verifyOtp(sessionId, enteredOtp);
+      
+      if (result.success) {
+        const profileData = {
+          mobileNumber: `+91${mobileNumber}`,
+          isMobileVerified: true
+        };
+
+        await saveUserProfile(profileData, 9);
+        showModalWithMessage("Mobile number verified successfully!");
+        
+        setTimeout(() => {
+          router.push(getNextScreen('homescreens/info9'));
+        }, 2000);
+      } else {
+        startShake();
+        showModalWithMessage("Wrong code entered. Please try again.", true);
+        setOtp(['', '', '', '', '', '']);
+        otpValues.current = ['', '', '', '', '', ''];
+        if (otpInputRefs.current[0]) {
+          otpInputRefs.current[0].focus();
+        }
+      }
+    } catch (error) {
+      showModalWithMessage("Failed to verify code. Please try again.", true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle individual OTP input - FIXED VERSION
+  const handleOtpChange = (value, index) => {
+    if (isNaN(value)) return;
+
+    // Update the ref immediately
+    otpValues.current[index] = value;
+    
+    // Update state for UI
+    const newOtp = [...otpValues.current];
+    setOtp(newOtp);
+
+    // Auto-focus next input
+    if (value && index < 5) {
+      setTimeout(() => {
+        if (otpInputRefs.current[index + 1]) {
+          otpInputRefs.current[index + 1].focus();
+        }
+      }, 10);
+    }
+  };
+
+  // Handle paste in OTP inputs - FIXED VERSION
+  const handleOtpPaste = (event) => {
+    const pastedData = event.nativeEvent.text;
+    const numbersOnly = pastedData.replace(/\D/g, '');
+    
+    if (numbersOnly.length === 6) {
+      const otpArray = numbersOnly.split('');
+      
+      // Update both ref and state
+      otpValues.current = [...otpArray];
+      setOtp(otpArray);
+      
+      // Focus on last input after paste
+      setTimeout(() => {
+        if (otpInputRefs.current[5]) {
+          otpInputRefs.current[5].focus();
+        }
+      }, 10);
+    }
+  };
+
+  // Handle text change from hidden input (for better paste support)
+  const handleHiddenInputChange = (text) => {
+    const numbersOnly = text.replace(/\D/g, '');
+    
+    if (numbersOnly.length === 6) {
+      const otpArray = numbersOnly.split('');
+      
+      // Update both ref and state
+      otpValues.current = [...otpArray];
+      setOtp(otpArray);
+      
+      // Focus on last input after paste
+      setTimeout(() => {
+        if (otpInputRefs.current[5]) {
+          otpInputRefs.current[5].focus();
+        }
+      }, 10);
+    }
+  };
+
+  const handleKeyPress = (e, index) => {
+    if (e.nativeEvent.key === 'Backspace' && !otp[index] && index > 0) {
+      otpInputRefs.current[index - 1].focus();
+    }
+  };
+
+  const handleEditNumber = () => {
+    setIsOtpSent(false);
+    setOtp(['', '', '', '', '', '']);
+    otpValues.current = ['', '', '', '', '', ''];
+    setCountdown(30);
+    setIsResendDisabled(true);
+  };
+
+  // Handle OTP input focus
+  const handleOtpFocus = (index) => {
+    // When focusing on an input, ensure the ref is in sync
+    if (otpInputRefs.current[index]) {
+      otpInputRefs.current[index].focus();
+    }
+  };
 
   // Translations
   const translations = {
@@ -9886,219 +10996,7 @@ export default function Info9() {
           profileFor === 'My Friend' ? "आपके दोस्त का मोबाइल नंबर सफलतापूर्वक सत्यापित!" :
           profileFor === 'Cousin' ? "आपके चचेरे भाई का मोबाइल नंबर सफलतापूर्वक सत्यापित!" :
           "आपके रिश्तेदार का मोबाइल नंबर सफलतापूर्वक सत्यापित!"
-    },
-    validNumber: {
-      ENG: `Please enter a valid 10-digit ${getPrefix().toLowerCase()} mobile number`,
-      HI: profileFor === 'MySelf' ? "कृपया अपना वैध 10-अंकीय मोबाइल नंबर दर्ज करें" :
-          profileFor === 'My Son' ? "कृपया अपने बेटे का वैध 10-अंकीय मोबाइल नंबर दर्ज करें" :
-          profileFor === 'My Daughter' ? "कृपया अपनी बेटी का वैध 10-अंकीय मोबाइल नंबर दर्ज करें" :
-          profileFor === 'My Sister' ? "कृपया अपनी बहन का वैध 10-अंकीय मोबाइल नंबर दर्ज करें" :
-          profileFor === 'My Brother' ? "कृपया अपने भाई का वैध 10-अंकीय मोबाइल नंबर दर्ज करें" :
-          profileFor === 'My Friend' ? "कृपया अपने दोस्त का वैध 10-अंकीय मोबाइल नंबर दर्ज करें" :
-          profileFor === 'Cousin' ? "कृपया अपने चचेरे भाई का वैध 10-अंकीय मोबाइल नंबर दर्ज करें" :
-          "कृपया अपने रिश्तेदार का वैध 10-अंकीय मोबाइल नंबर दर्ज करें"
-    },
-    wrongOtp: {
-      ENG: "Wrong code entered. Please try again.",
-      HI: "गलत कोड दर्ज किया गया। कृपया पुनः प्रयास करें।"
-    },
-    completeOtp: {
-      ENG: "Please enter the complete 6-digit code",
-      HI: "कृपया पूरा 6-अंकीय कोड दर्ज करें"
-    },
-    editNumber: {
-      ENG: "Edit Number",
-      HI: "नंबर संपादित करें"
     }
-  };
-
-  const otpInputRefs = useRef([]);
-  const hiddenOtpInputRef = useRef(null);
-
-  useEffect(() => {
-    let timer;
-    if (countdown > 0 && isOtpSent) {
-      timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-    } else if (countdown === 0 && isOtpSent) {
-      setIsResendDisabled(false);
-    }
-    return () => clearTimeout(timer);
-  }, [countdown, isOtpSent]);
-
-  // Auto-submit OTP when all 6 digits are entered
-  useEffect(() => {
-    const enteredOtp = otp.join('');
-    if (enteredOtp.length === 6 && isOtpSent) {
-      handleVerifyOtp();
-    }
-  }, [otp]);
-
-  const startShake = () => {
-    Animated.sequence([
-      Animated.timing(shakeAnimation, { toValue: 10, duration: 100, useNativeDriver: true }),
-      Animated.timing(shakeAnimation, { toValue: -10, duration: 100, useNativeDriver: true }),
-      Animated.timing(shakeAnimation, { toValue: 10, duration: 100, useNativeDriver: true }),
-      Animated.timing(shakeAnimation, { toValue: 0, duration: 100, useNativeDriver: true })
-    ]).start();
-  };
-
-  const showModalWithMessage = (message, isError = false) => {
-    setModalMessage(message);
-    
-    if (isError) {
-      setShowErrorModal(true);
-      setTimeout(() => {
-        setShowErrorModal(false);
-      }, 3000);
-    } else {
-      setShowSuccessModal(true);
-      setTimeout(() => {
-        setShowSuccessModal(false);
-      }, 2000);
-    }
-  };
-
-  const handleSendOtp = async () => {
-    if (!mobileNumber || mobileNumber.length !== 10) {
-      showModalWithMessage(translations.validNumber[language], true);
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const result = await sendOtp(`+91${mobileNumber}`);
-      
-      if (result.success) {
-        setSessionId(result.sessionId);
-        setIsOtpSent(true);
-        setIsResendDisabled(true);
-        setCountdown(30);
-        setOtp(['', '', '', '', '', '']);
-        
-        // Focus on first OTP input
-        setTimeout(() => {
-          if (otpInputRefs.current[0]) {
-            otpInputRefs.current[0].focus();
-          }
-        }, 500);
-      } else {
-        showModalWithMessage(result.message, true);
-      }
-    } catch (error) {
-      showModalWithMessage("Failed to send code. Please try again.", true);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleResendOtp = async () => {
-    if (!mobileNumber || mobileNumber.length !== 10) {
-      showModalWithMessage(translations.validNumber[language], true);
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const result = await sendOtp(`+91${mobileNumber}`);
-      
-      if (result.success) {
-        setSessionId(result.sessionId);
-        setIsResendDisabled(true);
-        setCountdown(30);
-        setOtp(['', '', '', '', '', '']);
-        showModalWithMessage("Code has been resent successfully");
-      } else {
-        showModalWithMessage(result.message, true);
-      }
-    } catch (error) {
-      showModalWithMessage("Failed to resend code. Please try again.", true);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = async () => {
-    const enteredOtp = otp.join('');
-    if (enteredOtp.length !== 6) {
-      showModalWithMessage(translations.completeOtp[language], true);
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const result = await verifyOtp(sessionId, enteredOtp);
-      
-      if (result.success) {
-        const profileData = {
-          ...userData,
-          mobileNumber: `+91${mobileNumber}`,
-          isMobileVerified: true,
-          profileProgress: 90,
-          updatedAt: serverTimestamp()
-        };
-
-        await saveUserProfile(profileData, 9);
-        showModalWithMessage(translations.verified[language]);
-        
-        setTimeout(() => {
-          router.push(getNextScreen('homescreens/info9'));
-        }, 2000);
-      } else {
-        startShake();
-        showModalWithMessage(translations.wrongOtp[language], true);
-        setOtp(['', '', '', '', '', '']);
-        if (otpInputRefs.current[0]) {
-          otpInputRefs.current[0].focus();
-        }
-      }
-    } catch (error) {
-      showModalWithMessage("Failed to verify code. Please try again.", true);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Handle individual OTP input
-  const handleOtpChange = (value, index) => {
-    if (isNaN(value)) return;
-
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-
-    // Auto-focus next input
-    if (value && index < 5) {
-      otpInputRefs.current[index + 1].focus();
-    }
-  };
-
-  // Handle paste in OTP inputs
-  const handleOtpPaste = (event) => {
-    const pastedData = event.nativeEvent.text;
-    const numbersOnly = pastedData.replace(/\D/g, '');
-    
-    if (numbersOnly.length === 6) {
-      const otpArray = numbersOnly.split('');
-      setOtp(otpArray);
-      
-      // Focus on last input after paste
-      if (otpInputRefs.current[5]) {
-        otpInputRefs.current[5].focus();
-      }
-    }
-  };
-
-  const handleKeyPress = (e, index) => {
-    if (e.nativeEvent.key === 'Backspace' && !otp[index] && index > 0) {
-      otpInputRefs.current[index - 1].focus();
-    }
-  };
-
-  const handleEditNumber = () => {
-    setIsOtpSent(false);
-    setOtp(['', '', '', '', '', '']);
-    setCountdown(30);
-    setIsResendDisabled(true);
   };
 
   return (
@@ -10204,7 +11102,7 @@ export default function Info9() {
                 </View>
                 <TouchableOpacity onPress={handleEditNumber} style={styles.editButton}>
                   <MaterialIcons name="edit" size={18} color="#7e57c2" />
-                  <Text style={styles.editText}>{translations.editNumber[language]}</Text>
+                  <Text style={styles.editText}>Edit Number</Text>
                 </TouchableOpacity>
               </View>
               
@@ -10213,16 +11111,9 @@ export default function Info9() {
               <Animated.View style={[styles.otpSection, { transform: [{ translateX: shakeAnimation }] }]}>
                 {/* Hidden input for better paste handling */}
                 <TextInput
-                  ref={hiddenOtpInputRef}
                   style={styles.hiddenInput}
                   value={otp.join('')}
-                  onChangeText={(text) => {
-                    const numbersOnly = text.replace(/\D/g, '');
-                    if (numbersOnly.length === 6) {
-                      const otpArray = numbersOnly.split('');
-                      setOtp(otpArray);
-                    }
-                  }}
+                  onChangeText={handleHiddenInputChange}
                   keyboardType="number-pad"
                   maxLength={6}
                 />
@@ -10242,6 +11133,7 @@ export default function Info9() {
                       onChangeText={(value) => handleOtpChange(value, index)}
                       onKeyPress={(e) => handleKeyPress(e, index)}
                       onPaste={handleOtpPaste}
+                      onFocus={() => handleOtpFocus(index)}
                       contextMenuHidden={false}
                       showSoftInputOnFocus={true}
                       selectionColor="#7e57c2"
@@ -10619,5 +11511,5 @@ const styles = StyleSheet.create({
   errorModalText: {
     color: '#F44336',
     fontWeight: '600',
-  }, 
+  },
 });
